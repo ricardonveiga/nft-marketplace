@@ -1,51 +1,64 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useQuery } from '@tanstack/react-query'
-import { api } from '@/lib/api'
+import { NftCard, NftCardSkeleton } from '@/components/nft/nft-card'
+import { Button } from '@/components/ui/button'
+import { useNfts } from '@/hooks/use-nfts'
 
-type HealthResponse = {
-  status: string
-}
+const PAGE_SIZE = 24
+const gridClass = 'grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
 
 export const Route = createFileRoute('/')({
   component: HomePage,
 })
 
 function HomePage() {
-  const { data, isPending, isError } = useQuery({
-    queryKey: ['health'],
-    queryFn: async () => {
-      const response = await api.get<HealthResponse>('/health')
-
-      if (typeof response.data?.status !== 'string') {
-        throw new Error('Resposta da API de saúde fora do formato esperado')
-      }
-
-      return response.data
-    },
+  const { data, isPending, isError, refetch } = useNfts({
+    page: 1,
+    pageSize: PAGE_SIZE,
   })
 
   return (
-    <section className="flex flex-col items-center justify-center gap-4 p-6 py-24 text-center">
-      <h1 className="text-2xl">NFT Marketplace</h1>
+    <div className="mx-auto w-full max-w-7xl px-4 py-12 md:px-8">
+      <section id="mercado" aria-labelledby="titulo-mercado" className="scroll-mt-32">
+        <h1 id="titulo-mercado" className="mb-8 text-3xl md:text-5xl">
+          Descubra NFTs
+        </h1>
 
-      {isPending && (
-        <p data-testid="health-status" className="text-muted-foreground">
-          Carregando status da API...
-        </p>
-      )}
+        {isPending && (
+          <div
+            role="status"
+            aria-label="Carregando NFTs"
+            data-testid="nft-grid-loading"
+            className={gridClass}
+          >
+            {Array.from({ length: 8 }, (_, index) => (
+              <NftCardSkeleton key={index} />
+            ))}
+          </div>
+        )}
 
-      {isError && (
-        <p data-testid="health-status" role="alert" className="text-destructive">
-          Não foi possível conectar à API.
-        </p>
-      )}
+        {isError && (
+          <div role="alert" className="flex flex-col items-center gap-4 py-16 text-center">
+            <p>Não foi possível carregar os NFTs.</p>
+            <Button onClick={() => refetch()}>Tentar novamente</Button>
+          </div>
+        )}
 
-      {data && (
-        <p data-testid="health-status" className="text-foreground">
-          API está{' '}
-          <span className="font-medium text-primary">{data.status}</span>
-        </p>
-      )}
-    </section>
+        {data && data.items.length === 0 && (
+          <p data-testid="nft-empty" className="py-16 text-center text-muted-foreground">
+            Nenhum NFT encontrado.
+          </p>
+        )}
+
+        {data && data.items.length > 0 && (
+          <ul data-testid="nft-grid" className={gridClass}>
+            {data.items.map((nft) => (
+              <li key={nft.id} className="flex">
+                <NftCard nft={nft} />
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+    </div>
   )
 }
