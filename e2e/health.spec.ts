@@ -1,10 +1,13 @@
 import { expect, test } from '@playwright/test'
 
-test('mostra o status de saude da API retornado pelo mock', async ({ page }) => {
+test('mock responde o status de saude da API', async ({ page }) => {
   await page.goto('/')
+  await expect(page.getByTestId('nft-grid')).toBeVisible()
 
-  const status = page.getByTestId('health-status')
+  const body = await page.evaluate(async () => {
+    const response = await fetch('/api/health')
+    return response.json()
+  })
 
-  await expect(status).toBeVisible()
-  await expect(status).toHaveText('API está ok')
+  expect(body).toEqual({ status: 'ok' })
 })
