@@ -21,8 +21,7 @@ src/routeTree.gen.ts
 /blob-report/
 /playwright/.cache/
 
-# Env local
-.env
+# Env local (.env fica versionado com VITE_ENABLE_MOCKS=true como padrão do projeto)
 .env.local
 
 # Editor directories and files

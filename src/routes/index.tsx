@@ -15,6 +15,11 @@ function HomePage() {
     queryKey: ['health'],
     queryFn: async () => {
       const response = await api.get<HealthResponse>('/health')
+
+      if (typeof response.data?.status !== 'string') {
+        throw new Error('Resposta da API de saúde fora do formato esperado')
+      }
+
       return response.data
     },
   })
