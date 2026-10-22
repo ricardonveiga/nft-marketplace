@@ -25,29 +25,27 @@ function HomePage() {
   })
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center gap-4 p-6 text-center">
-      <h1 className="text-2xl font-semibold text-neutral-900">
-        NFT Marketplace
-      </h1>
+    <section className="flex flex-col items-center justify-center gap-4 p-6 py-24 text-center">
+      <h1 className="text-2xl">NFT Marketplace</h1>
 
       {isPending && (
-        <p data-testid="health-status" className="text-neutral-500">
+        <p data-testid="health-status" className="text-muted-foreground">
           Carregando status da API...
         </p>
       )}
 
       {isError && (
-        <p data-testid="health-status" role="alert" className="text-red-600">
+        <p data-testid="health-status" role="alert" className="text-destructive">
           Não foi possível conectar à API.
         </p>
       )}
 
       {data && (
-        <p data-testid="health-status" className="text-neutral-700">
+        <p data-testid="health-status" className="text-foreground">
           API está{' '}
-          <span className="font-medium text-green-600">{data.status}</span>
+          <span className="font-medium text-primary">{data.status}</span>
         </p>
       )}
-    </main>
+    </section>
   )
 }
