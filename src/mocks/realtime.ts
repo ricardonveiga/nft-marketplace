@@ -147,6 +147,7 @@ export function orderUpdatedEvent(order: StoredOrder): OrderUpdatedEvent {
     occurredAt: new Date().toISOString(),
     data: {
       status: order.status,
+      settledAt: order.settledAt,
       transactionHash: order.transactionHash,
       declineReason: order.declineReason,
     },

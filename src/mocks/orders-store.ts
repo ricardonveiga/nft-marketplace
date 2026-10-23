@@ -88,6 +88,7 @@ export function listOrders(userId: string): StoredOrder[] {
         ...order,
         version: order.version + 1,
         status: 'declined' as const,
+        settledAt: new Date().toISOString(),
         declineReason: 'Pagamento recusado pela rede. Nenhum valor foi cobrado.',
       }
     }
@@ -98,6 +99,7 @@ export function listOrders(userId: string): StoredOrder[] {
       ...order,
       version: order.version + 1,
       status: 'confirmed' as const,
+      settledAt: new Date().toISOString(),
       transactionHash: fakeTransactionHash(order.id),
     }
   })
@@ -111,4 +113,28 @@ export function listOrders(userId: string): StoredOrder[] {
 
 export function toPublicOrder({ settleAt: _settleAt, ...order }: StoredOrder): Order {
   return order
+}
+
+/** Procura um pedido confirmado pela referência da transação (o "explorador" é público). */
+export function findConfirmedOrderByHash(hash: string): StoredOrder | undefined {
+  try {
+    for (const key of Object.keys(window.localStorage)) {
+      if (!key.startsWith(ORDERS_PREFIX)) {
+        continue
+      }
+
+      const userId = key.slice(ORDERS_PREFIX.length)
+      const match = listOrders(userId).find(
+        (order) => order.status === 'confirmed' && order.transactionHash?.toLowerCase() === hash.toLowerCase(),
+      )
+
+      if (match) {
+        return match
+      }
+    }
+  } catch {
+    // Sem localStorage não há onde procurar.
+  }
+
+  return undefined
 }

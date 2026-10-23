@@ -153,6 +153,7 @@ export const ordersHandlers = [
       },
       wallet: { id: wallet.id, label: wallet.label, address: wallet.address },
       network: body.network,
+      settledAt: null,
       transactionHash: null,
       declineReason: null,
       settleAt: Date.now() + SETTLE_AFTER_MS,

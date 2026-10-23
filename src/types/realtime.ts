@@ -34,6 +34,7 @@ export type NftUpdatedEvent = {
 
 export type OrderState = {
   status: OrderStatus
+  settledAt: string | null
   transactionHash: string | null
   declineReason: string | null
 }

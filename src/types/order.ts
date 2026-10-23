@@ -27,6 +27,8 @@ export type Order = {
   /** Versão do pedido: 1 ao criar, avança quando o pagamento é decidido. */
   version: number
   createdAt: string
+  /** Quando o pagamento foi decidido (confirmado ou recusado); null enquanto pendente. */
+  settledAt: string | null
   items: OrderItem[]
   couponCode: string | null
   subtotalEth: string

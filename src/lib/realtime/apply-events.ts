@@ -191,6 +191,7 @@ export function applyOrderUpdated(queryClient: QueryClient, event: OrderUpdatedE
     ...current,
     version: event.version,
     status: event.data.status,
+    settledAt: event.data.settledAt,
     transactionHash: event.data.transactionHash,
     declineReason: event.data.declineReason,
   })
