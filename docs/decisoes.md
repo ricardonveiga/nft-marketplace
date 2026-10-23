@@ -19,6 +19,27 @@ tudo o que difere dele (ou que ele não define) está listado aqui.
   preço usa inteiros de 0,01 ETH só para a interface. O serializador de search params
   (`src/lib/search-params.ts`) não converte valores em número, para `0.10` não virar `0.1`.
 
+## Carrinho
+
+- **A API calcula tudo**: subtotal, desconto, taxa de rede e total chegam prontos (strings
+  decimais, BigInt no mock); a interface só exibe. Nada é recalculado no cliente.
+- **Taxa de rede**: fixa, 0.0045 ETH por pedido com ao menos um item comprável.
+- **Estoque por edição**: `availableQuantity` = unidades restantes da edição (esgotado = 0).
+  Limite por pedido: 5 unidades; `maxQuantity` do item = menor entre o limite e o estoque.
+- **Itens indisponíveis** (esgotaram ou o estoque ficou abaixo da quantidade) continuam na
+  lista, sinalizados, **ficam fora dos valores** e bloqueiam a finalização até serem resolvidos.
+- **Cupons do mock**: `KURIO10` (10%), `GENESIS15` (15%), `EXPIRADO20` (expirado); códigos
+  inexistentes são inválidos. Desconto = subtotal × % (divisão inteira em wei).
+- **Carrinho do visitante** é identificado por `X-Guest-Cart` (UUID em
+  `localStorage['kurio.guest-cart']`). Ao entrar ou cadastrar, `POST /api/cart/merge` passa os
+  itens para a conta, somando quantidades (respeitando o limite). O carrinho de cada conta persiste.
+- **Troca de usuário/logout** zera o cache privado com `resetQueries` e a consulta do carrinho
+  é refeita com a nova identidade.
+- **Ordem das respostas**: cada cotação tem `version`; uma resposta mais antiga nunca
+  sobrescreve a mais nova (base para os eventos de tempo real).
+- **Botão "Finalizar compra"** fica desabilitado até a etapa de pagamento existir.
+- **Detalhe do NFT** continua provisório; o botão "Adicionar ao carrinho" já é o definitivo.
+
 ## Assets
 
 - **Artes dos NFTs**: as 4 imagens do Figma (1254 × 1254, ~2 MB cada) foram redimensionadas
@@ -41,10 +62,11 @@ tudo o que difere dele (ou que ele não define) está listado aqui.
 
 ## Mocks (MSW)
 
-- Cenários por `localStorage['mock-scenario']`: `empty`, `error`, `session-expired`.
+- Cenários por `localStorage['mock-scenario']`: `empty`, `error` (catálogo e carrinho), `session-expired`.
 - Usuários de demonstração: `ana@kurio.test` / `kurio123` e `bruno@kurio.test` / `kurio456`.
   Contas criadas no cadastro ficam em `localStorage['mock-users']` (sobrevivem ao refresh;
-  `resetRegisteredUsers()` volta ao cenário conhecido).
+  `resetRegisteredUsers()` volta ao cenário conhecido). Carrinhos ficam em
+  `localStorage['mock-cart:<dono>']` (`clearMockCarts()` volta ao cenário conhecido).
 - Sessão: token sem estado (`kurio.<usuário>.<expira>`) em `localStorage['kurio.session']`.
 - Respostas de erro: 401 `invalid_credentials` / `session_expired` / `unauthenticated`,
   409 `email_taken`, 422 `validation_error`, 503 no cenário `error`.
@@ -57,5 +79,6 @@ Páginas editoriais, suporte e atividade, "Esqueceu a senha?", login social, ite
 ## Pendências conhecidas
 
 - Seções do Figma ainda não implementadas na Início: hero, promoções e blog.
+- Carrinho montado sem ler o frame do Figma (limite do MCP): estrutura e medidas inferidas.
 - Login (mobile) e Cadastro foram montados sem ler os frames do Figma (limite do MCP):
   estrutura e campos do Cadastro são inferidos a partir do Login.
