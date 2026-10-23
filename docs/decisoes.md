@@ -289,6 +289,10 @@ socket (`order.updated`), ~1,2 s depois da criação.
     (visitante continua recebendo 401; catálogo e carrinho seguem abertos).
   - `transient-failure`: a 1ª tentativa de cada requisição responde 503 e a repetição funciona.
   - `error`: tudo responde 500, inclusive carteiras, perfil e autenticação.
+- **Reset único**: `__mockControl.resetAll()` (`src/mocks/reset.ts`) apaga tudo o que o servidor
+  simulado guarda (todas as chaves `mock-*`: catálogo, cenário, usuários, carrinhos, favoritos, perfis,
+  carteiras, conexão, pedidos, idempotência e sequência), a sessão e o carrinho do visitante,
+  zera os contadores dos cenários e recarrega a página. Resets parciais continuam existindo.
 - Nova tentativa automática (`src/lib/query-retry.ts`, padrão do `QueryClient`): só para consultas
   e só em falha transitória (sem resposta: 1 tentativa; 502/503/504: até 2), com espera de 300 ms
   que dobra. 401, 403, 404, 409, 422 e 500 não são repetidos. Ações do usuário (login, salvar,

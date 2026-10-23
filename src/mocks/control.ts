@@ -1,5 +1,6 @@
 import type { NftUpdatedEvent, OrderUpdatedEvent } from '@/types/realtime'
 import { nftUpdatedEvent, resetCatalogState, updateNftState, type NftChanges } from './catalog-state'
+import { resetAll } from './reset'
 import { resetScenarioState } from './scenario-effects'
 import {
   connectionsInfo,
@@ -34,6 +35,12 @@ export type MockControl = {
   resetCatalog: () => void
   /** Zera os contadores dos cenários (sequência de latência, falhas transitórias já usadas). */
   resetScenario: () => void
+  /**
+   * Restaura TUDO ao estado inicial conhecido: catálogo, cenário, usuários cadastrados, carrinhos,
+   * favoritos, perfis, carteiras, pedidos, sessão e rascunhos. Recarrega a página (`reload: false`
+   * desliga isso; o cache da tela só se atualiza com a recarga).
+   */
+  resetAll: (options?: { reload?: boolean }) => void
 }
 
 declare global {
@@ -63,4 +70,5 @@ export const mockControl: MockControl = {
   connections: connectionsInfo,
   resetCatalog: resetCatalogState,
   resetScenario: resetScenarioState,
+  resetAll,
 }

@@ -95,11 +95,19 @@ localStorage.removeItem('mock-scenario')        // volta ao padrão (sucesso)
 | `payment-declined` | O próximo pagamento é recusado |
 | `order-timeout` | O pedido é criado, mas a resposta não chega (uma vez); reenviar recupera o mesmo pedido |
 
-**Reset.** Para voltar a um estado conhecido, limpe os dados do site (`localStorage.clear(); sessionStorage.clear()`
-no console e recarregue): zera sessão, contas criadas, carrinhos, favoritos, perfis, carteiras,
-pedidos, estoque/preço do catálogo, cenário e o rascunho do pagamento. Para só reiniciar os contadores dos cenários (a
-sequência de latência e as falhas transitórias já usadas) use `__mockControl.resetScenario()`;
-para voltar o catálogo às fixtures, `__mockControl.resetCatalog()`.
+**Reset.** Um comando só devolve **tudo** ao estado inicial conhecido (catálogo, preços e estoque,
+cenário, contas cadastradas, carrinhos, favoritos, perfis, carteiras e conexão, pedidos, sessão e
+rascunhos) e recarrega a página:
+
+```js
+__mockControl.resetAll()                  // restaura tudo e recarrega
+__mockControl.resetAll({ reload: false }) // sem recarregar (o cache da tela só atualiza ao recarregar)
+```
+
+Resets parciais: `__mockControl.resetCatalog()` (só o catálogo) e `__mockControl.resetScenario()`
+(só os contadores dos cenários: sequência de latência e falhas transitórias já usadas). Limpar os
+dados do site (`localStorage.clear(); sessionStorage.clear()` e recarregar) tem o mesmo efeito do
+`resetAll()`. Teste: `e2e/reset.spec.ts`.
 
 ## Reproduzir os fluxos de falha
 
