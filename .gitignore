@@ -34,3 +34,6 @@ src/routeTree.gen.ts
 *.njsproj
 *.sln
 *.sw?
+
+# Gerado pelo TanStack Router
+.tanstack/

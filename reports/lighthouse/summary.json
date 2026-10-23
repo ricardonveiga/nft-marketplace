@@ -1,0 +1,353 @@
+{
+  "generatedAt": "2026-10-23T03:19:32.863Z",
+  "runsPerPageAndProfile": 3,
+  "host": {
+    "os": "Windows_NT 10.0.19045 (x64)",
+    "cpu": "Intel(R) Core(TM) i7-7700HQ CPU @ 2.80GHz",
+    "cpuCores": 8,
+    "memoryGb": 16,
+    "node": "v24.16.0"
+  },
+  "results": [
+    {
+      "page": "Início",
+      "path": "/",
+      "profile": "Mobile",
+      "median": {
+        "performance": 76,
+        "accessibility": 98,
+        "best-practices": 100,
+        "seo": 100,
+        "lcpMs": 3980,
+        "cls": 0.003,
+        "tbtMs": 293,
+        "fcpMs": 2844,
+        "speedIndexMs": 2844
+      },
+      "runs": [
+        {
+          "scores": {
+            "performance": 74,
+            "accessibility": 98,
+            "best-practices": 100,
+            "seo": 100
+          },
+          "metrics": {
+            "lcpMs": 4021,
+            "cls": 0.017,
+            "tbtMs": 346,
+            "fcpMs": 2869,
+            "speedIndexMs": 2869
+          }
+        },
+        {
+          "scores": {
+            "performance": 76,
+            "accessibility": 98,
+            "best-practices": 100,
+            "seo": 100
+          },
+          "metrics": {
+            "lcpMs": 3956,
+            "cls": 0.003,
+            "tbtMs": 293,
+            "fcpMs": 2829,
+            "speedIndexMs": 2829
+          }
+        },
+        {
+          "scores": {
+            "performance": 77,
+            "accessibility": 98,
+            "best-practices": 100,
+            "seo": 100
+          },
+          "metrics": {
+            "lcpMs": 3980,
+            "cls": 0.003,
+            "tbtMs": 258,
+            "fcpMs": 2844,
+            "speedIndexMs": 2844
+          }
+        }
+      ],
+      "environment": {
+        "lighthouse": "13.5.0",
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36",
+        "benchmarkIndex": 1408.5,
+        "throttlingMethod": "simulate",
+        "throttling": {
+          "rttMs": 150,
+          "throughputKbps": 1638.4,
+          "requestLatencyMs": 562.5,
+          "downloadThroughputKbps": 1474.5600000000002,
+          "uploadThroughputKbps": 675,
+          "cpuSlowdownMultiplier": 4
+        },
+        "formFactor": "mobile",
+        "screenEmulation": {
+          "mobile": true,
+          "width": 412,
+          "height": 823,
+          "deviceScaleFactor": 1.75,
+          "disabled": false
+        }
+      }
+    },
+    {
+      "page": "Início",
+      "path": "/",
+      "profile": "Desktop",
+      "median": {
+        "performance": 99,
+        "accessibility": 99,
+        "best-practices": 100,
+        "seo": 100,
+        "lcpMs": 860,
+        "cls": 0.001,
+        "tbtMs": 0,
+        "fcpMs": 619,
+        "speedIndexMs": 651
+      },
+      "runs": [
+        {
+          "scores": {
+            "performance": 99,
+            "accessibility": 99,
+            "best-practices": 100,
+            "seo": 100
+          },
+          "metrics": {
+            "lcpMs": 854,
+            "cls": 0.001,
+            "tbtMs": 0,
+            "fcpMs": 615,
+            "speedIndexMs": 651
+          }
+        },
+        {
+          "scores": {
+            "performance": 99,
+            "accessibility": 99,
+            "best-practices": 100,
+            "seo": 100
+          },
+          "metrics": {
+            "lcpMs": 860,
+            "cls": 0.001,
+            "tbtMs": 0,
+            "fcpMs": 621,
+            "speedIndexMs": 642
+          }
+        },
+        {
+          "scores": {
+            "performance": 99,
+            "accessibility": 99,
+            "best-practices": 100,
+            "seo": 100
+          },
+          "metrics": {
+            "lcpMs": 861,
+            "cls": 0.001,
+            "tbtMs": 0,
+            "fcpMs": 619,
+            "speedIndexMs": 679
+          }
+        }
+      ],
+      "environment": {
+        "lighthouse": "13.5.0",
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36",
+        "benchmarkIndex": 1319.5,
+        "throttlingMethod": "simulate",
+        "throttling": {
+          "rttMs": 40,
+          "throughputKbps": 10240,
+          "requestLatencyMs": 0,
+          "downloadThroughputKbps": 0,
+          "uploadThroughputKbps": 0,
+          "cpuSlowdownMultiplier": 1
+        },
+        "formFactor": "desktop",
+        "screenEmulation": {
+          "mobile": false,
+          "width": 1350,
+          "height": 940,
+          "deviceScaleFactor": 1,
+          "disabled": false
+        }
+      }
+    },
+    {
+      "page": "Detalhe do NFT",
+      "path": "/nft/nft-03",
+      "profile": "Mobile",
+      "median": {
+        "performance": 77,
+        "accessibility": 100,
+        "best-practices": 100,
+        "seo": 100,
+        "lcpMs": 3975,
+        "cls": 0,
+        "tbtMs": 264,
+        "fcpMs": 2918,
+        "speedIndexMs": 2918
+      },
+      "runs": [
+        {
+          "scores": {
+            "performance": 77,
+            "accessibility": 100,
+            "best-practices": 100,
+            "seo": 100
+          },
+          "metrics": {
+            "lcpMs": 3994,
+            "cls": 0,
+            "tbtMs": 276,
+            "fcpMs": 2928,
+            "speedIndexMs": 2928
+          }
+        },
+        {
+          "scores": {
+            "performance": 77,
+            "accessibility": 100,
+            "best-practices": 100,
+            "seo": 100
+          },
+          "metrics": {
+            "lcpMs": 3975,
+            "cls": 0,
+            "tbtMs": 264,
+            "fcpMs": 2918,
+            "speedIndexMs": 2918
+          }
+        },
+        {
+          "scores": {
+            "performance": 78,
+            "accessibility": 100,
+            "best-practices": 100,
+            "seo": 100
+          },
+          "metrics": {
+            "lcpMs": 3956,
+            "cls": 0,
+            "tbtMs": 242,
+            "fcpMs": 2903,
+            "speedIndexMs": 2903
+          }
+        }
+      ],
+      "environment": {
+        "lighthouse": "13.5.0",
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36",
+        "benchmarkIndex": 1288,
+        "throttlingMethod": "simulate",
+        "throttling": {
+          "rttMs": 150,
+          "throughputKbps": 1638.4,
+          "requestLatencyMs": 562.5,
+          "downloadThroughputKbps": 1474.5600000000002,
+          "uploadThroughputKbps": 675,
+          "cpuSlowdownMultiplier": 4
+        },
+        "formFactor": "mobile",
+        "screenEmulation": {
+          "mobile": true,
+          "width": 412,
+          "height": 823,
+          "deviceScaleFactor": 1.75,
+          "disabled": false
+        }
+      }
+    },
+    {
+      "page": "Detalhe do NFT",
+      "path": "/nft/nft-03",
+      "profile": "Desktop",
+      "median": {
+        "performance": 99,
+        "accessibility": 100,
+        "best-practices": 100,
+        "seo": 100,
+        "lcpMs": 886,
+        "cls": 0,
+        "tbtMs": 0,
+        "fcpMs": 625,
+        "speedIndexMs": 642
+      },
+      "runs": [
+        {
+          "scores": {
+            "performance": 99,
+            "accessibility": 100,
+            "best-practices": 100,
+            "seo": 100
+          },
+          "metrics": {
+            "lcpMs": 862,
+            "cls": 0,
+            "tbtMs": 0,
+            "fcpMs": 620,
+            "speedIndexMs": 620
+          }
+        },
+        {
+          "scores": {
+            "performance": 99,
+            "accessibility": 100,
+            "best-practices": 100,
+            "seo": 100
+          },
+          "metrics": {
+            "lcpMs": 886,
+            "cls": 0,
+            "tbtMs": 0,
+            "fcpMs": 625,
+            "speedIndexMs": 642
+          }
+        },
+        {
+          "scores": {
+            "performance": 99,
+            "accessibility": 100,
+            "best-practices": 100,
+            "seo": 100
+          },
+          "metrics": {
+            "lcpMs": 921,
+            "cls": 0,
+            "tbtMs": 0,
+            "fcpMs": 654,
+            "speedIndexMs": 694
+          }
+        }
+      ],
+      "environment": {
+        "lighthouse": "13.5.0",
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36",
+        "benchmarkIndex": 1351.5,
+        "throttlingMethod": "simulate",
+        "throttling": {
+          "rttMs": 40,
+          "throughputKbps": 10240,
+          "requestLatencyMs": 0,
+          "downloadThroughputKbps": 0,
+          "uploadThroughputKbps": 0,
+          "cpuSlowdownMultiplier": 1
+        },
+        "formFactor": "desktop",
+        "screenEmulation": {
+          "mobile": false,
+          "width": 1350,
+          "height": 940,
+          "deviceScaleFactor": 1,
+          "disabled": false
+        }
+      }
+    }
+  ]
+}
