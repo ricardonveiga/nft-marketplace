@@ -202,7 +202,7 @@ test('pagamento confirmado: pedido pendente vira confirmado, carrinho esvazia e 
   await expect(page.getByTestId('order-confirmed')).toBeVisible({ timeout: 10_000 })
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Pedido confirmado')
   await expect(page.getByTestId('order-id')).toHaveText('KUR-000001')
-  await expect(page.getByTestId('order-transaction')).toHaveText(/^0x[0-9a-f]{4}…[0-9a-f]{4}$/)
+  await expect(page.getByTestId('order-transaction')).toHaveText(/^0x[0-9a-f]{64}$/)
   await expect(page.getByTestId('order-item')).toContainText(NEON)
   await expect(page.getByTestId('order-subtotal')).toHaveText('1.99 ETH')
   await expect(page.getByTestId('order-total')).toHaveText('1.9945 ETH')
