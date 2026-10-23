@@ -38,7 +38,7 @@ test('clicar no card abre /nft/:id', async ({ page }) => {
   await page.getByTestId('nft-card').first().click()
 
   await expect(page).toHaveURL(/\/nft\/nft-01$/)
-  await expect(page.getByTestId('nft-id')).toHaveText('nft-01')
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Emerald Ape #042')
 })
 
 test('desktop: 3 colunas com cards de 258 px e espaçamento do Figma', async ({ page }) => {

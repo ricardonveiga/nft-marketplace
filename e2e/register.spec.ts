@@ -133,7 +133,7 @@ test('conflito também vale sem diferenciar maiúsculas', async ({ page }) => {
 
 test('retorno ao fluxo anterior: cadastra e volta para o NFT de origem', async ({ page }) => {
   await page.goto('/nft/nft-03')
-  await page.getByRole('link', { name: 'Entrar' }).click()
+  await page.getByRole('link', { name: 'Entrar', exact: true }).click()
   await expect(page).toHaveURL(/\/login\?redirect=%2Fnft%2Fnft-03/)
 
   // O destino é preservado ao alternar entre as abas do modal.

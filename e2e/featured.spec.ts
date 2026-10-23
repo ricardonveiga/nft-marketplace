@@ -45,7 +45,7 @@ test('clicar no destaque abre o detalhe do NFT', async ({ page }) => {
   await page.getByTestId('featured-nft').getByRole('link').click()
 
   await expect(page).toHaveURL(`/nft/${expected.id}`)
-  await expect(page.getByTestId('nft-id')).toHaveText(expected.id)
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText(expected.name)
 })
 
 test('card tem 310 px de largura e fica logo abaixo dos filtros', async ({ page }) => {

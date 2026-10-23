@@ -98,18 +98,18 @@ test('mostrar e ocultar senha', async ({ page }) => {
 
 test('retorno ao fluxo anterior: volta para o NFT de onde o usuário veio', async ({ page }) => {
   await page.goto('/nft/nft-03')
-  await page.getByRole('link', { name: 'Entrar' }).click()
+  await page.getByRole('link', { name: 'Entrar', exact: true }).click()
 
   await expect(page).toHaveURL(/\/login\?redirect=%2Fnft%2Fnft-03/)
   await signIn(page, ana)
 
   await expect(page).toHaveURL('/nft/nft-03')
-  await expect(page.getByTestId('nft-id')).toHaveText('nft-03')
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Neon Vessel #552')
 })
 
 test('retorno preserva os filtros do catálogo', async ({ page }) => {
   await page.goto('/?category=Fotografia&sort=price-desc')
-  await page.getByRole('link', { name: 'Entrar' }).click()
+  await page.getByRole('link', { name: 'Entrar', exact: true }).click()
   await signIn(page, ana)
 
   await expect(page).toHaveURL(/category=Fotografia/)

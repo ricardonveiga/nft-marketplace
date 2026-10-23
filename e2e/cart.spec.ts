@@ -108,7 +108,7 @@ test('mudança de quantidade é anunciada para leitores de tela', async ({ page 
   ).toHaveText(`Quantidade de ${EMERALD} alterada para 2.`)
 })
 
-test('limite por pedido também vale ao adicionar pelo detalhe', async ({ page }) => {
+test('limite por pedido: a tela de detalhe trava ao chegar no máximo', async ({ page }) => {
   await page.goto('/nft/nft-01')
   const add = page.getByRole('button', { name: 'Adicionar ao carrinho' })
 
@@ -117,15 +117,46 @@ test('limite por pedido também vale ao adicionar pelo detalhe', async ({ page }
     await expect(page.getByRole('status').filter({ hasText: 'Adicionado ao carrinho.' })).toBeVisible()
   }
 
-  await add.click()
-  await expect(page.getByRole('status').filter({ hasText: 'Limite de 5 unidades por pedido' })).toBeVisible()
+  await expect(add).toBeDisabled()
+  await expect(page.getByTestId('quantity-hint')).toContainText('Você já tem o máximo permitido')
 })
 
-test('NFT esgotado não entra no carrinho', async ({ page }) => {
-  await page.goto('/nft/nft-08')
-  await page.getByRole('button', { name: 'Adicionar ao carrinho' }).click()
+test('a API recusa passar do limite e de NFT esgotado, mesmo fora da interface', async ({ page }) => {
+  await page.goto('/')
+  await expect(page.getByTestId('nft-grid')).toBeVisible()
 
-  await expect(page.getByRole('status').filter({ hasText: 'Este NFT está esgotado.' })).toBeVisible()
+  const result = await page.evaluate(async () => {
+    const headers = {
+      'Content-Type': 'application/json',
+      'X-Guest-Cart': localStorage.getItem('kurio.guest-cart') ?? '',
+    }
+    const post = async (body: unknown) => {
+      const response = await fetch('/api/cart/items', { method: 'POST', headers, body: JSON.stringify(body) })
+
+      return { status: response.status, body: await response.json() }
+    }
+
+    return {
+      overLimit: await post({ nftId: 'nft-01', quantity: 6 }),
+      soldOut: await post({ nftId: 'nft-08' }),
+      fractional: await post({ nftId: 'nft-01', quantity: 1.5 }),
+      unknown: await post({ nftId: 'nao-existe' }),
+    }
+  })
+
+  expect(result.overLimit.status).toBe(409)
+  expect(result.overLimit.body.code).toBe('quantity_limit')
+  expect(result.soldOut.status).toBe(409)
+  expect(result.soldOut.body.code).toBe('sold_out')
+  expect(result.fractional.status).toBe(422)
+  expect(result.unknown.status).toBe(404)
+})
+
+test('NFT esgotado não tem como entrar no carrinho pela tela', async ({ page }) => {
+  await page.goto('/nft/nft-08')
+
+  await expect(page.getByText('Esta edição está esgotada.')).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Adicionar ao carrinho' })).toHaveCount(0)
   await expect(cartLink(page, 'Carrinho')).toBeVisible()
 })
 
