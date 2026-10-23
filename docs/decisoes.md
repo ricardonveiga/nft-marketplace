@@ -75,6 +75,31 @@ tudo o que difere dele (ou que ele não define) está listado aqui.
   real é relido. Cenário de teste: `localStorage['mock-scenario'] = 'favorites-error'`.
 - **Dados extras de mock**: descrição e criador por coleção, gerados nas fixtures.
 
+## Perfil do colecionador (`/perfil`)
+
+- **Dados**: nome, e-mail e telefone (opcional, só dígitos; exibido como `(11) 91234-5678`).
+  O perfil é parte do usuário da sessão: ao salvar, o cache da sessão se atualiza e o header
+  reflete na hora. A "consulta" do perfil é a própria consulta da sessão (`/api/auth/session`);
+  a API de perfil tem só as operações de escrita (`PATCH /api/profile`, `PUT`/`DELETE
+  /api/profile/avatar`, `POST /api/profile/password`).
+- **Validação** igual no formulário e na API: nome (2+ caracteres), e-mail válido, telefone com
+  DDD quando informado. "Salvar alterações" só habilita quando algo muda. E-mail de outra conta
+  é conflito (409) e o erro aparece no campo. Trocar o e-mail vale para o próximo login.
+- **Telefone no pagamento**: vem preenchido com o do perfil.
+- **Foto**: aceita PNG, JPEG ou WebP até 2 MB. O navegador recorta o quadrado central e reduz para
+  256 × 256 em WebP (~15 KB) antes de enviar; o que fica guardado é esse data URL, nunca o arquivo
+  original (`lib/image.ts`). Tipo inválido, arquivo grande e imagem corrompida têm mensagem
+  própria. Sem foto, aparecem as iniciais. A foto também aparece no menu da conta (header e barra
+  inferior do mobile). O campo de arquivo é um `<input type="file">` real, rotulado por
+  "Alterar foto" (acessível por teclado).
+- **Senha**: exige a senha atual (errada = erro no campo), a nova segue a mesma regra do cadastro
+  (8+ caracteres, letras e números), tem que ser diferente da atual e ter confirmação. Ao
+  concluir, os campos são limpos e a nova senha vale no próximo login. Cada campo tem o seu botão
+  de mostrar/ocultar.
+- **Mock**: alterações de perfil por usuário em `localStorage['mock-profile:<usuário>']`, por
+  cima das fixtures e dos usuários cadastrados (`resetProfiles()` volta ao cenário conhecido).
+- Sem frame mobile no Figma: abaixo de 1024 px os blocos empilham em uma coluna.
+
 ## Carteiras (`/carteiras`)
 
 - **Regra do desafio**: no máximo **uma principal e uma secundária**. A primeira carteira de uma
@@ -229,6 +254,7 @@ Páginas editoriais, suporte e atividade, "Esqueceu a senha?", login social, ite
 - Carrinho, Detalhe do NFT, Pagamento e Pedido montados sem ler os frames do Figma (limite do
   MCP): estrutura, campos e medidas inferidos.
 - Tela Carteiras montada sem ler o frame do Figma (limite do MCP): estrutura inferida.
-- Falta o recibo completo do pedido, o perfil do colecionador e os extras da Início (promoções, blog).
+- Tela de Perfil montada sem ler o frame do Figma (limite do MCP): estrutura inferida.
+- Falta o recibo completo do pedido e os extras da Início (promoções, blog).
 - Login (mobile) e Cadastro foram montados sem ler os frames do Figma (limite do MCP):
   estrutura e campos do Cadastro são inferidos a partir do Login.
