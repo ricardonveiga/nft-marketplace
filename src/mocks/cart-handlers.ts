@@ -42,7 +42,7 @@ function findCoupon(code: string | undefined) {
 }
 
 /** Calcula a cotação completa a partir do carrinho guardado (tudo em BigInt). */
-function buildCart(stored: StoredCart): Cart {
+export function buildCart(stored: StoredCart): Cart {
   const items: CartItem[] = []
 
   for (const { nftId, quantity } of stored.items) {

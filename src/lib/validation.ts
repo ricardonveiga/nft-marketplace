@@ -91,3 +91,51 @@ export function validateRegister(values: RegisterFields): FieldErrors<RegisterFi
 
   return errors
 }
+
+export type CollectorFields = {
+  name: string
+  email: string
+  phone: string
+}
+
+/** Telefone brasileiro com DDD: 10 ou 11 dígitos (aceita máscara, espaços e +55). */
+export function normalizePhone(value: string) {
+  const digits = value.replace(/\D/g, '')
+
+  return digits.startsWith('55') && digits.length > 11 ? digits.slice(2) : digits
+}
+
+export function validatePhone(value: string): string | undefined {
+  if (!value.trim()) {
+    return 'Informe seu telefone.'
+  }
+
+  const digits = normalizePhone(value)
+
+  return digits.length === 10 || digits.length === 11
+    ? undefined
+    : 'Informe um telefone válido com DDD.'
+}
+
+export function validateCollector(values: CollectorFields): FieldErrors<CollectorFields> {
+  const errors: FieldErrors<CollectorFields> = {}
+  const email = values.email.trim()
+
+  errors.name = validateName(values.name)
+
+  if (!email) {
+    errors.email = 'Informe seu e-mail.'
+  } else if (!isEmail(email)) {
+    errors.email = 'Informe um e-mail válido.'
+  }
+
+  errors.phone = validatePhone(values.phone)
+
+  for (const key of Object.keys(errors) as Array<keyof CollectorFields>) {
+    if (!errors[key]) {
+      delete errors[key]
+    }
+  }
+
+  return errors
+}

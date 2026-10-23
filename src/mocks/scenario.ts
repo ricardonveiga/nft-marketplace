@@ -4,6 +4,8 @@ export type MockScenario =
   | 'error'
   | 'session-expired'
   | 'favorites-error'
+  | 'payment-declined'
+  | 'order-timeout'
 
 export const SCENARIO_STORAGE_KEY = 'mock-scenario'
 
@@ -12,6 +14,8 @@ const SCENARIOS: readonly MockScenario[] = [
   'error',
   'session-expired',
   'favorites-error',
+  'payment-declined',
+  'order-timeout',
 ]
 
 /**
