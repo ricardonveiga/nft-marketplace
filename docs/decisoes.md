@@ -38,7 +38,21 @@ tudo o que difere dele (ou que ele não define) está listado aqui.
 - **Ordem das respostas**: cada cotação tem `version`; uma resposta mais antiga nunca
   sobrescreve a mais nova (base para os eventos de tempo real).
 - **Botão "Finalizar compra"** fica desabilitado até a etapa de pagamento existir.
-- **Detalhe do NFT** continua provisório; o botão "Adicionar ao carrinho" já é o definitivo.
+
+## Detalhe do NFT
+
+- **Galeria**: o Figma só tem 4 artes. A galeria mostra a arte do NFT e as outras 3 do catálogo
+  como miniaturas (dado de mock, só para exercitar a interface). A API devolve `gallery`.
+- **Quantidade**: o máximo é o menor entre o limite por pedido (5), o estoque da edição e o que
+  ainda cabe somando o que já está no carrinho. A API continua sendo quem decide (409 com mensagem).
+- **Edição esgotada**: a tela não oferece compra e explica o motivo.
+- **NFT inexistente**: `GET /api/nfts/:id` devolve 404 e a tela mostra "NFT não encontrado"
+  (o título da aba também muda).
+- **Comprar agora**: adiciona ao carrinho e abre o carrinho (o pagamento ainda não existe).
+- **Favoritos** exigem login (visitante vai ao login e volta ao mesmo NFT). Atualização
+  otimista; se a API falhar o coração volta ao estado anterior, o erro é avisado e o estado
+  real é relido. Cenário de teste: `localStorage['mock-scenario'] = 'favorites-error'`.
+- **Dados extras de mock**: descrição e criador por coleção, gerados nas fixtures.
 
 ## Assets
 
@@ -79,6 +93,7 @@ Páginas editoriais, suporte e atividade, "Esqueceu a senha?", login social, ite
 ## Pendências conhecidas
 
 - Seções do Figma ainda não implementadas na Início: hero, promoções e blog.
-- Carrinho montado sem ler o frame do Figma (limite do MCP): estrutura e medidas inferidas.
+- Carrinho e Detalhe do NFT montados sem ler os frames do Figma (limite do MCP): estrutura e
+  medidas inferidas.
 - Login (mobile) e Cadastro foram montados sem ler os frames do Figma (limite do MCP):
   estrutura e campos do Cadastro são inferidos a partir do Login.
