@@ -15,7 +15,7 @@ test('desktop: header com menu, busca, carrinho e entrar', async ({ page }) => {
   await expect(nav.getByText('Aprenda')).toBeVisible()
 
   await expect(page.getByRole('searchbox', { name: 'Buscar NFTs' })).toBeVisible()
-  await expect(page.getByRole('button', { name: 'Carrinho' })).toBeVisible()
+  await expect(page.getByRole('link', { name: 'Carrinho' })).toBeVisible()
   await expect(page.getByRole('link', { name: 'Entrar' })).toBeVisible()
   await expect(page.getByRole('navigation', { name: 'Navegação inferior' })).toBeHidden()
 })
