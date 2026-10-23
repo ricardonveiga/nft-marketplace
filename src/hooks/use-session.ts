@@ -32,7 +32,6 @@ export function useSession() {
     queryKey: SESSION_QUERY_KEY,
     queryFn: fetchSession,
     staleTime: 5 * 60 * 1000,
-    retry: false,
   })
 }
 

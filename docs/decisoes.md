@@ -247,15 +247,37 @@ socket (`order.updated`), ~1,2 s depois da criação.
 
 ## Mocks (MSW)
 
-- Cenários por `localStorage['mock-scenario']`: `empty`, `error` (catálogo, carrinho e pedidos),
-  `session-expired`, `favorites-error`, `payment-declined`, `order-timeout`.
+- Cenários por `localStorage['mock-scenario']`: `empty`, `session-expired`, `favorites-error`,
+  `payment-declined`, `order-timeout` e os de rede abaixo. Os de rede valem para a API inteira
+  (menos `/api/health`), aplicados por um handler único (`src/mocks/scenario-effects.ts`) que roda
+  antes dos handlers de cada rota:
+  - `slow`: toda resposta demora 1,2 s.
+  - `variable-latency`: latência em ciclo fixo (900, 60, 500, 30 ms) por requisição, então uma
+    resposta antiga chega depois de uma mais nova, sempre do mesmo jeito (`__mockControl.resetScenario()`
+    reinicia o ciclo).
+  - `request-timeout`: o servidor nunca responde; o Axios encerra no timeout (15 s; `VITE_API_TIMEOUT_MS`,
+    3 s nos testes).
+  - `network-error`: a conexão cai (erro de rede, sem resposta HTTP).
+  - `forbidden`: carteiras, pedidos, perfil e favoritos respondem 403 a quem está logado
+    (visitante continua recebendo 401; catálogo e carrinho seguem abertos).
+  - `transient-failure`: a 1ª tentativa de cada requisição responde 503 e a repetição funciona.
+  - `error`: tudo responde 500, inclusive carteiras, perfil e autenticação.
+- Nova tentativa automática (`src/lib/query-retry.ts`, padrão do `QueryClient`): só para consultas
+  e só em falha transitória (sem resposta: 1 tentativa; 502/503/504: até 2), com espera de 300 ms
+  que dobra. 401, 403, 404, 409, 422 e 500 não são repetidos. Ações do usuário (login, salvar,
+  pagar) nunca são repetidas sozinhas: quem repete é o usuário (o pagamento usa a chave de
+  idempotência). Falha ao verificar a sessão mostra "Não foi possível verificar sua sessão" com
+  botão de tentar de novo, em vez de mandar para o login.
+- Os mocks sobem em paralelo à primeira renderização: a tela mostra os esqueletos e o Axios e o
+  Socket.IO esperam o MSW ficar pronto (`src/lib/mocks-ready.ts`).
 - Usuários de demonstração: `ana@kurio.test` / `kurio123` e `bruno@kurio.test` / `kurio456`.
   Contas criadas no cadastro ficam em `localStorage['mock-users']` (sobrevivem ao refresh;
   `resetRegisteredUsers()` volta ao cenário conhecido). Carrinhos ficam em
   `localStorage['mock-cart:<dono>']` (`clearMockCarts()` volta ao cenário conhecido).
 - Sessão: token sem estado (`kurio.<usuário>.<expira>`) em `localStorage['kurio.session']`.
 - Respostas de erro: 401 `invalid_credentials` / `session_expired` / `unauthenticated`,
-  409 `email_taken`, 422 `validation_error`, 503 no cenário `error`.
+  403 `forbidden`, 409 `email_taken`, 422 `validation_error`, 503 `service_unavailable` (falha
+  transitória), 500 `internal_error` (cenário `error`).
 
 ## Fora do escopo (inertes e sinalizados com "Em breve")
 

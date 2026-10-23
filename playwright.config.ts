@@ -36,6 +36,8 @@ export default defineConfig({
     reuseExistingServer: !process.env.CI,
     env: {
       VITE_ENABLE_MOCKS: 'true',
+      // Timeout curto de propósito: o cenário request-timeout não pode custar 15 s por teste.
+      VITE_API_TIMEOUT_MS: '3000',
     },
   },
 })

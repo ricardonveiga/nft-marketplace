@@ -3,6 +3,7 @@ import { useRef, useState, type FormEvent } from 'react'
 import { AuthField } from '@/components/auth/auth-field'
 import { Button } from '@/components/ui/button'
 import { useUpdateProfile } from '@/hooks/use-profile'
+import { isForbidden } from '@/lib/api-error'
 import { formatPhone } from '@/lib/phone'
 import {
   normalizePhone,
@@ -78,7 +79,9 @@ export function ProfileForm({ user }: { user: User }) {
           const body = isAxiosError<ApiErrorBody>(error) ? error.response?.data : undefined
           const fieldErrors: FormErrors = { ...body?.errors }
 
-          if (!body?.errors) {
+          if (isForbidden(error)) {
+            fieldErrors.form = 'Você não tem permissão para alterar este perfil.'
+          } else if (!body?.errors) {
             fieldErrors.form = 'Não foi possível salvar os dados. Tente novamente.'
           }
 

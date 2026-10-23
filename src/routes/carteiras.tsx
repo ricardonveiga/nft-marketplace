@@ -7,6 +7,7 @@ import { WalletFormDialog } from '@/components/wallets/wallet-form-dialog'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useWallets } from '@/hooks/use-wallets'
+import { isForbidden } from '@/lib/api-error'
 import { getSafeRedirect, validateAuthSearch } from '@/lib/redirect'
 import { MAX_WALLETS } from '@/lib/wallets'
 
@@ -33,7 +34,7 @@ function WalletsPage() {
 function WalletsContent() {
   const { redirect } = Route.useSearch()
   const returnTo = getSafeRedirect(redirect)
-  const { data, isPending, isError, refetch } = useWallets()
+  const { data, isPending, isError, error, refetch } = useWallets()
   const busy = useIsMutating({ mutationKey: ['wallets', 'mutation'] }) > 0
   const [feedback, setFeedback] = useState<Feedback | null>(null)
 
@@ -78,8 +79,14 @@ function WalletsContent() {
 
       {isError && (
         <div role="alert" className="flex flex-col items-center gap-4 py-16 text-center">
-          <p>Não foi possível carregar suas carteiras.</p>
-          <Button onClick={() => refetch()}>Tentar novamente</Button>
+          {isForbidden(error) ? (
+            <p>Você não tem permissão para ver estas carteiras.</p>
+          ) : (
+            <>
+              <p>Não foi possível carregar suas carteiras.</p>
+              <Button onClick={() => refetch()}>Tentar novamente</Button>
+            </>
+          )}
         </div>
       )}
 

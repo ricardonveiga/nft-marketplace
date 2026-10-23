@@ -20,7 +20,6 @@ export function useWallets() {
     queryFn: fetchWallets,
     enabled: Boolean(user),
     staleTime: 30 * 1000,
-    retry: 1,
   })
 }
 

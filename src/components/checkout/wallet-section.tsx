@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useConnectWallet, useDisconnectWallet, useWallets } from '@/hooks/use-wallets'
 import { shortAddress } from '@/lib/address'
-import { getApiErrorMessage } from '@/lib/api-error'
+import { getApiErrorMessage, isForbidden } from '@/lib/api-error'
 import type { NftNetwork } from '@/types/nft'
 
 type WalletSectionProps = {
@@ -30,7 +30,7 @@ export function WalletSection({
   walletError,
   networkError,
 }: WalletSectionProps) {
-  const { data, isPending, isError, refetch } = useWallets()
+  const { data, isPending, isError, error, refetch } = useWallets()
   const connect = useConnectWallet()
   const disconnect = useDisconnectWallet()
   const [message, setMessage] = useState<Message | null>(null)
@@ -49,10 +49,16 @@ export function WalletSection({
   if (isError || !data) {
     return (
       <div role="alert" className="flex flex-col items-start gap-3">
-        <p className="text-sm text-destructive">Não foi possível carregar suas carteiras.</p>
-        <Button variant="outline" onClick={() => refetch()}>
-          Tentar novamente
-        </Button>
+        {isForbidden(error) ? (
+          <p className="text-sm text-destructive">Você não tem permissão para ver estas carteiras.</p>
+        ) : (
+          <>
+            <p className="text-sm text-destructive">Não foi possível carregar suas carteiras.</p>
+            <Button variant="outline" onClick={() => refetch()}>
+              Tentar novamente
+            </Button>
+          </>
+        )}
       </div>
     )
   }

@@ -17,6 +17,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { CART_QUERY_KEY } from '@/hooks/use-cart'
 import { useOrder } from '@/hooks/use-orders'
 import { clearCheckoutState, clearIdempotencyKey } from '@/lib/checkout-draft'
+import { isForbidden } from '@/lib/api-error'
 import { formatDateTime } from '@/lib/format'
 import type { User } from '@/types/auth'
 import type { Order } from '@/types/order'
@@ -162,8 +163,14 @@ function OrderContent({ user }: { user: User }) {
   if (isError || !order) {
     return (
       <div role="alert" className="flex flex-col items-center gap-4 py-16 text-center">
-        <p>Não foi possível carregar o pedido.</p>
-        <Button onClick={() => refetch()}>Tentar novamente</Button>
+        {isForbidden(error) ? (
+          <p>Você não tem permissão para ver este pedido.</p>
+        ) : (
+          <>
+            <p>Não foi possível carregar o pedido.</p>
+            <Button onClick={() => refetch()}>Tentar novamente</Button>
+          </>
+        )}
       </div>
     )
   }

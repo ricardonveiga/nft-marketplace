@@ -36,7 +36,6 @@ export function useCart() {
     queryKey: CART_QUERY_KEY,
     queryFn: fetchCart,
     staleTime: 60 * 1000,
-    retry: 1,
   })
 }
 

@@ -13,7 +13,6 @@ export function useFavorites() {
     queryFn: fetchFavorites,
     enabled: Boolean(user),
     staleTime: 60 * 1000,
-    retry: 1,
   })
 }
 

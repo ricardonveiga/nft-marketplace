@@ -1,5 +1,6 @@
 import { Navigate, useRouterState } from '@tanstack/react-router'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useSession } from '@/hooks/use-session'
 import { getSafeRedirect } from '@/lib/redirect'
@@ -35,6 +36,16 @@ export function RequireAuth({ children }: { children: (user: User) => ReactNode 
         className="mx-auto w-full max-w-[1264px] px-6 py-12 md:px-8"
       >
         <Skeleton className="h-8 w-1/3" />
+      </div>
+    )
+  }
+
+  // Só quando não há sessão conhecida: uma releitura que falha não derruba quem já está dentro.
+  if (session.isError && !session.data) {
+    return (
+      <div role="alert" className="mx-auto flex w-full max-w-[1264px] flex-col items-center gap-4 px-6 py-16 text-center md:px-8">
+        <p>Não foi possível verificar sua sessão.</p>
+        <Button onClick={() => session.refetch()}>Tentar novamente</Button>
       </div>
     )
   }

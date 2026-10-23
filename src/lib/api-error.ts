@@ -10,6 +10,11 @@ export function getApiErrorMessage(error: unknown, fallback: string) {
   return fallback
 }
 
+/** 403: o usuário está autenticado, mas não tem permissão para o recurso. */
+export function isForbidden(error: unknown) {
+  return isAxiosError(error) && error.response?.status === 403
+}
+
 export function getApiErrorCode(error: unknown) {
   return isAxiosError<ApiErrorBody>(error) ? error.response?.data?.code : undefined
 }

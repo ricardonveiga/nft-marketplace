@@ -3,6 +3,7 @@ import { useRef, useState, type FormEvent } from 'react'
 import { PasswordField } from '@/components/auth/auth-field'
 import { Button } from '@/components/ui/button'
 import { useChangePassword } from '@/hooks/use-profile'
+import { isForbidden } from '@/lib/api-error'
 import {
   validatePasswordChange,
   type FieldErrors,
@@ -68,7 +69,9 @@ export function PasswordForm() {
           const body = isAxiosError<ApiErrorBody>(error) ? error.response?.data : undefined
           const fieldErrors: FormErrors = { ...body?.errors }
 
-          if (!body?.errors) {
+          if (isForbidden(error)) {
+            fieldErrors.form = 'Você não tem permissão para alterar a senha desta conta.'
+          } else if (!body?.errors) {
             fieldErrors.form = 'Não foi possível alterar a senha. Tente novamente.'
           }
 

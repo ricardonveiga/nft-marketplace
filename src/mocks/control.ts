@@ -1,5 +1,6 @@
 import type { NftUpdatedEvent, OrderUpdatedEvent } from '@/types/realtime'
 import { nftUpdatedEvent, resetCatalogState, updateNftState, type NftChanges } from './catalog-state'
+import { resetScenarioState } from './scenario-effects'
 import {
   connectionsInfo,
   disconnectAll,
@@ -31,6 +32,8 @@ export type MockControl = {
   connections: () => Array<{ userId: string | null }>
   /** Volta o catálogo às fixtures originais. */
   resetCatalog: () => void
+  /** Zera os contadores dos cenários (sequência de latência, falhas transitórias já usadas). */
+  resetScenario: () => void
 }
 
 declare global {
@@ -59,4 +62,5 @@ export const mockControl: MockControl = {
   setOffline,
   connections: connectionsInfo,
   resetCatalog: resetCatalogState,
+  resetScenario: resetScenarioState,
 }
