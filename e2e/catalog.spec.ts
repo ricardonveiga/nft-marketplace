@@ -96,13 +96,13 @@ test.describe('cenários do MSW', () => {
     await page.addInitScript(() => localStorage.setItem('mock-scenario', 'error'))
     await page.goto('/')
 
-    // O TanStack Query tenta 3 vezes com backoff antes de expor o erro.
-    await expect(page.getByRole('alert')).toContainText('Não foi possível carregar os NFTs.', {
+    // 500 não é repetido: o erro aparece direto (promoções e artigos têm os próprios avisos).
+    await expect(page.getByRole('alert').filter({ hasText: 'Não foi possível carregar os NFTs.' })).toBeVisible({
       timeout: 15_000,
     })
 
     await page.evaluate(() => localStorage.removeItem('mock-scenario'))
-    await page.getByRole('button', { name: 'Tentar novamente' }).click()
+    await page.getByRole('region', { name: 'Catálogo de NFTs' }).getByRole('button', { name: 'Tentar novamente' }).click()
 
     await expect(page.getByTestId('nft-card')).toHaveCount(9)
   })

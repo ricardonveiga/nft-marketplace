@@ -103,7 +103,7 @@ test.describe('falhas de conexão', () => {
     })
 
     await switchTo(page, null)
-    await page.getByRole('button', { name: 'Tentar novamente' }).click()
+    await page.getByRole('region', { name: 'Catálogo de NFTs' }).getByRole('button', { name: 'Tentar novamente' }).click()
     await expect(page.getByTestId('nft-grid')).toBeVisible()
   })
 
@@ -142,7 +142,7 @@ test.describe('falhas de conexão', () => {
     })
 
     await switchTo(page, null)
-    await page.getByRole('button', { name: 'Tentar novamente' }).click()
+    await page.getByRole('region', { name: 'Catálogo de NFTs' }).getByRole('button', { name: 'Tentar novamente' }).click()
     await expect(page.getByTestId('nft-grid')).toBeVisible()
   })
 })

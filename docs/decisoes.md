@@ -279,6 +279,17 @@ socket (`order.updated`), ~1,2 s depois da criação.
   403 `forbidden`, 409 `email_taken`, 422 `validation_error`, 503 `service_unavailable` (falha
   transitória), 500 `internal_error` (cenário `error`).
 
+## Promoções e Diário da Cunhagem (Início)
+
+- Conteúdo editorial vindo do MSW (`GET /api/promotions`, `GET /api/blog/posts`; fixtures em
+  `src/mocks/fixtures/editorial.ts`), depois do catálogo. Nada de dado fixo nos componentes.
+- Os cards **não são links**. Nas promoções o cupom aparece como texto e é um cupom real: as
+  fixtures leem os mesmos cupons do carrinho (`KURIO10`, `GENESIS15`), então o desconto prometido
+  é o aplicado. Nos artigos, "Ler artigo (em breve)" segue o padrão inerte do cabeçalho e do
+  rodapé (`aria-disabled`, `title="Em breve"`, cursor bloqueado).
+- Lista vazia (cenário `empty`) esconde a seção; erro mostra aviso com "Tentar novamente" só na
+  seção, sem afetar o catálogo. Datas em UTC (`formatDate`), imagens decorativas (`alt=""`).
+
 ## Fora do escopo (inertes e sinalizados com "Em breve")
 
 Páginas editoriais, suporte e atividade, "Esqueceu a senha?", login social, itens do menu
@@ -286,12 +297,12 @@ Páginas editoriais, suporte e atividade, "Esqueceu a senha?", login social, ite
 
 ## Pendências conhecidas
 
-- Seções do Figma ainda não implementadas na Início: promoções e blog.
+- Promoções e "Diário da Cunhagem" da Início montados sem ler o frame do Figma (limite do MCP):
+  estrutura (3 cards em linha, depois do catálogo) e textos inferidos.
 - Carrinho, Detalhe do NFT, Pagamento e Pedido montados sem ler os frames do Figma (limite do
   MCP): estrutura, campos e medidas inferidos.
 - Tela Carteiras montada sem ler o frame do Figma (limite do MCP): estrutura inferida.
 - Tela de Perfil montada sem ler o frame do Figma (limite do MCP): estrutura inferida.
 - Recibo/confirmação montados sem ler o frame do Figma (limite do MCP): estrutura inferida.
-- Falta só os extras da Início (promoções, blog) no que é funcional.
 - Login (mobile) e Cadastro foram montados sem ler os frames do Figma (limite do MCP):
   estrutura e campos do Cadastro são inferidos a partir do Login.
