@@ -75,6 +75,30 @@ tudo o que difere dele (ou que ele não define) está listado aqui.
   real é relido. Cenário de teste: `localStorage['mock-scenario'] = 'favorites-error'`.
 - **Dados extras de mock**: descrição e criador por coleção, gerados nas fixtures.
 
+## Carteiras (`/carteiras`)
+
+- **Regra do desafio**: no máximo **uma principal e uma secundária**. A primeira carteira de uma
+  conta vira a principal; a segunda, a secundária; não há uma terceira (a API recusa com 409
+  `wallet_limit`, e a tela nem oferece o botão).
+- **Ações**: cadastrar, editar (apelido, endereço, redes), trocar qual é a principal e remover
+  (com diálogo de confirmação). Remover a principal promove a outra. Trocar o endereço de uma
+  carteira conectada encerra a conexão (a conexão passou a valer para outro endereço).
+- **Validação** (a mesma no formulário e na API simulada): apelido de 2 a 30 caracteres, endereço
+  `0x` + 40 caracteres hexadecimais, ao menos uma rede. Endereço repetido na mesma conta é conflito
+  (409 `wallet_duplicate`, sem diferenciar maiúsculas) e o erro aparece no campo.
+- **Formato do endereço**: só aceita o formato `0x…` para as três redes (inclusive Solana), por
+  simplicidade e para casar com os dados do mock. Um endereço real de Solana (base58) seria
+  recusado; num backend de verdade a validação dependeria da rede.
+- **Formulário** em diálogo de 500 px (mesmo padrão do modal de login), com foco preso, Esc para
+  fechar e retorno do foco ao botão. Cada abertura recomeça do estado salvo.
+- **Do pagamento**: o aviso "sem carteiras" e o link "Gerenciar carteiras" levam a
+  `/carteiras?redirect=/pagamento`; depois de salvar, aparece "Voltar ao pagamento". Assim contas
+  novas conseguem concluir uma compra.
+- **Mock**: carteiras por usuário em `localStorage['mock-wallets:<usuário>']`, semeadas com as
+  fixtures (Ana: 2; Bruno: 1; contas novas: nenhuma). A "Carteira secundária" da Ana continua
+  recusando a conexão, para o cenário de recusa do pagamento.
+- **Sem frame mobile** no Figma: a tela empilha as carteiras em uma coluna abaixo de 768 px.
+
 ## Pagamento e pedido
 
 - **Duas etapas**: (1) dados do colecionador + carteira e rede, (2) revisão. O envio só acontece
@@ -82,7 +106,7 @@ tudo o que difere dele (ou que ele não define) está listado aqui.
   volta ao pagamento (o destino é fixado na primeira renderização da guarda de rota).
 - **Dados do colecionador**: nome, e-mail e telefone brasileiro com DDD (10 ou 11 dígitos,
   aceita máscara). Vêm preenchidos com a conta. Os campos são inferidos (sem o Figma).
-- **Carteiras**: do mock (Ana tem 2, Bruno 1; contas novas não têm nenhuma e são avisadas).
+- **Carteiras**: do mock (Ana tem 2, Bruno 1; contas novas não têm nenhuma e cadastram em `/carteiras`).
   A conexão é simulada no servidor: demora ~0,5 s, persiste após refresh, e a "Carteira
   secundária" da Ana sempre **recusa** a conexão (cenário determinístico). Desconectar é possível.
   A rede de pagamento só oferece as redes que a carteira aceita.
@@ -204,7 +228,7 @@ Páginas editoriais, suporte e atividade, "Esqueceu a senha?", login social, ite
 - Seções do Figma ainda não implementadas na Início: promoções e blog.
 - Carrinho, Detalhe do NFT, Pagamento e Pedido montados sem ler os frames do Figma (limite do
   MCP): estrutura, campos e medidas inferidos.
-- Falta o cadastro/edição de carteiras (tela Carteiras), o recibo completo do pedido, o
-  perfil do colecionador e os extras da Início (promoções, blog).
+- Tela Carteiras montada sem ler o frame do Figma (limite do MCP): estrutura inferida.
+- Falta o recibo completo do pedido, o perfil do colecionador e os extras da Início (promoções, blog).
 - Login (mobile) e Cadastro foram montados sem ler os frames do Figma (limite do MCP):
   estrutura e campos do Cadastro são inferidos a partir do Login.
