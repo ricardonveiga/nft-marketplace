@@ -80,6 +80,10 @@ export function Hero() {
       aria-label="Destaques"
       className="relative h-[190px] overflow-hidden rounded-[20px] bg-surface-dark md:h-[450px] md:rounded-xl"
     >
+      {/* Só no mobile (Figma: Ellipse 49/50 do frame mobile). O desktop tem fundo liso. */}
+      <div aria-hidden="true" data-testid="hero-circle" className="pointer-events-none absolute -top-8 -left-20 size-[248px] rounded-full bg-primary/10 md:hidden" />
+      <div aria-hidden="true" data-testid="hero-circle" className="pointer-events-none absolute -top-2.5 left-[73px] size-[248px] rounded-full bg-primary/10 md:hidden" />
+
       <div className="relative flex h-full items-center justify-between gap-2 px-4 md:gap-4 md:px-10">
         <div className="flex max-w-[188px] flex-col gap-3 md:max-w-[600px] md:gap-6">
           <div className="flex flex-col gap-1.5 md:gap-4">

@@ -198,3 +198,21 @@ test('a moldura da arte do hero tem sempre o mesmo fundo creme, seja qual for o 
     await expect(slide(page).getByRole('link')).toHaveCSS('background-color', 'rgb(252, 242, 218)')
   }
 })
+
+test('fundo do hero: círculos decorativos só no mobile; no desktop o fundo é liso', async ({ page }) => {
+  await page.goto('/')
+  await expect(slide(page)).toBeVisible()
+
+  const circles = page.getByTestId('hero-circle')
+  const isMobile = (page.viewportSize()?.width ?? 0) < 768
+
+  await expect(circles).toHaveCount(2)
+
+  for (const circle of await circles.all()) {
+    if (isMobile) {
+      await expect(circle).toBeVisible()
+    } else {
+      await expect(circle).toBeHidden()
+    }
+  }
+})

@@ -56,8 +56,12 @@ tudo o que difere dele (ou que ele não define) está listado aqui.
   conferir o hex exato no Figma.
 - **EXPLORAR** rola até o catálogo e leva o foco para a seção (sem mexer na URL nem nos filtros).
 - **Dimensões**: 1200 × 450 no desktop e 366 × 190 no mobile (medidas do Figma). O fundo é
-  `surface-dark`. Os círculos decorativos atrás do texto foram removidos: não existem no Figma
-  (eram uma adição própria, a partir de um palpite sobre as elipses do mobile).
+  `surface-dark`. **Desktop: fundo liso, sem círculos** (Figma Desktop/Início). **Mobile: as duas
+  elipses translúcidas** (Figma: Ellipse 49/50 do frame mobile), escondidas a partir de 768 px
+  (`md:hidden`). Entre 2 versões anteriores os círculos tinham ido para os dois tamanhos e depois
+  sumido dos dois; agora estão separados por breakpoint e um teste confere (`hero-circle`). Não há
+  gradiente de fundo: as elipses (`primary` a 10%) são o efeito do mobile; o único gradiente que
+  existia era o do texto sobre a imagem, já removido.
 - Sem destaques (catálogo vazio ou erro) o hero mantém texto e botão, sem arte.
 
 ## Carrinho
