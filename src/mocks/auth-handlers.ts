@@ -8,7 +8,8 @@ import type {
   User,
 } from '@/types/auth'
 import { getScenario } from './scenario'
-import { addUser, findUserByEmail, listUsers, type StoredUser } from './users-store'
+import { hashPassword } from './password'
+import { addUser, findUserByEmail, listUsers, passwordMatches, type StoredUser } from './users-store'
 
 const SESSION_TTL_MS = 8 * 60 * 60 * 1000
 
@@ -67,7 +68,7 @@ export const authHandlers = [
     }
 
     const found = findUserByEmail(email)
-    const user = found?.password === password ? found : undefined
+    const user = found && (await passwordMatches(found, password)) ? found : undefined
 
     if (!user) {
       return error(401, {
@@ -118,7 +119,7 @@ export const authHandlers = [
       })
     }
 
-    const user = addUser({ name, email, password })
+    const user = addUser({ name, email, passwordHash: await hashPassword(password) })
     const response: LoginResponse = {
       user: toPublicUser({ ...user, phone: null, avatarUrl: null }),
       token: createToken(user.id),

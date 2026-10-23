@@ -17,7 +17,7 @@ UI (React, shadcn/ui, Tailwind)
 
 - **Rotas e URL:** TanStack Router (por arquivos). Busca, filtros, ordenação, aba e página do
   catálogo vivem nos search params (`src/lib/catalog-search.ts`, `search-params.ts`) e sobrevivem a
-  refresh e ao histórico. Rotas privadas passam por `RequireAuth`. Recurso inexistente em rota válida (NFT, pedido) tem tela própria.
+  refresh e ao histórico. Rotas privadas passam por `RequireAuth`. Recurso inexistente em rota válida (NFT, pedido) e rota inexistente têm tela própria.
 - **REST:** toda chamada passa por `src/lib/api.ts` (Axios, `baseURL: /api`, timeout de 15 s, ou
   `VITE_API_TIMEOUT_MS`). O interceptor de requisição espera o MSW subir, envia `Authorization` e
   `X-Guest-Cart`; o de resposta reconhece `session_expired`.
@@ -99,6 +99,14 @@ Transporte, limitações do ambiente de mocks e o painel `__mockControl`: seçã
 - **Retorno ao fluxo:** `/login?redirect=…` aceita só caminhos internos (`getSafeRedirect` recusa
   `//`, URLs externas e o próprio login). Rotas privadas (`/pagamento`, `/perfil`, `/carteiras`,
   favoritos e pedidos) usam `RequireAuth`.
+- **Senhas:** o mock nunca guarda senha em claro. Contas cadastradas (`mock-users`) e senhas
+  trocadas no perfil (`mock-profile:*`) ficam só como hash SHA-256 (`passwordHash`, 64 hex, via
+  `crypto.subtle`); login e troca de senha comparam hashes. Só as duas credenciais de demonstração
+  (públicas, no código das fixtures) existem em claro, e são "hasheadas" na hora da comparação.
+  Dados de versões antigas (senha em claro) são convertidos em hash na inicialização do mock
+  (`migratePlainPasswords`). Num backend real o certo seria um hash lento e com sal (argon2/bcrypt).
+- **Rota inexistente:** um caminho que não existe mostra "Página não encontrada" dentro do layout
+  do site (`notFoundComponent` na rota raiz), com link para a Início.
 - **Isolamento entre usuários:** ao entrar, sair, expirar ou trocar de conta, `clearPrivateData`
   (`resetQueries`) zera todo o cache, exceto `nfts` (público) e a sessão, e refaz as consultas em
   uso com a identidade nova. O cliente Socket.IO cancela a assinatura da sessão anterior e assina
@@ -179,13 +187,6 @@ WebSocket; sem namespaces, salas, broadcast nem acks; o servidor simulado vive n
 
 **Conhecidas e abertas:**
 
-- **Senhas em texto no mock.** O desafio pede para não armazenar senhas em claro. As contas das
-  fixtures usam credenciais fictícias fixas, mas contas criadas no cadastro e senhas trocadas no
-  perfil são guardadas **em texto puro** em `localStorage` (`mock-users`, `mock-profile:*`).
-  Pendente: guardar só um hash (SHA-256 com `crypto.subtle`) e comparar o hash no login e na troca.
-- **Rota inexistente sem tela própria.** Um caminho que não existe (ex.: `/xyz`) cai no "não
-  encontrado" padrão do TanStack Router, sem o layout do site (nenhum `notFoundComponent`
-  configurado). O desafio pede tratamento de rotas inexistentes. Pendente.
 - **Performance mobile do Lighthouse abaixo da meta:** 78 (meta 90) em Início e Detalhe; desktop
   99. Causas e tentativas em [`docs/lighthouse.md`](./docs/lighthouse.md).
 - **Fidelidade ao Figma, por tela.** O MCP do Figma ficou sem cota; parte da conferência foi feita

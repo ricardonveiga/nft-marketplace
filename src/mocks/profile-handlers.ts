@@ -9,7 +9,8 @@ import {
 import type { ApiErrorBody, PasswordChangeRequest, ProfileUpdateRequest } from '@/types/auth'
 import { authenticate } from './auth-handlers'
 import { writeProfile } from './profiles-store'
-import { findUserByEmail, listUsers } from './users-store'
+import { hashPassword } from './password'
+import { findUserByEmail, listUsers, passwordMatches } from './users-store'
 
 // Foto do perfil: o cliente reduz a imagem antes de enviar; aqui só se confere o formato e o
 // tamanho (um limite folgado, para não encher o localStorage).
@@ -129,7 +130,7 @@ export const profileHandlers = [
     const newPassword = typeof body?.newPassword === 'string' ? body.newPassword : ''
     const stored = listUsers().find((candidate) => candidate.id === user.id)
 
-    if (!stored || stored.password !== currentPassword) {
+    if (!stored || !(await passwordMatches(stored, currentPassword))) {
       return error(422, {
         code: 'invalid_current_password',
         message: 'A senha atual está incorreta.',
@@ -145,7 +146,7 @@ export const profileHandlers = [
       return error(422, { code: 'validation_error', errors: { newPassword: passwordError } })
     }
 
-    writeProfile(user.id, { password: newPassword })
+    writeProfile(user.id, { passwordHash: await hashPassword(newPassword) })
 
     return HttpResponse.json({ ok: true })
   }),

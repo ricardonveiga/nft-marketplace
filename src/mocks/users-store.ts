@@ -1,4 +1,5 @@
 import { mockUsers, type MockUser } from './fixtures/users'
+import { hashPassword } from './password'
 import { readProfile } from './profiles-store'
 
 /** Usuário com o perfil já aplicado por cima (nome, e-mail, telefone, foto e senha editados). */
@@ -26,7 +27,9 @@ export function listUsers(): StoredUser[] {
       ...user,
       name: profile.name ?? user.name,
       email: profile.email ?? user.email,
-      password: profile.password ?? user.password,
+      // Uma senha trocada no perfil vale no lugar da de demonstração (que sai de cena).
+      password: profile.passwordHash ? undefined : user.password,
+      passwordHash: profile.passwordHash ?? user.passwordHash,
       phone: profile.phone ?? null,
       avatarUrl: profile.avatarUrl ?? null,
     }
@@ -39,13 +42,13 @@ export function findUserByEmail(email: string) {
   return listUsers().find((user) => user.email.toLowerCase() === normalized)
 }
 
-export function addUser(data: Pick<MockUser, 'name' | 'email' | 'password'>): MockUser {
+export function addUser(data: Pick<MockUser, 'name' | 'email'> & { passwordHash: string }): MockUser {
   const registered = readRegistered()
   const user: MockUser = {
     id: `user-${mockUsers.length + registered.length + 1}`,
     name: data.name,
     email: data.email,
-    password: data.password,
+    passwordHash: data.passwordHash,
   }
 
   try {
@@ -55,6 +58,47 @@ export function addUser(data: Pick<MockUser, 'name' | 'email' | 'password'>): Mo
   }
 
   return user
+}
+
+/** Confere a senha comparando hashes; as credenciais de demonstração são "hasheadas" na hora. */
+export async function passwordMatches(user: StoredUser, candidate: string) {
+  const expected = user.passwordHash ?? (user.password ? await hashPassword(user.password) : undefined)
+
+  return expected !== undefined && (await hashPassword(candidate)) === expected
+}
+
+/**
+ * Navegadores que já visitaram uma versão anterior podem ter senhas em claro guardadas
+ * (`mock-users` e `mock-profile:*`). Troca cada uma pelo hash, uma vez, antes de o mock responder.
+ */
+export async function migratePlainPasswords() {
+  try {
+    const storage = window.localStorage
+
+    for (const key of Object.keys(storage)) {
+      if (key !== STORAGE_KEY && !key.startsWith('mock-profile:')) {
+        continue
+      }
+
+      const parsed = JSON.parse(storage.getItem(key) ?? 'null') as unknown
+      const records = Array.isArray(parsed) ? parsed : parsed ? [parsed] : []
+      let changed = false
+
+      for (const record of records as Array<Record<string, unknown>>) {
+        if (typeof record.password === 'string') {
+          record.passwordHash = await hashPassword(record.password)
+          delete record.password
+          changed = true
+        }
+      }
+
+      if (changed) {
+        storage.setItem(key, JSON.stringify(parsed))
+      }
+    }
+  } catch {
+    // Sem localStorage (ou com dados ilegíveis) não há senha guardada para migrar.
+  }
 }
 
 export function resetRegisteredUsers() {

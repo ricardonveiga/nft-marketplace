@@ -298,6 +298,9 @@ socket (`order.updated`), ~1,2 s depois da criação.
   Contas criadas no cadastro ficam em `localStorage['mock-users']` (sobrevivem ao refresh;
   `resetRegisteredUsers()` volta ao cenário conhecido). Carrinhos ficam em
   `localStorage['mock-cart:<dono>']` (`clearMockCarts()` volta ao cenário conhecido).
+- Senhas: nunca em claro no armazenamento; só hash SHA-256 (`passwordHash`). Ver "Política de sessão"
+  em `ARCHITECTURE.md`.
+- Rota inexistente: página "Página não encontrada" dentro do layout (`notFoundComponent`).
 - Sessão: token sem estado (`kurio.<usuário>.<expira>`) em `localStorage['kurio.session']`.
 - Respostas de erro: 401 `invalid_credentials` / `session_expired` / `unauthenticated`,
   403 `forbidden`, 409 `email_taken`, 422 `validation_error`, 503 `service_unavailable` (falha
@@ -381,5 +384,4 @@ a conferência vem de prints enviados pelo usuário.
 - **Sem conferir com o frame (estrutura inferida):** Promoções e Diário da Cunhagem, Carrinho,
   Detalhe do NFT, Recibo/confirmação, Login mobile, Cadastro, e as telas Carteiras e Perfil além
   do menu lateral.
-- **Fora do Figma:** senhas em texto no mock, rota inexistente sem tela própria e Performance
-  mobile do Lighthouse abaixo da meta (ver `ARCHITECTURE.md`).
+- **Fora do Figma:** Performance mobile do Lighthouse abaixo da meta (ver `ARCHITECTURE.md`).

@@ -8,7 +8,8 @@ export type ProfileOverride = Partial<{
   email: string
   phone: string | null
   avatarUrl: string | null
-  password: string
+  /** Hash SHA-256 da senha nova (nunca a senha em claro). */
+  passwordHash: string
 }>
 
 export function readProfile(userId: string): ProfileOverride {

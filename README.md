@@ -65,7 +65,7 @@ trace (`trace: retain-on-failure`) em `test-results/`; abra com `npx playwright 
 | Ana | `ana@kurio.test` | `kurio123` (2 carteiras) |
 | Bruno | `bruno@kurio.test` | `kurio456` (1 carteira) |
 
-Também é possível criar uma conta em `/cadastro` (fica em `localStorage['mock-users']`). Cupons do
+Também é possível criar uma conta em `/cadastro` (fica em `localStorage['mock-users']`, com a senha só como hash SHA-256). Cupons do
 carrinho: `KURIO10` (10%), `GENESIS15` (15%) e `EXPIRADO20` (expirado, para ver o erro).
 A carteira "Carteira secundária" da Ana sempre recusa a conexão, para exercitar a recusa.
 
