@@ -5,8 +5,8 @@ import type { Cart, CartItem, CartItemStatus } from '@/types/cart'
 import { authenticate } from './auth-handlers'
 import { deleteCart, readCart, writeCart, type StoredCart } from './cart-store'
 import { mockCoupons } from './fixtures/coupons'
-import { REFERENCE_DATE, nfts } from './fixtures/nfts'
-import { MAX_QUANTITY_PER_ORDER } from './limits'
+import { currentNft, maxQuantityFor } from './catalog-state'
+import { REFERENCE_DATE } from './fixtures/nfts'
 import { getScenario } from './scenario'
 
 // Taxa de rede fixa por pedido (qualquer carrinho com itens à venda).
@@ -32,9 +32,9 @@ function resolveOwner(request: Request): { owner: string } | Response {
 }
 
 function maxQuantityOf(nftId: string) {
-  const nft = nfts.find((candidate) => candidate.id === nftId)
+  const nft = currentNft(nftId)
 
-  return nft ? Math.min(MAX_QUANTITY_PER_ORDER, nft.availableQuantity) : 0
+  return nft ? maxQuantityFor(nft) : 0
 }
 
 function findCoupon(code: string | undefined) {
@@ -46,7 +46,7 @@ export function buildCart(stored: StoredCart): Cart {
   const items: CartItem[] = []
 
   for (const { nftId, quantity } of stored.items) {
-    const nft = nfts.find((candidate) => candidate.id === nftId)
+    const nft = currentNft(nftId)
 
     if (!nft) {
       continue
@@ -133,7 +133,7 @@ export const cartHandlers = [
       quantity?: unknown
     } | null
     const quantity = body?.quantity ?? 1
-    const nft = nfts.find((candidate) => candidate.id === body?.nftId)
+    const nft = currentNft(typeof body?.nftId === 'string' ? body.nftId : undefined)
 
     if (!isPositiveInteger(quantity)) {
       return invalidQuantity()

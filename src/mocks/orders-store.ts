@@ -86,6 +86,7 @@ export function listOrders(userId: string): StoredOrder[] {
     if (getScenario() === 'payment-declined') {
       return {
         ...order,
+        version: order.version + 1,
         status: 'declined' as const,
         declineReason: 'Pagamento recusado pela rede. Nenhum valor foi cobrado.',
       }
@@ -95,6 +96,7 @@ export function listOrders(userId: string): StoredOrder[] {
 
     return {
       ...order,
+      version: order.version + 1,
       status: 'confirmed' as const,
       transactionHash: fakeTransactionHash(order.id),
     }

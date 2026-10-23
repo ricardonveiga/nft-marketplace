@@ -24,6 +24,8 @@ export type OrderItem = {
 export type Order = {
   id: string
   status: OrderStatus
+  /** Versão do pedido: 1 ao criar, avança quando o pagamento é decidido. */
+  version: number
   createdAt: string
   items: OrderItem[]
   couponCode: string | null

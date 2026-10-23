@@ -1,7 +1,7 @@
 import { HttpResponse, http } from 'msw'
 import type { ApiErrorBody } from '@/types/auth'
 import { authenticate } from './auth-handlers'
-import { nfts } from './fixtures/nfts'
+import { currentNft } from './catalog-state'
 import { getScenario } from './scenario'
 
 // Favoritos por usuário no localStorage (sobrevivem ao refresh e à troca de conta).
@@ -50,7 +50,7 @@ export const favoritesHandlers = [
 
     const nftId = String(params.nftId)
 
-    if (!nfts.some((nft) => nft.id === nftId)) {
+    if (!currentNft(nftId)) {
       return error(404, { code: 'nft_not_found', message: 'NFT não encontrado.' })
     }
 

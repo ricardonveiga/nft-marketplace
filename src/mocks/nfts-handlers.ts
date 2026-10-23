@@ -15,9 +15,8 @@ import {
   descriptionOf,
   galleryOf,
   networkOrder,
-  nfts,
 } from './fixtures/nfts'
-import { MAX_QUANTITY_PER_ORDER } from './limits'
+import { currentNft, currentNfts, maxQuantityFor } from './catalog-state'
 import { getScenario } from './scenario'
 
 const DEFAULT_PAGE_SIZE = 12
@@ -158,7 +157,7 @@ export const nftsHandlers = [
       return HttpResponse.json({ message: 'Serviço indisponível' }, { status: 503 })
     }
 
-    const featured = pickFeatured(scenario === 'empty' ? [] : nfts)
+    const featured = pickFeatured(scenario === 'empty' ? [] : currentNfts())
 
     return featured
       ? HttpResponse.json({ nft: featured })
@@ -172,7 +171,7 @@ export const nftsHandlers = [
       return HttpResponse.json({ message: 'Serviço indisponível' }, { status: 503 })
     }
 
-    const nft = scenario === 'empty' ? undefined : nfts.find((candidate) => candidate.id === params.id)
+    const nft = scenario === 'empty' ? undefined : currentNft(String(params.id))
 
     if (!nft) {
       return HttpResponse.json(
@@ -186,7 +185,7 @@ export const nftsHandlers = [
       description: descriptionOf(nft),
       creator: creatorOf(nft),
       gallery: galleryOf(nft),
-      maxQuantity: Math.min(MAX_QUANTITY_PER_ORDER, nft.availableQuantity),
+      maxQuantity: maxQuantityFor(nft),
     }
 
     return HttpResponse.json({ nft: detail })
@@ -219,7 +218,7 @@ export const nftsHandlers = [
       tab: search.tab ?? DEFAULT_TAB,
     }
 
-    const source = scenario === 'empty' ? [] : nfts
+    const source = scenario === 'empty' ? [] : currentNfts()
     const filtered = sortNfts(
       source.filter((nft) => matches(nft, filters)),
       search.sort ?? DEFAULT_SORT,

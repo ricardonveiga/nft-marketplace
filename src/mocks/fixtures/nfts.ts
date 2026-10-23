@@ -101,6 +101,7 @@ export const nfts: readonly Nft[] = seeds.map(
     rarity,
     availability,
     availableQuantity: remainingUnits(edition, availability),
+    version: 1,
     // Quanto menor o índice, mais recente: a ordem padrão reproduz o Figma.
     listedAt: new Date(REFERENCE_DATE - index * 2 * DAY).toISOString(),
     popularity: (index * 53 + 17) % 100,
