@@ -1,5 +1,5 @@
 import { api } from '@/lib/api'
-import type { NftListParams, NftListResponse } from '@/types/nft'
+import type { Nft, NftListParams, NftListResponse } from '@/types/nft'
 
 export async function fetchNfts({
   category,
@@ -19,4 +19,15 @@ export async function fetchNfts({
   }
 
   return response.data
+}
+
+/** NFT em destaque da Início (e do hero): o mais caro entre os disponíveis. */
+export async function fetchFeaturedNft() {
+  const response = await api.get<{ nft: Nft }>('/nfts/featured')
+
+  if (!response.data?.nft) {
+    throw new Error('Resposta de /nfts/featured fora do formato esperado')
+  }
+
+  return response.data.nft
 }

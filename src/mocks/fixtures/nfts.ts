@@ -74,7 +74,7 @@ const seeds: readonly Seed[] = [
   ['Ivory Baron #411', 'neon', '1.48', undefined, '411/800', 'comum', 'esgotado'],
   ['Violet Nomad #198', 'sage', '0.66', '0.80', '198/300', 'comum', 'disponivel'],
   ['Golden Signal #271', 'golden', '0.52', undefined, '271/400', 'comum', 'disponivel'],
-  ['Emerald Ape #009', 'emerald', '3.80', undefined, '9/500', 'epico', 'esgotado'],
+  ['Emerald Ape #009', 'emerald', '6.50', undefined, '9/500', 'epico', 'esgotado'],
 ]
 
 export const nfts: readonly Nft[] = seeds.map(

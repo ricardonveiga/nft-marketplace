@@ -133,7 +133,34 @@ function buildFacets(source: readonly Nft[], filters: Filters): NftFacets {
   }
 }
 
+/**
+ * Critério de "destaque" (card da barra lateral e hero): o NFT mais caro entre os
+ * disponíveis. Esgotados ficam de fora para o destaque sempre poder ser comprado.
+ */
+function pickFeatured(source: readonly Nft[]) {
+  return source
+    .filter((nft) => nft.availability === 'disponivel')
+    .reduce<Nft | undefined>(
+      (best, nft) => (!best || compareEth(nft.priceEth, best.priceEth) > 0 ? nft : best),
+      undefined,
+    )
+}
+
 export const nftsHandlers = [
+  http.get('/api/nfts/featured', () => {
+    const scenario = getScenario()
+
+    if (scenario === 'error') {
+      return HttpResponse.json({ message: 'Serviço indisponível' }, { status: 503 })
+    }
+
+    const featured = pickFeatured(scenario === 'empty' ? [] : nfts)
+
+    return featured
+      ? HttpResponse.json({ nft: featured })
+      : HttpResponse.json({ code: 'not_found' }, { status: 404 })
+  }),
+
   http.get('/api/nfts', ({ request }) => {
     const scenario = getScenario()
 
