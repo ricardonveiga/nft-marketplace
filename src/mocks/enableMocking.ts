@@ -4,6 +4,9 @@ export async function enableMocking() {
   }
 
   const { worker } = await import('./browser')
+  const { mockControl } = await import('./control')
+
+  window.__mockControl = mockControl
 
   return worker.start({
     onUnhandledRequest: 'bypass',

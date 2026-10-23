@@ -14,6 +14,7 @@ import {
   toPublicOrder,
   type StoredOrder,
 } from './orders-store'
+import { scheduleOrderSettlement } from './realtime'
 import { getScenario } from './scenario'
 import { readConnectedWalletId, walletsOf } from './wallets-handlers'
 
@@ -128,6 +129,7 @@ export const ordersHandlers = [
     const order: StoredOrder = {
       id: nextOrderId(),
       status: 'pending',
+      version: 1,
       createdAt: new Date().toISOString(),
       items: cart.items.map(({ nft, quantity, unitPriceEth, lineTotalEth }) => ({
         nftId: nft.id,
@@ -158,6 +160,7 @@ export const ordersHandlers = [
 
     saveOrder(user.id, order)
     saveIdempotency(user.id, key, { hash, orderId: order.id })
+    scheduleOrderSettlement(user.id, order.id)
 
     // Timeout simulado: o pedido FOI criado, mas a resposta não chega. Vale uma vez só;
     // reenviar com a mesma chave recupera o mesmo pedido.
