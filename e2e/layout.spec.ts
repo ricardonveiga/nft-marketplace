@@ -85,3 +85,19 @@ test('tablet (768 px): sem rolagem horizontal e com filtros na barra de abas', a
   expect(((await enter.boundingBox())?.x ?? 0) + 100).toBeLessThanOrEqual(768)
   await expect(page.getByRole('button', { name: 'Filtros' })).toBeVisible()
 })
+
+test('rota inexistente mostra a página não encontrada, dentro do layout, com saída para a Início', async ({ page }) => {
+  const response = await page.goto('/uma/rota/que/nao-existe')
+
+  // O app é uma SPA com fallback: a página abre e o roteador trata o caminho.
+  expect(response?.ok()).toBe(true)
+  await expect(page.getByTestId('route-not-found')).toBeVisible()
+  await expect(page.getByRole('heading', { level: 1, name: 'Página não encontrada' })).toBeVisible()
+  await expect(page).toHaveTitle('Página não encontrada | Kurio')
+  await expect(page.getByRole('banner')).toBeVisible()
+  await expect(page.getByRole('contentinfo')).toBeVisible()
+
+  await page.getByRole('link', { name: 'Voltar à Início' }).click()
+  await expect(page).toHaveURL('/')
+  await expect(page.getByTestId('nft-grid')).toBeVisible()
+})

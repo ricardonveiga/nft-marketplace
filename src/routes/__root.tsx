@@ -1,6 +1,7 @@
 import { Outlet, createRootRoute } from '@tanstack/react-router'
 import { AuthListener } from '@/components/auth/auth-listener'
 import { FiltersDrawerProvider } from '@/components/catalog/filters-drawer'
+import { NotFound } from '@/components/layout/not-found'
 import { MobileTabBar } from '@/components/layout/mobile-tab-bar'
 import { ConnectionBanner } from '@/components/realtime/connection-banner'
 import { RealtimeProvider } from '@/components/realtime/realtime-provider'
@@ -9,6 +10,7 @@ import { SiteHeader } from '@/components/layout/site-header'
 
 export const Route = createRootRoute({
   component: RootComponent,
+  notFoundComponent: NotFound,
 })
 
 function RootComponent() {
