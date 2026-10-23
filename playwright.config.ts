@@ -4,6 +4,16 @@ export default defineConfig({
   testDir: './e2e',
   fullyParallel: true,
   reporter: 'html',
+  // Baselines da regressão visual: uma pasta por projeto (desktop/mobile), versionadas no repositório.
+  snapshotPathTemplate: '{testDir}/__screenshots__/{projectName}/{arg}{ext}',
+  expect: {
+    toHaveScreenshot: {
+      animations: 'disabled',
+      caret: 'hide',
+      // Folga pequena para variações de antialiasing entre máquinas; mudanças reais passam disso.
+      maxDiffPixelRatio: 0.01,
+    },
+  },
   use: {
     baseURL: 'http://localhost:5199',
     trace: 'on-first-retry',
