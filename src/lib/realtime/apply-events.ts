@@ -136,10 +136,13 @@ export function applyNftUpdated(queryClient: QueryClient, event: NftUpdatedEvent
   queryClient.setQueriesData({ queryKey: ['nfts'] }, (data) => patchCacheValue(data, event))
 
   // ...e releitura do que depende de cálculo ou ordenação da API: listas (ordem, filtros e
-  // contagens), destaque (o mais caro pode ter mudado) e carrinho (subtotal, taxa, total).
+  // contagens), destaque e hero (o mais caro pode ter mudado) e carrinho (subtotal, taxa, total).
   void queryClient.invalidateQueries({
     queryKey: ['nfts'],
-    predicate: (query) => query.queryKey[1] === 'featured' || typeof query.queryKey[1] === 'object',
+    predicate: (query) =>
+      query.queryKey[1] === 'featured' ||
+      query.queryKey[1] === 'highlights' ||
+      typeof query.queryKey[1] === 'object',
   })
 
   const cart = queryClient.getQueryData<Cart>(['cart'])

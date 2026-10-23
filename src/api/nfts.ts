@@ -32,6 +32,17 @@ export async function fetchFeaturedNft() {
   return response.data.nft
 }
 
+/** Destaques do hero: o primeiro é o mesmo NFT do card "em destaque". */
+export async function fetchHighlights() {
+  const response = await api.get<{ nfts: Nft[] }>('/nfts/highlights')
+
+  if (!Array.isArray(response.data?.nfts)) {
+    throw new Error('Resposta de /nfts/highlights fora do formato esperado')
+  }
+
+  return response.data.nfts
+}
+
 export async function fetchNft(id: string) {
   const response = await api.get<{ nft: NftDetail }>(`/nfts/${encodeURIComponent(id)}`)
 

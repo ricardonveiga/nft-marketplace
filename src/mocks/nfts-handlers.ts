@@ -140,13 +140,19 @@ function buildFacets(source: readonly Nft[], filters: Filters): NftFacets {
  * Critério de "destaque" (card da barra lateral e hero): o NFT mais caro entre os
  * disponíveis. Esgotados ficam de fora para o destaque sempre poder ser comprado.
  */
-function pickFeatured(source: readonly Nft[]) {
+const HIGHLIGHTS_COUNT = 3
+
+/** Os `count` NFTs mais caros entre os disponíveis; empate desfeito pelo id (ordem estável). */
+function pickHighlights(source: readonly Nft[], count: number) {
   return source
     .filter((nft) => nft.availability === 'disponivel')
-    .reduce<Nft | undefined>(
-      (best, nft) => (!best || compareEth(nft.priceEth, best.priceEth) > 0 ? nft : best),
-      undefined,
-    )
+    .sort((a, b) => compareEth(b.priceEth, a.priceEth) || a.id.localeCompare(b.id))
+    .slice(0, count)
+}
+
+/** O destaque é o primeiro dos destaques: o card da barra lateral e o hero concordam sempre. */
+function pickFeatured(source: readonly Nft[]) {
+  return pickHighlights(source, 1)[0]
 }
 
 export const nftsHandlers = [
@@ -162,6 +168,19 @@ export const nftsHandlers = [
     return featured
       ? HttpResponse.json({ nft: featured })
       : HttpResponse.json({ code: 'not_found' }, { status: 404 })
+  }),
+
+  // Destaques do hero (o primeiro é o mesmo NFT do card "em destaque").
+  http.get('/api/nfts/highlights', () => {
+    const scenario = getScenario()
+
+    if (scenario === 'error') {
+      return HttpResponse.json({ message: 'Serviço indisponível' }, { status: 503 })
+    }
+
+    const nfts = pickHighlights(scenario === 'empty' ? [] : currentNfts(), HIGHLIGHTS_COUNT)
+
+    return HttpResponse.json({ nfts })
   }),
 
   http.get('/api/nfts/:id', ({ params }) => {

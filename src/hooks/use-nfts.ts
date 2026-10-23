@@ -1,6 +1,6 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { isAxiosError } from 'axios'
-import { fetchFeaturedNft, fetchNft, fetchNfts } from '@/api/nfts'
+import { fetchFeaturedNft, fetchHighlights, fetchNft, fetchNfts } from '@/api/nfts'
 import type { NftListParams } from '@/types/nft'
 
 export function useNfts(params: NftListParams = {}) {
@@ -28,5 +28,13 @@ export function useNft(id: string) {
     staleTime: 30 * 1000,
     retry: (failureCount, error) =>
       !(isAxiosError(error) && error.response?.status === 404) && failureCount < 1,
+  })
+}
+
+export function useHighlights() {
+  return useQuery({
+    queryKey: ['nfts', 'highlights'],
+    queryFn: fetchHighlights,
+    retry: false,
   })
 }
