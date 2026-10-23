@@ -115,6 +115,18 @@ export function OrderCollectorSection({ order }: { order: Order }) {
         <Row label="Nome" value={order.collector.name} testId="order-collector-name" />
         <Row label="E-mail" value={order.collector.email} testId="order-collector-email" />
         <Row label="Telefone" value={formatPhone(order.collector.phone)} testId="order-collector-phone" />
+        {order.collector.username && (
+          <Row label="Nome de usuário" value={order.collector.username} testId="order-collector-username" />
+        )}
+        {order.collector.ensName && (
+          <Row label="Nome ENS" value={order.collector.ensName} testId="order-collector-ens" />
+        )}
+        {order.collector.referralCode && (
+          <Row label="Código de indicação" value={order.collector.referralCode} testId="order-collector-referral" />
+        )}
+        {order.collector.notes && (
+          <Row label="Observação" value={order.collector.notes} testId="order-collector-notes" />
+        )}
       </dl>
     </Section>
   )

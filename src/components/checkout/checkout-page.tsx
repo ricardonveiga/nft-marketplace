@@ -17,6 +17,7 @@ import {
   saveDraft,
 } from '@/lib/checkout-draft'
 import {
+  NOTES_MAX_LENGTH,
   normalizePhone,
   validateCollector,
   type CollectorFields,
@@ -39,6 +40,23 @@ const stepLabels: Record<Step, string> = {
   review: 'Revisão',
 }
 
+const OPTIONAL_FIELDS = ['username', 'ensName', 'referralCode', 'notes'] as const
+
+/** Campos opcionais preenchidos (aparados); vazios não vão no pedido. */
+function optionalFields(collector: CollectorFields) {
+  const filled: Partial<Record<(typeof OPTIONAL_FIELDS)[number], string>> = {}
+
+  for (const field of OPTIONAL_FIELDS) {
+    const value = collector[field].trim()
+
+    if (value) {
+      filled[field] = value
+    }
+  }
+
+  return filled
+}
+
 export function CheckoutPage({ user }: { user: User }) {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
@@ -47,13 +65,17 @@ export function CheckoutPage({ user }: { user: User }) {
   const create = useCreateOrder()
 
   const [initial] = useState(loadDraft)
-  const [collector, setCollector] = useState<CollectorFields>(
-    initial.collector ?? {
-      name: user.name,
-      email: user.email,
-      phone: user.phone ? formatPhone(user.phone) : '',
-    },
-  )
+  const [collector, setCollector] = useState<CollectorFields>({
+    name: user.name,
+    email: user.email,
+    phone: user.phone ? formatPhone(user.phone) : '',
+    username: '',
+    ensName: '',
+    referralCode: '',
+    notes: '',
+    // Rascunhos antigos não têm os campos opcionais: os valores acima completam.
+    ...initial.collector,
+  })
   const [walletId, setWalletId] = useState<string | null>(initial.walletId ?? null)
   const [network, setNetwork] = useState<NftNetwork | ''>(initial.network ?? '')
   const [errors, setErrors] = useState<FormErrors>({})
@@ -71,6 +93,10 @@ export function CheckoutPage({ user }: { user: User }) {
     name: useRef<HTMLInputElement>(null),
     email: useRef<HTMLInputElement>(null),
     phone: useRef<HTMLInputElement>(null),
+    username: useRef<HTMLInputElement>(null),
+    ensName: useRef<HTMLInputElement>(null),
+    referralCode: useRef<HTMLInputElement>(null),
+    notes: useRef<HTMLTextAreaElement>(null),
   }
 
   const cart = cartQuery.data
@@ -147,7 +173,9 @@ export function CheckoutPage({ user }: { user: User }) {
   }
 
   function focusFirstError(found: FormErrors) {
-    const field = (['name', 'email', 'phone'] as const).find((key) => found[key])
+    const field = (['name', 'email', 'phone', 'username', 'ensName', 'referralCode', 'notes'] as const).find(
+      (key) => found[key],
+    )
 
     if (field) {
       refs[field].current?.focus()
@@ -222,6 +250,7 @@ export function CheckoutPage({ user }: { user: User }) {
         name: collector.name.trim(),
         email: collector.email.trim(),
         phone: normalizePhone(collector.phone),
+        ...optionalFields(collector),
       },
       walletId: selectedWallet.id,
       network,
@@ -355,7 +384,7 @@ export function CheckoutPage({ user }: { user: User }) {
           >
             <section aria-labelledby="dados" className="flex flex-col gap-4">
               <h2 id="dados" className="text-lg leading-4">
-                Dados do colecionador
+                Perfil do colecionador
               </h2>
               <AuthField
                 showLabel
@@ -392,6 +421,61 @@ export function CheckoutPage({ user }: { user: User }) {
                 onChange={(value) => setCollectorField('phone', value)}
                 inputRef={refs.phone}
               />
+              <AuthField
+                showLabel
+                label="Nome de usuário (opcional)"
+                name="username"
+                placeholder="seu_usuario"
+                autoComplete="username"
+                value={collector.username}
+                error={errors.username}
+                onChange={(value) => setCollectorField('username', value)}
+                inputRef={refs.username}
+              />
+              <AuthField
+                showLabel
+                label="Nome ENS (opcional)"
+                name="ensName"
+                placeholder="nome.eth"
+                autoComplete="off"
+                value={collector.ensName}
+                error={errors.ensName}
+                onChange={(value) => setCollectorField('ensName', value)}
+                inputRef={refs.ensName}
+              />
+              <AuthField
+                showLabel
+                label="Código de indicação (opcional)"
+                name="referralCode"
+                placeholder="KURIO2026"
+                autoComplete="off"
+                value={collector.referralCode}
+                error={errors.referralCode}
+                onChange={(value) => setCollectorField('referralCode', value)}
+                inputRef={refs.referralCode}
+              />
+              <div className="flex flex-col gap-1">
+                <label htmlFor="checkout-notes" className="text-sm">
+                  Observação (opcional)
+                </label>
+                <textarea
+                  id="checkout-notes"
+                  ref={refs.notes}
+                  name="notes"
+                  rows={3}
+                  maxLength={NOTES_MAX_LENGTH}
+                  value={collector.notes}
+                  onChange={(event) => setCollectorField('notes', event.target.value)}
+                  aria-invalid={errors.notes ? true : undefined}
+                  aria-describedby={errors.notes ? 'checkout-notes-error' : undefined}
+                  className="w-full resize-y rounded-md bg-surface-dark px-4 py-2 text-sm text-foreground outline-none placeholder:text-brand-secondary focus-visible:ring-2 focus-visible:ring-ring aria-[invalid=true]:ring-2 aria-[invalid=true]:ring-destructive"
+                />
+                {errors.notes && (
+                  <p id="checkout-notes-error" className="text-xs text-destructive">
+                    {errors.notes}
+                  </p>
+                )}
+              </div>
             </section>
 
             <section aria-labelledby="carteira" className="flex flex-col gap-4">
@@ -434,6 +518,8 @@ export function CheckoutPage({ user }: { user: User }) {
                 <dd>{collector.name.trim()}</dd>
                 <dd className="text-sm">{collector.email.trim()}</dd>
                 <dd className="text-sm">{formatPhone(collector.phone)}</dd>
+                {collector.username.trim() && <dd className="text-sm">@{collector.username.trim()}</dd>}
+                {collector.ensName.trim() && <dd className="text-sm">{collector.ensName.trim()}</dd>}
               </div>
               <div>
                 <dt className="text-sm text-text-secondary">Carteira</dt>
@@ -500,7 +586,7 @@ export function CheckoutPage({ user }: { user: User }) {
                 aria-busy={create.isPending}
                 className="h-[45px] rounded-md px-8 text-base font-bold"
               >
-                {create.isPending ? 'Processando…' : 'Confirmar pagamento'}
+                {create.isPending ? 'Processando…' : 'Confirmar compra'}
               </Button>
             </div>
           </section>

@@ -296,7 +296,7 @@ test('conta nova cadastra a carteira pelo pagamento e conclui a compra', async (
   await expect(page.getByTestId(/wallet-status-wallet-/)).toHaveText('Conectada')
   await page.getByRole('button', { name: 'Revisar pedido' }).click()
   await page.getByLabel('Li e aceito os termos de compra de NFTs.').check()
-  await page.getByRole('button', { name: 'Confirmar pagamento' }).click()
+  await page.getByRole('button', { name: 'Confirmar compra' }).click()
 
   await expect(page.getByTestId('order-confirmed')).toBeVisible({ timeout: 10_000 })
 })

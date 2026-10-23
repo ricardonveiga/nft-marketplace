@@ -34,6 +34,7 @@ export function WalletSection({
   const connect = useConnectWallet()
   const disconnect = useDisconnectWallet()
   const [message, setMessage] = useState<Message | null>(null)
+  const [otherRequested, setOtherRequested] = useState(false)
   const legendId = useId()
   const networkErrorId = useId()
 
@@ -86,6 +87,12 @@ export function WalletSection({
   }
 
   const selected = data.wallets.find((wallet) => wallet.id === walletId)
+  const primary = data.wallets.find((wallet) => wallet.isPrimary)
+  // Com a principal selecionada só ela aparece; "Usar outra carteira?" libera as demais.
+  const canChoose = data.wallets.length > 1
+  const showAll = canChoose && (otherRequested || Boolean(selected && !selected.isPrimary))
+  const shownId = (selected ?? primary)?.id
+  const visibleWallets = showAll ? data.wallets : data.wallets.filter((wallet) => wallet.id === shownId)
   const connected = Boolean(selected) && data.connectedWalletId === selected?.id
   const busy = connect.isPending || disconnect.isPending
 
@@ -126,7 +133,7 @@ export function WalletSection({
           Carteira
         </legend>
 
-        {data.wallets.map((wallet) => {
+        {visibleWallets.map((wallet) => {
           const checked = wallet.id === walletId
           const isConnected = wallet.id === data.connectedWalletId
 
@@ -178,6 +185,39 @@ export function WalletSection({
           </p>
         )}
       </fieldset>
+
+      {canChoose && (
+        <label className="flex w-fit items-center gap-3 text-sm">
+          <input
+            type="checkbox"
+            checked={showAll}
+            onChange={(event) => {
+              setOtherRequested(event.target.checked)
+              setMessage(null)
+
+              // Voltar a usar a carteira principal desfaz a escolha da outra.
+              if (!event.target.checked && primary) {
+                onWalletChange(primary.id)
+              }
+            }}
+            className="size-4 accent-[var(--primary)]"
+          />
+          Usar outra carteira?
+        </label>
+      )}
+
+      {selected && (
+        <dl data-testid="checkout-wallet-details" className="grid gap-3 text-sm sm:grid-cols-2">
+          <div>
+            <dt className="text-text-secondary">Tipo de carteira</dt>
+            <dd>{selected.isPrimary ? 'Principal' : 'Secundária'}</dd>
+          </div>
+          <div className="min-w-0">
+            <dt className="text-text-secondary">Endereço da carteira</dt>
+            <dd className="break-all">{selected.address}</dd>
+          </div>
+        </dl>
+      )}
 
       <Link
         to="/carteiras"

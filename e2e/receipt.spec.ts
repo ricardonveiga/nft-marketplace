@@ -28,7 +28,7 @@ async function addToCart(page: Page, nftId: string, times = 1) {
   }
 }
 
-/** Do formulário de pagamento até o clique em "Confirmar pagamento". */
+/** Do formulário de pagamento até o clique em "Confirmar compra". */
 async function payOrder(page: Page) {
   await page.goto('/pagamento')
   await main(page).getByLabel('Telefone').fill('(11) 91234-5678')
@@ -36,7 +36,7 @@ async function payOrder(page: Page) {
   await expect(page.getByTestId('wallet-status-wallet-ana-1')).toHaveText('Conectada')
   await page.getByRole('button', { name: 'Revisar pedido' }).click()
   await page.getByLabel('Li e aceito os termos de compra de NFTs.').check()
-  await page.getByRole('button', { name: 'Confirmar pagamento' }).click()
+  await page.getByRole('button', { name: 'Confirmar compra' }).click()
 }
 
 /** Cria e confirma um pedido simples (Neon Vessel #552) e devolve a referência da transação. */
@@ -204,7 +204,7 @@ test('pagamento recusado: sem referência de transação, com itens do retrato e
   await page.getByRole('button', { name: 'Revisar pedido' }).click()
   await page.getByLabel('Li e aceito os termos de compra de NFTs.').check()
   await page.evaluate(() => localStorage.setItem('mock-scenario', 'payment-declined'))
-  await page.getByRole('button', { name: 'Confirmar pagamento' }).click()
+  await page.getByRole('button', { name: 'Confirmar compra' }).click()
 
   await expect(page.getByTestId('order-declined')).toBeVisible({ timeout: 10_000 })
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Pagamento recusado')

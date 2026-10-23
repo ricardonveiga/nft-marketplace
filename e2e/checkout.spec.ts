@@ -39,7 +39,7 @@ async function startCheckout(page: Page) {
   await signIn(page, ana)
   await addToCart(page, 'nft-03')
   await page.goto('/pagamento')
-  await expect(page.getByRole('heading', { name: 'Dados do colecionador' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Perfil do colecionador' })).toBeVisible()
 }
 
 async function fillAndReview(page: Page) {
@@ -72,7 +72,7 @@ test('visitante vai do carrinho ao login e volta ao pagamento', async ({ page })
 
   await expect(page).toHaveURL('/pagamento')
   // Os itens do visitante foram para a conta e aparecem no resumo.
-  await expect(page.getByRole('heading', { name: 'Dados do colecionador' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Perfil do colecionador' })).toBeVisible()
   await expect(page.getByTestId('summary-total')).toHaveText('1.9945 ETH')
 })
 
@@ -135,6 +135,7 @@ test('carteira: conectar, desconectar e escolher a rede entre as que ela aceita'
 test('carteira que recusa a conexão mostra o erro e continua desconectada', async ({ page }) => {
   await startCheckout(page)
 
+  await page.getByLabel('Usar outra carteira?').check()
   await page.getByRole('radio', { name: /Carteira secundária/ }).check()
   await expect(page.getByLabel('Rede de pagamento').locator('option:not([disabled])')).toHaveText(['Polygon', 'Solana'])
   await page.getByRole('button', { name: 'Conectar carteira' }).click()
@@ -187,7 +188,7 @@ test('confirmar exige aceitar os termos', async ({ page }) => {
   await startCheckout(page)
   await fillAndReview(page)
 
-  await page.getByRole('button', { name: 'Confirmar pagamento' }).click()
+  await page.getByRole('button', { name: 'Confirmar compra' }).click()
 
   await expect(page.getByText('Aceite os termos de compra para continuar.')).toBeVisible()
   await expect(page).toHaveURL('/pagamento')
@@ -198,7 +199,7 @@ test('pagamento confirmado: pedido pendente vira confirmado, carrinho esvazia e 
   await startCheckout(page)
   await fillAndReview(page)
   await acceptTerms(page)
-  await page.getByRole('button', { name: 'Confirmar pagamento' }).click()
+  await page.getByRole('button', { name: 'Confirmar compra' }).click()
 
   await expect(page).toHaveURL(/\/pedido\/KUR-000001$/)
   await expect(page.getByTestId('order-confirmed')).toBeVisible({ timeout: 10_000 })
@@ -225,7 +226,7 @@ test('clique repetido em confirmar cria um único pedido', async ({ page }) => {
   await acceptTerms(page)
 
   // Três cliques no mesmo instante, antes de o React atualizar qualquer coisa.
-  await page.getByRole('button', { name: 'Confirmar pagamento' }).evaluate((button: HTMLElement) => {
+  await page.getByRole('button', { name: 'Confirmar compra' }).evaluate((button: HTMLElement) => {
     button.click()
     button.click()
     button.click()
@@ -243,13 +244,13 @@ test('timeout depois da criação: reenviar recupera o mesmo pedido, sem duplica
 
   // O pedido é criado, mas a resposta nunca chega (uma vez só).
   await page.evaluate(() => localStorage.setItem('mock-scenario', 'order-timeout'))
-  await page.getByRole('button', { name: 'Confirmar pagamento' }).click()
+  await page.getByRole('button', { name: 'Confirmar compra' }).click()
 
   await expect(page.getByRole('alert').filter({ hasText: 'Não recebemos a resposta do servidor' })).toBeVisible()
   await expect(page).toHaveURL('/pagamento')
   expect(await ordersOf(page, 'user-ana')).toHaveLength(1)
 
-  await page.getByRole('button', { name: 'Confirmar pagamento' }).click()
+  await page.getByRole('button', { name: 'Confirmar compra' }).click()
 
   await expect(page).toHaveURL(/\/pedido\/KUR-000001$/)
   expect(await ordersOf(page, 'user-ana')).toHaveLength(1)
@@ -260,7 +261,7 @@ test('timeout seguido de refresh também não duplica o pedido', async ({ page }
   await fillAndReview(page)
   await acceptTerms(page)
   await page.evaluate(() => localStorage.setItem('mock-scenario', 'order-timeout'))
-  await page.getByRole('button', { name: 'Confirmar pagamento' }).click()
+  await page.getByRole('button', { name: 'Confirmar compra' }).click()
   await expect(page.getByRole('alert').filter({ hasText: 'Não recebemos a resposta' })).toBeVisible()
 
   // Recarrega a página e tenta de novo: a mesma chave (guardada na sessão) recupera o pedido.
@@ -268,7 +269,7 @@ test('timeout seguido de refresh também não duplica o pedido', async ({ page }
   await expect(walletStatus(page, 'wallet-ana-1')).toHaveText('Conectada')
   await page.getByRole('button', { name: 'Revisar pedido' }).click()
   await acceptTerms(page)
-  await page.getByRole('button', { name: 'Confirmar pagamento' }).click()
+  await page.getByRole('button', { name: 'Confirmar compra' }).click()
 
   await expect(page).toHaveURL(/\/pedido\/KUR-000001$/)
   expect(await ordersOf(page, 'user-ana')).toHaveLength(1)
@@ -292,7 +293,7 @@ test('valores que mudam antes de confirmar exigem nova confirmação', async ({ 
     })
   })
 
-  await page.getByRole('button', { name: 'Confirmar pagamento' }).click()
+  await page.getByRole('button', { name: 'Confirmar compra' }).click()
 
   await expect(page.getByRole('alert').filter({ hasText: 'Os valores do seu pedido mudaram' })).toBeVisible()
   await expect(page).toHaveURL('/pagamento')
@@ -301,10 +302,10 @@ test('valores que mudam antes de confirmar exigem nova confirmação', async ({ 
   expect(await ordersOf(page, 'user-ana')).toHaveLength(0)
 
   // Só confirma de novo depois de o usuário aceitar os novos valores.
-  await page.getByRole('button', { name: 'Confirmar pagamento' }).click()
+  await page.getByRole('button', { name: 'Confirmar compra' }).click()
   await expect(page.getByText('Aceite os termos de compra para continuar.')).toBeVisible()
   await acceptTerms(page)
-  await page.getByRole('button', { name: 'Confirmar pagamento' }).click()
+  await page.getByRole('button', { name: 'Confirmar compra' }).click()
 
   await expect(page.getByTestId('order-total')).toHaveText('3.6845 ETH', { timeout: 10_000 })
 })
@@ -320,9 +321,9 @@ test('carteira desconectada depois da revisão volta ao formulário com o erro',
       headers: { Authorization: `Bearer ${localStorage.getItem('kurio.session')}` },
     })
   })
-  await page.getByRole('button', { name: 'Confirmar pagamento' }).click()
+  await page.getByRole('button', { name: 'Confirmar compra' }).click()
 
-  await expect(page.getByRole('heading', { name: 'Dados do colecionador' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Perfil do colecionador' })).toBeVisible()
   await expect(page.getByText('Conecte a carteira para concluir o pagamento.')).toBeVisible()
   expect(await ordersOf(page, 'user-ana')).toHaveLength(0)
 })
@@ -332,7 +333,7 @@ test('pagamento recusado mantém o carrinho e permite tentar de novo com outro p
   await fillAndReview(page)
   await acceptTerms(page)
   await page.evaluate(() => localStorage.setItem('mock-scenario', 'payment-declined'))
-  await page.getByRole('button', { name: 'Confirmar pagamento' }).click()
+  await page.getByRole('button', { name: 'Confirmar compra' }).click()
 
   await expect(page.getByTestId('order-declined')).toBeVisible({ timeout: 10_000 })
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Pagamento recusado')
@@ -345,7 +346,7 @@ test('pagamento recusado mantém o carrinho e permite tentar de novo com outro p
   await expect(page.getByTestId('summary-total')).toHaveText('1.9945 ETH')
   await page.getByRole('button', { name: 'Revisar pedido' }).click()
   await acceptTerms(page)
-  await page.getByRole('button', { name: 'Confirmar pagamento' }).click()
+  await page.getByRole('button', { name: 'Confirmar compra' }).click()
 
   await expect(page).toHaveURL(/\/pedido\/KUR-000002$/)
   await expect(page.getByTestId('order-confirmed')).toBeVisible({ timeout: 10_000 })
@@ -371,7 +372,7 @@ test('sessão expirada na hora de pagar leva ao login e volta ao pagamento sem p
   await acceptTerms(page)
 
   await page.evaluate(() => localStorage.setItem('mock-scenario', 'session-expired'))
-  await page.getByRole('button', { name: 'Confirmar pagamento' }).click()
+  await page.getByRole('button', { name: 'Confirmar compra' }).click()
 
   await expect(page).toHaveURL(/\/login\?.*reason=expired/)
   await expect(page).toHaveURL(/redirect=%2Fpagamento/)
@@ -390,7 +391,7 @@ test('o pedido de um usuário não aparece para outro', async ({ page }) => {
   await startCheckout(page)
   await fillAndReview(page)
   await acceptTerms(page)
-  await page.getByRole('button', { name: 'Confirmar pagamento' }).click()
+  await page.getByRole('button', { name: 'Confirmar compra' }).click()
   await expect(page.getByTestId('order-confirmed')).toBeVisible({ timeout: 10_000 })
 
   await page.getByRole('button', { name: `Conta de ${ana.name}` }).click()
@@ -410,7 +411,7 @@ test('sem rolagem horizontal no pagamento e na confirmação em 390, 768 e 1440 
   await startCheckout(page)
   await fillAndReview(page)
   await acceptTerms(page)
-  await page.getByRole('button', { name: 'Confirmar pagamento' }).click()
+  await page.getByRole('button', { name: 'Confirmar compra' }).click()
   await expect(page.getByTestId('order-confirmed')).toBeVisible({ timeout: 10_000 })
 
   for (const width of [390, 768, 1440]) {
@@ -424,4 +425,55 @@ test('sem rolagem horizontal no pagamento e na confirmação em 390, 768 e 1440 
       expect(overflow, `${path} em ${width}px`).toBe(0)
     }
   }
+})
+
+test('perfil do colecionador: campos opcionais validam, vão na revisão e ficam no recibo', async ({ page }) => {
+  await startCheckout(page)
+  await main(page).getByLabel('Telefone').fill('(11) 91234-5678')
+  await connectPrimaryWallet(page)
+
+  await main(page).getByLabel('Nome de usuário (opcional)').fill('a')
+  await main(page).getByLabel('Nome ENS (opcional)').fill('ana')
+  await main(page).getByLabel('Código de indicação (opcional)').fill('!!')
+  await page.getByRole('button', { name: 'Revisar pedido' }).click()
+
+  await expect(main(page).getByLabel('Nome de usuário (opcional)')).toBeFocused()
+  await expect(page.getByText('Use de 3 a 30 letras, números, ponto ou sublinhado.')).toBeVisible()
+  await expect(page.getByText('Informe um nome ENS válido, como nome.eth.')).toBeVisible()
+  await expect(page.getByText('O código tem de 4 a 12 letras ou números.')).toBeVisible()
+
+  await main(page).getByLabel('Nome de usuário (opcional)').fill('ana_souza')
+  await main(page).getByLabel('Nome ENS (opcional)').fill('ana.eth')
+  await main(page).getByLabel('Código de indicação (opcional)').fill('KURIO2026')
+  await main(page).getByLabel('Observação (opcional)').fill('Entregar na carteira principal.')
+  await page.getByRole('button', { name: 'Revisar pedido' }).click()
+
+  await expect(page.getByTestId('review-details')).toContainText('@ana_souza')
+  await page.getByLabel('Li e aceito os termos de compra de NFTs.').check()
+  await page.getByRole('button', { name: 'Confirmar compra' }).click()
+
+  await expect(page.getByTestId('order-confirmed')).toBeVisible({ timeout: 10_000 })
+  await expect(page.getByTestId('order-collector-username')).toHaveText('ana_souza')
+  await expect(page.getByTestId('order-collector-ens')).toHaveText('ana.eth')
+  await expect(page.getByTestId('order-collector-referral')).toHaveText('KURIO2026')
+  await expect(page.getByTestId('order-collector-notes')).toHaveText('Entregar na carteira principal.')
+})
+
+test('"Usar outra carteira?": a principal vem sozinha, a outra aparece ao marcar e some ao desmarcar', async ({ page }) => {
+  await startCheckout(page)
+
+  const details = page.getByTestId('checkout-wallet-details')
+  await expect(page.getByRole('radio')).toHaveCount(1)
+  await expect(details).toContainText('Principal')
+  await expect(details).toContainText('0x')
+
+  await page.getByLabel('Usar outra carteira?').check()
+  await expect(page.getByRole('radio')).toHaveCount(2)
+  await page.getByRole('radio', { name: /Carteira secundária/ }).check()
+  await expect(details).toContainText('Secundária')
+
+  await page.getByLabel('Usar outra carteira?').uncheck()
+  await expect(page.getByRole('radio')).toHaveCount(1)
+  await expect(page.getByRole('radio', { name: /Carteira principal/ })).toBeChecked()
+  await expect(details).toContainText('Principal')
 })

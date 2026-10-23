@@ -1,6 +1,6 @@
 import { HttpResponse, http } from 'msw'
 import { normalizePhone, validateCollector } from '@/lib/validation'
-import type { Order, CreateOrderRequest, OrderErrorBody } from '@/types/order'
+import type { CollectorData, Order, CreateOrderRequest, OrderErrorBody } from '@/types/order'
 import { authenticate } from './auth-handlers'
 import { buildCart } from './cart-handlers'
 import { readCart } from './cart-store'
@@ -17,6 +17,22 @@ import {
 import { scheduleOrderSettlement } from './realtime'
 import { getScenario } from './scenario'
 import { readConnectedWalletId, walletsOf } from './wallets-handlers'
+
+const OPTIONAL_COLLECTOR_FIELDS = ['username', 'ensName', 'referralCode', 'notes'] as const
+
+function optionalCollectorFields(collector: CollectorData): Partial<CollectorData> {
+  const kept: Partial<CollectorData> = {}
+
+  for (const field of OPTIONAL_COLLECTOR_FIELDS) {
+    const value = collector[field]?.trim()
+
+    if (value) {
+      kept[field] = value
+    }
+  }
+
+  return kept
+}
 
 function error(status: number, body: OrderErrorBody) {
   return HttpResponse.json(body, { status })
@@ -150,6 +166,8 @@ export const ordersHandlers = [
         name: body.collector.name.trim(),
         email: body.collector.email.trim(),
         phone: normalizePhone(body.collector.phone),
+        // Opcionais: só entram no retrato quando informados.
+        ...optionalCollectorFields(body.collector),
       },
       wallet: { id: wallet.id, label: wallet.label, address: wallet.address },
       network: body.network,

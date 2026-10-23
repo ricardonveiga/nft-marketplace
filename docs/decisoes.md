@@ -304,6 +304,32 @@ socket (`order.updated`), ~1,2 s depois da criação.
   dessas telas, então essa adaptação é nossa.
 - Hero da Início e Pagamento mobile foram conferidos com prints e batem com o Figma (sem mudanças).
 
+## Pagamento desktop: perfil do colecionador (conferido com prints)
+
+A descrição do Figma (sem o MCP) lista um formulário extenso "Perfil do colecionador" ao lado do
+resumo. Como cada campo foi tratado:
+
+- **Já existiam**: nome (o "nome de exibição"/"nome do perfil" do Figma é o mesmo dado; o rótulo
+  continua "Nome completo"), e-mail, telefone, carteira, rede e o resumo (itens, subtotal, cupom,
+  desconto, taxa e total).
+- **Novos, opcionais** (vazio = não informado; só entram no pedido quando preenchidos):
+  **Nome de usuário** (3–30: letras, números, `.` ou `_`), **Nome ENS** (`nome.eth`),
+  **Código de indicação** (4–12 letras ou números) e **Observação** (até 280 caracteres). O Figma
+  repete "ENS" e "nome ENS"; ficou um campo só. A validação é a mesma no formulário e na API
+  simulada (`src/lib/validation.ts`), os valores vão no retrato do pedido e aparecem no recibo.
+  O código de indicação é só registrado: não altera valores (não há regra de negócio para ele).
+- **Derivados da carteira** (somente leitura, não são campos): "Tipo de carteira" (Principal ou
+  Secundária) e "Endereço da carteira" completo. Não existe campo para digitar um endereço avulso:
+  o desafio manda pagar com as carteiras cadastradas.
+- **"Usar outra carteira?"**: só aparece com mais de uma carteira. Desmarcado, mostra só a
+  principal; marcado, lista as demais para escolher. Desmarcar volta para a principal.
+- **Botão** "Confirmar pagamento" passou a "Confirmar compra" (texto do Figma). O fluxo continua em
+  duas etapas (dados, depois revisão com aceite dos termos): a revisão antes do envio é exigida
+  pelo desafio, e o Figma descreve só a tela de dados.
+- **Pendente de conferir**: a descrição do Figma é em texto; espaçamentos, ordem exata e o visual
+  mobile dos novos campos não foram comparados com o frame. As baselines de Pagamento foram
+  regeneradas, então só valem como regressão, não como prova de fidelidade.
+
 ## Fora do escopo (inertes e sinalizados com "Em breve")
 
 Páginas editoriais, suporte e atividade, "Esqueceu a senha?", login social, itens do menu

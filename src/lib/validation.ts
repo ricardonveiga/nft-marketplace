@@ -96,6 +96,48 @@ export type CollectorFields = {
   name: string
   email: string
   phone: string
+  username: string
+  ensName: string
+  referralCode: string
+  notes: string
+}
+
+export const NOTES_MAX_LENGTH = 280
+
+export function validateUsername(value: string): string | undefined {
+  const trimmed = value.trim()
+
+  if (!trimmed) {
+    return undefined
+  }
+
+  return /^[A-Za-z0-9_.]{3,30}$/.test(trimmed)
+    ? undefined
+    : 'Use de 3 a 30 letras, números, ponto ou sublinhado.'
+}
+
+export function validateEnsName(value: string): string | undefined {
+  const trimmed = value.trim()
+
+  if (!trimmed) {
+    return undefined
+  }
+
+  return /^([a-z0-9-]+\.)+eth$/i.test(trimmed) ? undefined : 'Informe um nome ENS válido, como nome.eth.'
+}
+
+export function validateReferralCode(value: string): string | undefined {
+  const trimmed = value.trim()
+
+  if (!trimmed) {
+    return undefined
+  }
+
+  return /^[A-Za-z0-9]{4,12}$/.test(trimmed) ? undefined : 'O código tem de 4 a 12 letras ou números.'
+}
+
+export function validateNotes(value: string): string | undefined {
+  return value.length > NOTES_MAX_LENGTH ? `Use no máximo ${NOTES_MAX_LENGTH} caracteres.` : undefined
 }
 
 /** Telefone brasileiro com DDD: 10 ou 11 dígitos (aceita máscara, espaços e +55). */
@@ -117,7 +159,10 @@ export function validatePhone(value: string): string | undefined {
     : 'Informe um telefone válido com DDD.'
 }
 
-export function validateCollector(values: CollectorFields): FieldErrors<CollectorFields> {
+/** Os campos opcionais podem faltar (pedidos de clientes antigos); nome, e-mail e telefone valem sempre. */
+export function validateCollector(
+  values: Pick<CollectorFields, 'name' | 'email' | 'phone'> & Partial<CollectorFields>,
+): FieldErrors<CollectorFields> {
   const errors: FieldErrors<CollectorFields> = {}
   const email = values.email.trim()
 
@@ -130,6 +175,10 @@ export function validateCollector(values: CollectorFields): FieldErrors<Collecto
   }
 
   errors.phone = validatePhone(values.phone)
+  errors.username = validateUsername(values.username ?? '')
+  errors.ensName = validateEnsName(values.ensName ?? '')
+  errors.referralCode = validateReferralCode(values.referralCode ?? '')
+  errors.notes = validateNotes(values.notes ?? '')
 
   for (const key of Object.keys(errors) as Array<keyof CollectorFields>) {
     if (!errors[key]) {

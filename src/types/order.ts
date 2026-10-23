@@ -7,6 +7,11 @@ export type CollectorData = {
   name: string
   email: string
   phone: string
+  /** Campos opcionais do perfil do colecionador (vazio = não informado). */
+  username?: string
+  ensName?: string
+  referralCode?: string
+  notes?: string
 }
 
 export type OrderItem = {
@@ -54,7 +59,9 @@ export type CreateOrderRequest = {
 export type OrderErrorBody = {
   code: string
   message?: string
-  errors?: Partial<Record<'name' | 'email' | 'phone' | 'network', string>>
+  errors?: Partial<
+    Record<'name' | 'email' | 'phone' | 'username' | 'ensName' | 'referralCode' | 'notes' | 'network', string>
+  >
   /** Cotação atual, quando o pedido foi recusado por mudança de valores/disponibilidade. */
   cart?: Cart
   orderId?: string

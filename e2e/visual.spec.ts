@@ -87,7 +87,7 @@ test('Pagamento: dados e revisão', async ({ page }) => {
     localStorage.setItem('mock-cart:user:user-ana', JSON.stringify(cart))
   }, seededCart)
   await signIn(page, '/pagamento')
-  await expect(page.getByRole('heading', { name: 'Dados do colecionador' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Perfil do colecionador' })).toBeVisible()
   await page.getByRole('main').getByLabel('Telefone').fill('(11) 91234-5678')
   await page.getByRole('button', { name: 'Conectar carteira' }).click()
   await expect(page.getByTestId('wallet-status-wallet-ana-1')).toHaveText('Conectada')

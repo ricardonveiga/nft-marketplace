@@ -177,12 +177,12 @@ test('pagamento: mudança de preço durante a revisão exige nova confirmação'
   // A tela avisa sozinha, sem o usuário tentar enviar.
   await expect(page.getByRole('alert').filter({ hasText: 'Os valores do pedido mudaram' })).toBeVisible()
   await expect(page.getByTestId('summary-total')).toHaveText('2.1045 ETH')
-  await expect(page.getByRole('button', { name: 'Confirmar pagamento' })).toBeDisabled()
+  await expect(page.getByRole('button', { name: 'Confirmar compra' })).toBeDisabled()
 
   await page.getByRole('button', { name: 'Aceitar novos valores' }).click()
   await expect(page.getByLabel('Li e aceito os termos de compra de NFTs.')).not.toBeChecked()
   await page.getByLabel('Li e aceito os termos de compra de NFTs.').check()
-  await page.getByRole('button', { name: 'Confirmar pagamento' }).click()
+  await page.getByRole('button', { name: 'Confirmar compra' }).click()
 
   await expect(page.getByTestId('order-total')).toHaveText('2.1045 ETH', { timeout: 10_000 })
 })
@@ -203,7 +203,7 @@ test('order.updated: o pedido pendente é confirmado pelo socket, sem polling', 
   await reviewAndConfirm(page)
   const orderReads = countRequests(page, '/api/orders/')
 
-  await page.getByRole('button', { name: 'Confirmar pagamento' }).click()
+  await page.getByRole('button', { name: 'Confirmar compra' }).click()
   await expect(page.getByTestId('order-confirmed')).toBeVisible({ timeout: 10_000 })
 
   // Uma leitura (a abertura da página) basta: o desfecho veio pelo evento.
@@ -218,7 +218,7 @@ test('order.updated: a recusa também chega pelo socket', async ({ page }) => {
   await page.evaluate(() => localStorage.setItem('mock-scenario', 'payment-declined'))
   const orderReads = countRequests(page, '/api/orders/')
 
-  await page.getByRole('button', { name: 'Confirmar pagamento' }).click()
+  await page.getByRole('button', { name: 'Confirmar compra' }).click()
 
   await expect(page.getByTestId('order-declined')).toBeVisible({ timeout: 10_000 })
   expect(orderReads.count).toBeLessThanOrEqual(1)
@@ -316,7 +316,7 @@ test('queda breve: o cliente reconecta e continua recebendo eventos', async ({ p
 test('pedido pendente é retomado depois de uma queda de conexão', async ({ page }) => {
   await reviewAndConfirm(page)
 
-  await page.getByRole('button', { name: 'Confirmar pagamento' }).click()
+  await page.getByRole('button', { name: 'Confirmar compra' }).click()
   await expect(page).toHaveURL(/\/pedido\/KUR-000001$/)
   // O servidor cai antes de decidir o pedido: o evento de desfecho se perde.
   await control(page).setOffline(true)
