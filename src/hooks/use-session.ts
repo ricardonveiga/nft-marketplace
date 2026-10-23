@@ -5,6 +5,7 @@ import {
   type QueryClient,
 } from '@tanstack/react-query'
 import { fetchSession, login, logout, register } from '@/api/auth'
+import { mergeGuestCart } from '@/api/cart'
 import { clearSessionToken, setSessionToken } from '@/lib/session-token'
 import type { LoginResponse } from '@/types/auth'
 
@@ -15,9 +16,13 @@ export const SESSION_QUERY_KEY = ['session'] as const
 // com observadores ativos deixaria a interface presa à versão antiga.
 const PRESERVED_QUERY_KEYS = new Set(['nfts', SESSION_QUERY_KEY[0]])
 
-/** Remove do cache tudo o que pertence ao usuário anterior (carrinho, favoritos...). */
+/**
+ * Zera o cache do usuário anterior (carrinho, favoritos...). `resetQueries` limpa os
+ * dados e refaz sozinho as consultas em uso (como o contador do carrinho), agora com
+ * a identidade nova; `removeQueries` deixaria a interface presa à versão antiga.
+ */
 export function clearPrivateData(queryClient: QueryClient) {
-  queryClient.removeQueries({
+  return queryClient.resetQueries({
     predicate: (query) => !PRESERVED_QUERY_KEYS.has(String(query.queryKey[0])),
   })
 }
@@ -35,10 +40,18 @@ export function useSession() {
 function useStartSession() {
   const queryClient = useQueryClient()
 
-  return ({ user, token }: LoginResponse) => {
-    clearPrivateData(queryClient)
+  return async ({ user, token }: LoginResponse) => {
     setSessionToken(token)
     queryClient.setQueryData(SESSION_QUERY_KEY, user)
+
+    // Os itens do visitante passam para a conta antes de o carrinho ser relido.
+    try {
+      await mergeGuestCart()
+    } catch {
+      // Sem a mesclagem o carrinho da conta continua valendo; nada a desfazer.
+    }
+
+    await clearPrivateData(queryClient)
   }
 }
 
