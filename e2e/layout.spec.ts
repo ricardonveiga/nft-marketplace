@@ -16,7 +16,7 @@ test('desktop: header com menu, busca, carrinho e entrar', async ({ page }) => {
 
   await expect(page.getByRole('searchbox', { name: 'Buscar NFTs' })).toBeVisible()
   await expect(page.getByRole('button', { name: 'Carrinho' })).toBeVisible()
-  await expect(page.getByRole('button', { name: 'Entrar' })).toBeVisible()
+  await expect(page.getByRole('link', { name: 'Entrar' })).toBeVisible()
   await expect(page.getByRole('navigation', { name: 'Navegação inferior' })).toBeHidden()
 })
 
@@ -80,7 +80,7 @@ test('tablet (768 px): sem rolagem horizontal e com filtros na barra de abas', a
   )
   expect(overflow).toBe(0)
 
-  const enter = page.getByRole('button', { name: 'Entrar' })
+  const enter = page.getByRole('link', { name: 'Entrar' })
   await expect(enter).toBeVisible()
   expect(((await enter.boundingBox())?.x ?? 0) + 100).toBeLessThanOrEqual(768)
   await expect(page.getByRole('button', { name: 'Filtros' })).toBeVisible()
