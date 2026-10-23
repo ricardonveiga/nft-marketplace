@@ -1,8 +1,10 @@
-import { Link } from '@tanstack/react-router'
+import { Link, useRouterState } from '@tanstack/react-router'
 import { SlidersHorizontal } from 'lucide-react'
 import cartIcon from '@/assets/icons/cart.svg'
 import loginIcon from '@/assets/icons/login.svg'
+import { useFiltersDrawer } from '@/components/catalog/filters-drawer'
 import { Button } from '@/components/ui/button'
+import { useCatalogSearch } from '@/hooks/use-catalog-search'
 import { SearchField } from './search-field'
 
 type SiteHeaderProps = {
@@ -12,7 +14,7 @@ type SiteHeaderProps = {
 const navItemClass =
   'relative flex h-full items-center text-base text-foreground transition-colors hover:text-text-accent focus-visible:outline-2 focus-visible:outline-ring'
 
-const soonClass = `${navItemClass} cursor-not-allowed opacity-60 hover:text-foreground`
+const soonClass = `${navItemClass} hidden cursor-not-allowed opacity-60 hover:text-foreground lg:flex`
 
 function NavLabel({ isActive, children }: { isActive: boolean; children: string }) {
   return (
@@ -29,11 +31,19 @@ function NavLabel({ isActive, children }: { isActive: boolean; children: string 
 }
 
 export function SiteHeader({ cartItemCount = 0 }: SiteHeaderProps) {
+  const { search, update } = useCatalogSearch()
+  const { openFilters } = useFiltersDrawer()
+  const onHome = useRouterState({ select: (state) => state.location.pathname === '/' })
+
+  function handleSearch(query: string) {
+    update({ q: query.trim() || undefined })
+  }
+
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background">
       {/* Desktop */}
       <div className="mx-auto hidden h-[45px] w-full max-w-[1264px] items-stretch justify-between px-8 md:flex">
-        <div className="flex w-40 items-center">
+        <div className="flex items-center lg:w-40">
           <Link
             to="/"
             className="text-sm font-bold tracking-[1.4px] text-foreground"
@@ -42,10 +52,10 @@ export function SiteHeader({ cartItemCount = 0 }: SiteHeaderProps) {
           </Link>
         </div>
 
-        <nav aria-label="Principal" className="flex gap-10">
+        <nav aria-label="Principal" className="flex gap-6 lg:gap-10">
           <Link
             to="/"
-            activeOptions={{ exact: true, includeHash: true }}
+            activeOptions={{ exact: true, includeHash: true, includeSearch: false }}
             activeProps={{ className: 'font-bold text-text-accent' }}
             className={navItemClass}
           >
@@ -54,7 +64,7 @@ export function SiteHeader({ cartItemCount = 0 }: SiteHeaderProps) {
           <Link
             to="/"
             hash="mercado"
-            activeOptions={{ exact: true, includeHash: true }}
+            activeOptions={{ exact: true, includeHash: true, includeSearch: false }}
             activeProps={{ className: 'font-bold text-text-accent' }}
             className={navItemClass}
           >
@@ -68,11 +78,14 @@ export function SiteHeader({ cartItemCount = 0 }: SiteHeaderProps) {
           </span>
         </nav>
 
-        <div className="flex items-center gap-7">
+        <div className="flex items-center gap-4 lg:gap-7">
           <SearchField
+            key={`desktop-${search.q ?? ''}`}
             label="Buscar NFTs"
             placeholder="Buscar NFTs"
-            className="h-[35px] w-[220px] rounded-md border border-border bg-card"
+            defaultValue={search.q}
+            onSearch={handleSearch}
+            className="h-[35px] w-[170px] rounded-md border border-border bg-card lg:w-[220px]"
           />
 
           <button
@@ -105,17 +118,23 @@ export function SiteHeader({ cartItemCount = 0 }: SiteHeaderProps) {
       {/* Mobile */}
       <div className="flex items-center gap-2 px-6 py-4 md:hidden">
         <SearchField
+          key={`mobile-${search.q ?? ''}`}
           label="Explorar coleções"
           placeholder="Explorar coleções"
+          defaultValue={search.q}
+          onSearch={handleSearch}
           className="h-[45px] flex-1 rounded-xl bg-card"
         />
+        {onHome && (
         <button
           type="button"
           aria-label="Filtros"
+          onClick={openFilters}
           className="grid size-[45px] shrink-0 place-items-center rounded-xl bg-linear-to-br from-primary to-surface-dark text-primary-foreground focus-visible:outline-2 focus-visible:outline-ring"
         >
           <SlidersHorizontal className="size-[22px]" aria-hidden="true" />
         </button>
+        )}
       </div>
     </header>
   )

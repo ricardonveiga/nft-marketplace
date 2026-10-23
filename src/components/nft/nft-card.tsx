@@ -19,14 +19,14 @@ export function NftCard({ nft }: { nft: Nft }) {
       data-testid="nft-card"
       className="group flex w-full flex-col gap-2 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring md:gap-3"
     >
-      <div className="relative flex h-[200px] items-center justify-center overflow-hidden rounded-[20px] bg-[linear-gradient(139.5deg,var(--card)_12%,var(--surface-raised)_106.6%)] md:h-[300px] md:rounded-none md:bg-none md:bg-card">
+      <div className="relative flex h-[200px] items-center justify-center overflow-hidden rounded-[20px] bg-[linear-gradient(139.5deg,var(--card)_12%,var(--surface-raised)_106.6%)] md:aspect-[258/300] md:h-auto md:rounded-none md:bg-none md:bg-card">
         <img
           src={nft.imageUrl}
           alt={`${nft.name}, da coleção ${nft.collection}`}
           width={600}
           height={600}
           loading="lazy"
-          className={`size-[168px] rounded-2xl object-cover md:size-[250px] md:rounded-[15px] ${soldOut ? 'opacity-60' : ''}`}
+          className={`size-[168px] rounded-2xl object-cover md:aspect-square md:size-auto md:w-[calc(100%-8px)] md:max-w-[250px] md:rounded-[15px] ${soldOut ? 'opacity-60' : ''}`}
         />
 
         {nft.rarity !== 'comum' && (
@@ -66,7 +66,7 @@ export function NftCardSkeleton() {
       data-testid="nft-card-skeleton"
       className="flex flex-col gap-2 md:gap-3"
     >
-      <Skeleton className="h-[200px] w-full rounded-[20px] md:h-[300px] md:rounded-none" />
+      <Skeleton className="h-[200px] w-full rounded-[20px] md:aspect-[258/300] md:h-auto md:rounded-none" />
       <div className="flex flex-col gap-1.5 pl-2 md:pl-0">
         <Skeleton className="h-4 w-3/4" />
         <Skeleton className="h-4 w-1/3" />
