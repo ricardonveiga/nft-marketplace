@@ -69,3 +69,19 @@ test('newsletter não aparenta sucesso funcional', async ({ page }) => {
     'Inscrição indisponível nesta demonstração.',
   )
 })
+
+test('tablet (768 px): sem rolagem horizontal e com filtros na barra de abas', async ({ page }) => {
+  await page.setViewportSize({ width: 768, height: 900 })
+  await page.goto('/')
+  await expect(page.getByTestId('nft-grid')).toBeVisible()
+
+  const overflow = await page.evaluate(
+    () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+  )
+  expect(overflow).toBe(0)
+
+  const enter = page.getByRole('button', { name: 'Entrar' })
+  await expect(enter).toBeVisible()
+  expect(((await enter.boundingBox())?.x ?? 0) + 100).toBeLessThanOrEqual(768)
+  await expect(page.getByRole('button', { name: 'Filtros' })).toBeVisible()
+})
