@@ -54,6 +54,39 @@ tudo o que difere dele (ou que ele não define) está listado aqui.
   real é relido. Cenário de teste: `localStorage['mock-scenario'] = 'favorites-error'`.
 - **Dados extras de mock**: descrição e criador por coleção, gerados nas fixtures.
 
+## Pagamento e pedido
+
+- **Duas etapas**: (1) dados do colecionador + carteira e rede, (2) revisão. O envio só acontece
+  na revisão, depois de aceitar os termos. `/pagamento` exige login: o visitante vai ao login e
+  volta ao pagamento (o destino é fixado na primeira renderização da guarda de rota).
+- **Dados do colecionador**: nome, e-mail e telefone brasileiro com DDD (10 ou 11 dígitos,
+  aceita máscara). Vêm preenchidos com a conta. Os campos são inferidos (sem o Figma).
+- **Carteiras**: do mock (Ana tem 2, Bruno 1; contas novas não têm nenhuma e são avisadas).
+  A conexão é simulada no servidor: demora ~0,5 s, persiste após refresh, e a "Carteira
+  secundária" da Ana sempre **recusa** a conexão (cenário determinístico). Desconectar é possível.
+  A rede de pagamento só oferece as redes que a carteira aceita.
+- **Idempotência**: `POST /api/orders` exige o cabeçalho `Idempotency-Key`. Mesma chave + mesmo
+  conteúdo devolve o mesmo pedido (sem criar outro); mesma chave com conteúdo diferente é
+  conflito (409). A chave vem do conteúdo do pedido e fica na sessão da aba: reenviar depois de
+  um timeout ou de um refresh recupera o mesmo pedido. Muda quando o conteúdo muda e é
+  renovada depois de um desfecho (para a tentativa seguinte ser um pedido novo).
+- **Cliques repetidos**: uma trava síncrona (ref) + botão desabilitado; um segundo clique no
+  mesmo instante nem chega à API. Além disso a API recusa um novo pedido enquanto há um pendente.
+- **Revalidação**: o envio leva a cotação revisada (`version` + total). Se o carrinho mudou
+  (valores, cupom, taxa) a API responde 409 `quote_changed` com a cotação atual; a tela mostra
+  o novo resumo, desmarca os termos e exige nova confirmação. Itens indisponíveis, carteira
+  desconectada e carrinho vazio também têm tratamento próprio.
+- **Estados do pedido**: `pending` → `confirmed` | `declined`. O "processador" simulado decide
+  ~1,2 s depois da criação; a página do pedido relê a cada segundo enquanto pendente (hoje por
+  polling; os eventos `order.updated` entram na etapa de tempo real). Confirmado esvazia o
+  carrinho; recusado mantém carrinho e rascunho.
+- **Pedido = retrato (snapshot)** dos itens, valores, carteira e dados do colecionador; mudanças
+  no catálogo não o alteram. Pedidos são privados: outro usuário recebe "não encontrado".
+- **Confirmação provisória** (`/pedido/:id`): só os dados essenciais (número, referência de
+  transação simulada, itens, valores, carteira, rede). O recibo completo vem na próxima etapa.
+- **Cenários**: `payment-declined` (o próximo pagamento é recusado), `order-timeout` (cria o
+  pedido mas a resposta não chega, uma vez).
+
 ## Assets
 
 - **Artes dos NFTs**: as 4 imagens do Figma (1254 × 1254, ~2 MB cada) foram redimensionadas
@@ -76,7 +109,8 @@ tudo o que difere dele (ou que ele não define) está listado aqui.
 
 ## Mocks (MSW)
 
-- Cenários por `localStorage['mock-scenario']`: `empty`, `error` (catálogo e carrinho), `session-expired`.
+- Cenários por `localStorage['mock-scenario']`: `empty`, `error` (catálogo, carrinho e pedidos),
+  `session-expired`, `favorites-error`, `payment-declined`, `order-timeout`.
 - Usuários de demonstração: `ana@kurio.test` / `kurio123` e `bruno@kurio.test` / `kurio456`.
   Contas criadas no cadastro ficam em `localStorage['mock-users']` (sobrevivem ao refresh;
   `resetRegisteredUsers()` volta ao cenário conhecido). Carrinhos ficam em
@@ -93,7 +127,8 @@ Páginas editoriais, suporte e atividade, "Esqueceu a senha?", login social, ite
 ## Pendências conhecidas
 
 - Seções do Figma ainda não implementadas na Início: hero, promoções e blog.
-- Carrinho e Detalhe do NFT montados sem ler os frames do Figma (limite do MCP): estrutura e
-  medidas inferidas.
+- Carrinho, Detalhe do NFT, Pagamento e Pedido montados sem ler os frames do Figma (limite do
+  MCP): estrutura, campos e medidas inferidos.
+- Falta o cadastro/edição de carteiras (tela Carteiras) e o recibo completo do pedido.
 - Login (mobile) e Cadastro foram montados sem ler os frames do Figma (limite do MCP):
   estrutura e campos do Cadastro são inferidos a partir do Login.
