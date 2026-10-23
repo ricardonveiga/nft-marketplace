@@ -116,9 +116,9 @@ function HomePage() {
               aria-busy={isPlaceholderData}
               className={`${gridClass} ${isPlaceholderData ? 'opacity-60 transition-opacity' : ''}`}
             >
-              {data.items.map((nft) => (
+              {data.items.map((nft, index) => (
                 <li key={nft.id} className="flex">
-                  <NftCard nft={nft} />
+                  <NftCard nft={nft} priority={index < 3} />
                 </li>
               ))}
             </ul>

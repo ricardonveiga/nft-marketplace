@@ -9,7 +9,8 @@ const rarityLabel: Record<NftRarity, string> = {
   lendario: 'LENDÁRIO',
 }
 
-export function NftCard({ nft }: { nft: Nft }) {
+/** `priority` marca os cards já visíveis ao abrir a página: a imagem carrega logo, sem lazy. */
+export function NftCard({ nft, priority = false }: { nft: Nft; priority?: boolean }) {
   const soldOut = nft.availability === 'esgotado'
 
   return (
@@ -25,7 +26,8 @@ export function NftCard({ nft }: { nft: Nft }) {
           alt={`${nft.name}, da coleção ${nft.collection}`}
           width={600}
           height={600}
-          loading="lazy"
+          loading={priority ? 'eager' : 'lazy'}
+          fetchPriority={priority ? 'high' : undefined}
           className={`size-[168px] rounded-2xl object-cover md:aspect-square md:size-auto md:w-[calc(100%-8px)] md:max-w-[250px] md:rounded-[15px] ${soldOut ? 'opacity-60' : ''}`}
         />
 
