@@ -1,84 +1,89 @@
-import type { Nft, NftAvailability, NftRarity } from '@/types/nft'
+import type {
+  Nft,
+  NftAvailability,
+  NftNetwork,
+  NftRarity,
+} from '@/types/nft'
+
+type Artwork = 'emerald' | 'sage' | 'neon' | 'golden'
 
 type Seed = readonly [
   name: string,
+  artwork: Artwork,
   priceEth: string,
+  previousPriceEth: string | undefined,
   edition: string,
   rarity: NftRarity,
   availability: NftAvailability,
 ]
 
-const collections: ReadonlyArray<{ name: string; seeds: readonly Seed[] }> = [
-  {
-    name: 'Aurora Drift',
-    seeds: [
-      ['Brisa Dourada', '0.85', '1/50', 'raro', 'disponivel'],
-      ['Véu Boreal', '1.20', '7/50', 'epico', 'disponivel'],
-      ['Eco Polar', '0.45', '23/50', 'comum', 'disponivel'],
-      ['Chama Glacial', '3.50', '50/50', 'lendario', 'esgotado'],
-    ],
-  },
-  {
-    name: 'Pixel Reliquary',
-    seeds: [
-      ['Guardião 8-bit', '0.30', '12/200', 'comum', 'disponivel'],
-      ['Relíquia Cúbica', '0.75', '4/200', 'raro', 'disponivel'],
-      ['Códice Quebrado', '2.10', '1/200', 'lendario', 'disponivel'],
-      ['Moeda Fantasma', '0.18', '200/200', 'comum', 'esgotado'],
-    ],
-  },
-  {
-    name: 'Neon Orchard',
-    seeds: [
-      ['Maçã Elétrica', '0.62', '3/80', 'raro', 'disponivel'],
-      ['Pomar Noturno', '0.95', '15/80', 'raro', 'disponivel'],
-      ['Semente Prisma', '1.80', '2/80', 'epico', 'disponivel'],
-      ['Raiz Luminosa', '0.27', '80/80', 'comum', 'esgotado'],
-    ],
-  },
-  {
-    name: 'Cobalt Tides',
-    seeds: [
-      ['Maré Alta', '1.05', '9/120', 'raro', 'disponivel'],
-      ['Coral Sintético', '0.40', '48/120', 'comum', 'disponivel'],
-      ['Abismo Azul', '2.75', '1/120', 'lendario', 'disponivel'],
-      ['Concha de Sal', '0.55', '120/120', 'comum', 'esgotado'],
-    ],
-  },
-  {
-    name: 'Ember Glyphs',
-    seeds: [
-      ['Glifo Brasa', '0.90', '5/60', 'raro', 'disponivel'],
-      ['Cinza Viva', '0.35', '31/60', 'comum', 'disponivel'],
-      ['Runa Solar', '1.60', '2/60', 'epico', 'disponivel'],
-      ['Fogo Antigo', '4.20', '60/60', 'lendario', 'esgotado'],
-    ],
-  },
-  {
-    name: 'Quiet Mosaic',
-    seeds: [
-      ['Fragmento Calmo', '0.22', '40/300', 'comum', 'disponivel'],
-      ['Padrão Silente', '0.68', '17/300', 'raro', 'disponivel'],
-      ['Tessela Rara', '1.35', '6/300', 'epico', 'disponivel'],
-      ['Mosaico Final', '0.50', '300/300', 'raro', 'esgotado'],
-    ],
-  },
+const collectionByArtwork: Record<Artwork, string> = {
+  emerald: 'Emerald Apes',
+  sage: 'Sage Nomads',
+  neon: 'Neon Vessels',
+  golden: 'Golden Signals',
+}
+
+const categories = [
+  'Arte digital',
+  'Fotografia',
+  'Música',
+  'Arte 3D',
+  'Colecionáveis',
+  'Generativa',
+  'Jogos',
+  'Assinaturas',
+  'Utilidade',
+] as const
+
+const networks: readonly NftNetwork[] = ['Ethereum', 'Polygon', 'Solana']
+
+// Os 9 primeiros seguem a primeira página do frame Desktop / Início do Figma.
+const seeds: readonly Seed[] = [
+  ['Emerald Ape #042', 'emerald', '1.19', undefined, '42/500', 'comum', 'disponivel'],
+  ['Sage Nomad #009', 'sage', '1.69', undefined, '9/300', 'comum', 'disponivel'],
+  ['Neon Vessel #552', 'neon', '1.99', '2.29', '552/800', 'raro', 'disponivel'],
+  ['Cosmic Bloom #118', 'sage', '1.29', undefined, '118/300', 'comum', 'disponivel'],
+  ['Violet Nomad #314', 'sage', '1.39', undefined, '24/300', 'comum', 'disponivel'],
+  ['Ivory Baron #088', 'neon', '1.79', undefined, '88/800', 'comum', 'disponivel'],
+  ['Golden Beat #207', 'golden', '0.99', undefined, '207/400', 'comum', 'disponivel'],
+  ['Golden Echo #333', 'golden', '0.59', undefined, '333/400', 'comum', 'esgotado'],
+  ['Golden Signal #160', 'golden', '0.39', undefined, '160/400', 'comum', 'disponivel'],
+  ['Emerald Ape #108', 'emerald', '2.40', undefined, '108/500', 'raro', 'disponivel'],
+  ['Emerald Ape #217', 'emerald', '1.05', '1.25', '217/500', 'comum', 'disponivel'],
+  ['Sage Nomad #077', 'sage', '0.85', undefined, '77/300', 'comum', 'esgotado'],
+  ['Neon Vessel #301', 'neon', '3.10', undefined, '301/800', 'epico', 'disponivel'],
+  ['Cosmic Bloom #054', 'sage', '1.55', undefined, '54/300', 'raro', 'disponivel'],
+  ['Golden Beat #412', 'golden', '0.72', undefined, '12/400', 'comum', 'disponivel'],
+  ['Ivory Baron #190', 'neon', '2.05', '2.50', '190/800', 'raro', 'disponivel'],
+  ['Violet Nomad #022', 'sage', '4.20', undefined, '22/300', 'lendario', 'disponivel'],
+  ['Golden Signal #089', 'golden', '0.48', undefined, '89/400', 'comum', 'disponivel'],
+  ['Emerald Ape #330', 'emerald', '1.33', undefined, '330/500', 'comum', 'disponivel'],
+  ['Sage Nomad #145', 'sage', '0.95', undefined, '145/300', 'comum', 'disponivel'],
+  ['Neon Vessel #076', 'neon', '2.75', undefined, '76/800', 'epico', 'esgotado'],
+  ['Cosmic Bloom #260', 'sage', '1.12', undefined, '260/300', 'comum', 'disponivel'],
+  ['Golden Beat #003', 'golden', '5.00', undefined, '3/400', 'lendario', 'disponivel'],
+  ['Ivory Baron #411', 'neon', '1.48', undefined, '411/800', 'comum', 'esgotado'],
+  ['Violet Nomad #198', 'sage', '0.66', '0.80', '198/300', 'comum', 'disponivel'],
+  ['Golden Signal #271', 'golden', '0.52', undefined, '271/400', 'comum', 'disponivel'],
+  ['Emerald Ape #009', 'emerald', '3.80', undefined, '9/500', 'epico', 'esgotado'],
 ]
 
-export const nfts: readonly Nft[] = collections.flatMap(
-  ({ name: collection, seeds }, collectionIndex) =>
-    seeds.map(([name, priceEth, edition, rarity, availability], seedIndex) => {
-      const number = collectionIndex * seeds.length + seedIndex + 1
-
-      return {
-        id: `nft-${String(number).padStart(2, '0')}`,
-        name,
-        collection,
-        imageUrl: `/nfts/nft-${String(number).padStart(2, '0')}.svg`,
-        priceEth,
-        edition,
-        rarity,
-        availability,
-      }
-    }),
+export const nfts: readonly Nft[] = seeds.map(
+  (
+    [name, artwork, priceEth, previousPriceEth, edition, rarity, availability],
+    index,
+  ) => ({
+    id: `nft-${String(index + 1).padStart(2, '0')}`,
+    name,
+    collection: collectionByArtwork[artwork],
+    category: categories[index % categories.length],
+    network: networks[index % networks.length],
+    imageUrl: `/nfts/${artwork}.webp`,
+    priceEth,
+    ...(previousPriceEth ? { previousPriceEth } : {}),
+    edition,
+    rarity,
+    availability,
+  }),
 )
