@@ -14,6 +14,8 @@ export type AuthFieldProps = {
   error?: string
   /** Texto de ajuda, associado ao campo por aria-describedby. */
   hint?: string
+  /** Mostra o rótulo (por padrão é só para leitores de tela, como no Figma do login). */
+  showLabel?: boolean
   onChange: (value: string) => void
   inputRef?: RefObject<HTMLInputElement | null>
   trailing?: ReactNode
@@ -29,6 +31,7 @@ export function AuthField({
   value,
   error,
   hint,
+  showLabel,
   onChange,
   inputRef,
   trailing,
@@ -42,7 +45,7 @@ export function AuthField({
 
   return (
     <div className="flex flex-col gap-1">
-      <label htmlFor={id} className="sr-only">
+      <label htmlFor={id} className={showLabel ? 'text-sm' : 'sr-only'}>
         {label}
       </label>
       <div className="relative">

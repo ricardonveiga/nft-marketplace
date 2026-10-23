@@ -1,3 +1,4 @@
+import { Link } from '@tanstack/react-router'
 import { useId, useState, type FormEvent } from 'react'
 import { Button } from '@/components/ui/button'
 import { useApplyCoupon, useRemoveCoupon } from '@/hooks/use-cart'
@@ -152,19 +153,26 @@ export function CartSummary(props: CartSummaryProps) {
         </p>
       )}
 
-      <Button
-        type="button"
-        disabled
-        title="O pagamento será liberado na próxima etapa"
-        className="h-[45px] w-full rounded-md text-base font-bold"
-      >
-        Finalizar compra
-      </Button>
-      <p className="-mt-2 text-xs text-text-secondary">
-        {hasPayable
-          ? 'O pagamento será liberado na próxima etapa.'
-          : 'Adicione itens disponíveis para finalizar.'}
-      </p>
+      {blocked || !hasPayable ? (
+        <>
+          <Button
+            type="button"
+            disabled
+            className="h-[45px] w-full rounded-md text-base font-bold"
+          >
+            Finalizar compra
+          </Button>
+          {!hasPayable && (
+            <p className="-mt-2 text-xs text-text-secondary">
+              Adicione itens disponíveis para finalizar.
+            </p>
+          )}
+        </>
+      ) : (
+        <Button asChild className="h-[45px] w-full rounded-md text-base font-bold">
+          <Link to="/pagamento">Finalizar compra</Link>
+        </Button>
+      )}
     </section>
   )
 }
