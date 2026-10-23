@@ -78,7 +78,7 @@ tudo o que difere dele (ou que ele não define) está listado aqui.
   desconectada e carrinho vazio também têm tratamento próprio.
 - **Estados do pedido**: `pending` → `confirmed` | `declined`. O "processador" simulado decide
   ~1,2 s depois da criação; a página do pedido relê a cada segundo enquanto pendente (hoje por
-  polling; os eventos `order.updated` entram na etapa de tempo real). Confirmado esvazia o
+  polling de reserva; o desfecho chega por `order.updated`, ver "Tempo real"). Confirmado esvazia o
   carrinho; recusado mantém carrinho e rascunho.
 - **Pedido = retrato (snapshot)** dos itens, valores, carteira e dados do colecionador; mudanças
   no catálogo não o alteram. Pedidos são privados: outro usuário recebe "não encontrado".
@@ -86,6 +86,61 @@ tudo o que difere dele (ou que ele não define) está listado aqui.
   transação simulada, itens, valores, carteira, rede). O recibo completo vem na próxima etapa.
 - **Cenários**: `payment-declined` (o próximo pagamento é recusado), `order-timeout` (cria o
   pedido mas a resposta não chega, uma vez).
+
+## Tempo real (Socket.IO)
+
+**Transporte.** O cliente é o `socket.io-client` de verdade, conectado a um servidor Socket.IO
+simulado na camada de rede com MSW + `@mswjs/socket.io-binding` (`src/mocks/realtime.ts`).
+Nenhum setter ou callback atualiza o cache por fora: a interface só muda quando o evento chega
+pelo socket.
+
+**Limitações do ambiente de mocks** (documentadas por exigência do desafio):
+- só **WebSocket** (`transports: ['websocket']`); o MSW intercepta o WebSocket, não o long-polling;
+- o binding simula o handshake do Engine.IO; o mock envia os **pings** de keep-alive (sem eles o
+  cliente cairia por "ping timeout" em ~30 s);
+- sem namespaces, salas, broadcast nem acks: a assinatura de pedidos é um evento da aplicação
+  (`orders.subscribe` com o token da sessão) e o "quarto" do usuário é uma lista mantida no mock;
+- o MSW tira o prefixo `/socket.io/` da URL antes de comparar, então o handler usa `ws.link('*')` e
+  só trata conexões do Engine.IO (parâmetro `EIO`); o resto (como o HMR do Vite) passa direto;
+- o `socket.io-client` é carregado **sob demanda, depois de o mock ligar**: o Engine.IO guarda o
+  `WebSocket` nativo ao ser importado, e importar antes impede a interceptação (isso também tira o
+  cliente do pacote inicial). O `vite.config.ts` pré-declara a dependência para o Vite não
+  reotimizar no meio da sessão;
+- o servidor vive na página: recarregar derruba o servidor e os timers do mock (a retomada é
+  feita pelo REST, que lê o mesmo estado).
+
+**Eventos** (contrato em `src/types/realtime.ts`). Todos trazem `eventId` (identidade estável),
+`resource` (tipo e id), `version` e `data` com o **estado completo** dos campos afetados (não um
+diff), então aplicar duas vezes dá o mesmo resultado:
+- `nft.updated` (público): preço, preço anterior, disponibilidade, estoque e máximo por pedido;
+- `order.updated` (só para o dono do pedido): status, referência da transação e motivo da recusa.
+
+**Regras do cliente** (`src/lib/realtime/apply-events.ts`): evento com `eventId` já visto é
+ignorado (duplicata); evento com versão menor ou igual à já conhecida do recurso é ignorado
+(antigo, fora de ordem, ou dado que o REST já trouxe mais novo, inclusive no carrinho). Só o que
+passa por essas regras causa efeitos: patch do cache (catálogo, detalhe, destaque), releitura do
+que a API calcula (listas, destaque, carrinho) e o aviso. Pedidos usam a mesma regra por versão.
+
+**Fonte única de verdade.** `src/mocks/catalog-state.ts` guarda preço e estoque mutáveis (com
+versão por NFT) e todo o REST (catálogo, detalhe, destaque, carrinho, pedidos) e os eventos leem
+dali, então nunca divergem. Persiste em `localStorage['mock-nft-state']`.
+
+**Interface.** Avisos em região `role="status"` onde fazem sentido (detalhe, carrinho,
+pagamento, pedido; só o que chegou depois de a tela abrir). No pagamento, uma mudança de valores
+durante a revisão mostra o aviso sozinha e exige "Aceitar novos valores" + novo aceite dos termos.
+Sem conexão, aparece "Sem conexão em tempo real. Tentando reconectar…"; ao reconectar, o cliente
+relê catálogo, carrinho e pedidos (os eventos perdidos não voltam). O polling do pedido só roda
+como reserva enquanto o socket está fora.
+
+**Sessão.** Ao entrar, o cliente assina os pedidos do usuário; ao sair ou trocar de conta, cancela
+a assinatura anterior e assina a nova. O servidor só entrega `order.updated` ao dono.
+
+**Painel de controle do mock** (`window.__mockControl`, só com mocks ligados; `src/mocks/control.ts`)
+para cenários reproduzíveis: `updateNft(id, {priceEth, availableQuantity})` (muda o estado e emite),
+`replay(evento)` (duplicata), `emit(evento)` (evento antigo/fora de ordem), `disconnect()`,
+`setOffline(bool)`, `connections()` (quem assinou o quê) e `resetCatalog()`. Ele só comanda o
+SERVIDOR simulado; quem atualiza a tela é o cliente real. O desfecho dos pedidos também sai pelo
+socket (`order.updated`), ~1,2 s depois da criação.
 
 ## Assets
 
@@ -129,6 +184,7 @@ Páginas editoriais, suporte e atividade, "Esqueceu a senha?", login social, ite
 - Seções do Figma ainda não implementadas na Início: hero, promoções e blog.
 - Carrinho, Detalhe do NFT, Pagamento e Pedido montados sem ler os frames do Figma (limite do
   MCP): estrutura, campos e medidas inferidos.
-- Falta o cadastro/edição de carteiras (tela Carteiras) e o recibo completo do pedido.
+- Falta o cadastro/edição de carteiras (tela Carteiras), o recibo completo do pedido, o
+  perfil do colecionador e os extras da Início (hero, promoções, blog).
 - Login (mobile) e Cadastro foram montados sem ler os frames do Figma (limite do MCP):
   estrutura e campos do Cadastro são inferidos a partir do Login.
