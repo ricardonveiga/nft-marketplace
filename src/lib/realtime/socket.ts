@@ -1,5 +1,6 @@
 import { useSyncExternalStore } from 'react'
 import type { Socket } from 'socket.io-client'
+import { whenMocksReady } from '../mocks-ready'
 
 let socketPromise: Promise<Socket> | null = null
 
@@ -13,7 +14,9 @@ let socketPromise: Promise<Socket> | null = null
  * cliente do pacote inicial. Só usa WebSocket (o MSW não intercepta o long-polling).
  */
 export function getSocket() {
-  socketPromise ??= import('socket.io-client').then(({ io }) =>
+  socketPromise ??= whenMocksReady()
+    .then(() => import('socket.io-client'))
+    .then(({ io }) =>
     io({
       path: '/socket.io',
       transports: ['websocket'],

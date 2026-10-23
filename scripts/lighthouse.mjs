@@ -19,8 +19,10 @@ import desktopConfig from 'lighthouse/core/config/desktop-config.js'
 
 const PORT = 4179
 const BASE_URL = `http://localhost:${PORT}`
-const RUNS = 3
-const OUT_DIR = path.resolve('reports/lighthouse')
+// Variáveis só para experimentos locais; a auditoria oficial usa os padrões (3 medições, tudo).
+const RUNS = Number(process.env.LH_RUNS ?? 3)
+const OUT_DIR = path.resolve(process.env.LH_OUT ?? 'reports/lighthouse')
+const ONLY_PROFILE = process.env.LH_PROFILE
 const CATEGORIES = ['performance', 'accessibility', 'best-practices', 'seo']
 
 const pages = [
@@ -32,6 +34,8 @@ const profiles = [
   { id: 'mobile', name: 'Mobile', config: undefined },
   { id: 'desktop', name: 'Desktop', config: desktopConfig },
 ]
+
+const activeProfiles = () => (ONLY_PROFILE ? profiles.filter((profile) => profile.id === ONLY_PROFILE) : profiles)
 
 const npx = process.platform === 'win32' ? 'npx.cmd' : 'npx'
 const npm = process.platform === 'win32' ? 'npm.cmd' : 'npm'
@@ -123,7 +127,7 @@ async function main() {
     const results = []
 
     for (const page of pages) {
-      for (const profile of profiles) {
+      for (const profile of activeProfiles()) {
         const runs = []
 
         for (let index = 1; index <= RUNS; index++) {
