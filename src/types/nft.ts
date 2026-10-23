@@ -22,6 +22,8 @@ export type Nft = {
   edition: string
   rarity: NftRarity
   availability: NftAvailability
+  /** Unidades ainda disponíveis da edição (0 quando esgotado). */
+  availableQuantity: number
   /** Data de listagem (ISO 8601). Alimenta a aba "Novos lançamentos" e a ordenação. */
   listedAt: string
   /** Pontuação de 0 a 100. Alimenta a aba "Em alta". */

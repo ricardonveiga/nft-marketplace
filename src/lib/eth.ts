@@ -40,3 +40,12 @@ export function centiToEth(centi: number) {
 export function formatEthBr(value: string) {
   return value.replace('.', ',')
 }
+
+/** wei (BigInt) -> string decimal em ETH, sem zeros à direita e com no mínimo 2 casas. */
+export function weiToEth(wei: bigint, minDecimals = 2) {
+  const digits = wei.toString().padStart(ETH_DECIMALS + 1, '0')
+  const whole = digits.slice(0, -ETH_DECIMALS)
+  const fraction = digits.slice(-ETH_DECIMALS).replace(/0+$/, '').padEnd(minDecimals, '0')
+
+  return `${whole}.${fraction}`
+}

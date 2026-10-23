@@ -77,6 +77,13 @@ const seeds: readonly Seed[] = [
   ['Emerald Ape #009', 'emerald', '6.50', undefined, '9/500', 'epico', 'esgotado'],
 ]
 
+/** Unidades restantes da edição "atual/total"; esgotado não tem nenhuma. */
+function remainingUnits(edition: string, availability: NftAvailability) {
+  const [current, total] = edition.split('/').map(Number)
+
+  return availability === 'esgotado' ? 0 : Math.max(total - current, 0)
+}
+
 export const nfts: readonly Nft[] = seeds.map(
   (
     [name, artwork, priceEth, previousPriceEth, edition, rarity, availability],
@@ -93,6 +100,7 @@ export const nfts: readonly Nft[] = seeds.map(
     edition,
     rarity,
     availability,
+    availableQuantity: remainingUnits(edition, availability),
     // Quanto menor o índice, mais recente: a ordem padrão reproduz o Figma.
     listedAt: new Date(REFERENCE_DATE - index * 2 * DAY).toISOString(),
     popularity: (index * 53 + 17) % 100,

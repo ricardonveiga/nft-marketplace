@@ -1,4 +1,5 @@
 import axios, { isAxiosError } from 'axios'
+import { getGuestCartId } from './guest-cart'
 import { emitSessionExpired, getSessionToken } from './session-token'
 
 export const api = axios.create({
@@ -10,6 +11,8 @@ export const api = axios.create({
 
 api.interceptors.request.use((config) => {
   const token = getSessionToken()
+
+  config.headers['X-Guest-Cart'] = getGuestCartId()
 
   if (token) {
     config.headers.Authorization = `Bearer ${token}`
