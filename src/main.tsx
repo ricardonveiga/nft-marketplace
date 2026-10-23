@@ -4,9 +4,10 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import { enableMocking } from './mocks/enableMocking'
+import { parseSearch, stringifySearch } from './lib/search-params'
 import { routeTree } from './routeTree.gen'
 
-const router = createRouter({ routeTree })
+const router = createRouter({ routeTree, parseSearch, stringifySearch })
 
 declare module '@tanstack/react-router' {
   interface Register {
