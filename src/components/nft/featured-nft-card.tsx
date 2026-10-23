@@ -35,8 +35,7 @@ export function FeaturedNftCard() {
         <Link
           to="/nft/$id"
           params={{ id: nft.id }}
-          aria-label={`Ver ${nft.name}, ${nft.priceEth} ETH`}
-          className="block aspect-[310/368] focus-visible:outline-2 focus-visible:outline-offset-[-4px] focus-visible:outline-ring"
+          className="group relative block aspect-[310/368] focus-visible:outline-2 focus-visible:outline-offset-[-4px] focus-visible:outline-ring"
         >
           <img
             src={nft.imageUrl}
@@ -45,6 +44,10 @@ export function FeaturedNftCard() {
             height={600}
             className="size-full rounded-[20px] object-cover"
           />
+          <div className="absolute inset-x-0 bottom-0 flex flex-col gap-1 rounded-b-[20px] bg-linear-to-t from-background/90 via-background/60 to-transparent px-5 pt-12 pb-5">
+            <p className="text-base leading-4 font-bold text-foreground">{nft.name}</p>
+            <p className="text-lg leading-5 font-bold text-text-accent">{nft.priceEth} ETH</p>
+          </div>
         </Link>
       ) : (
         <div
