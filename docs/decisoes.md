@@ -46,6 +46,14 @@ tudo o que difere dele (ou que ele não define) está listado aqui.
   DOM, só para leitores de tela (`sr-only`), para o link do destaque ter nome acessível e o valor
   atualizado por `nft.updated` seguir verificável. A miniatura de 58 px sobreposta (mobile) é o
   próximo destaque, decorativa.
+- **Fundo da moldura da arte**: fixo, creme `#fcf2da` (token `hero-art`, medido no print do hero,
+  igual ao fundo das artes Golden e Sage), seja qual for o NFT em destaque. A troca dinâmica do
+  destaque continua igual; só o fundo ao redor da imagem não varia com o fundo embutido em cada
+  arte. No desktop a arte (quadrada) fica inteira (`object-contain`) na moldura de 446 × 450, então
+  a cor fixa aparece nas bordas finas e enquanto a imagem carrega; no mobile (138 × 138) a moldura
+  é do tamanho da arte. As artes Emerald e Neon têm fundo próprio (verde-acinzentado), então a
+  moldura não fica imperceptível com elas. Valor medido em print; sem o MCP não foi possível
+  conferir o hex exato no Figma.
 - **EXPLORAR** rola até o catálogo e leva o foco para a seção (sem mexer na URL nem nos filtros).
 - **Dimensões**: 1200 × 450 no desktop e 366 × 190 no mobile (medidas do Figma). O fundo é
   `surface-dark`. Os círculos decorativos atrás do texto foram removidos: não existem no Figma

@@ -185,3 +185,16 @@ test('sem rolagem horizontal em 390, 768 e 1440 px', async ({ page }) => {
     expect(overflow, `largura ${width}`).toBe(0)
   }
 })
+
+test('a moldura da arte do hero tem sempre o mesmo fundo creme, seja qual for o destaque', async ({ page }) => {
+  await page.goto('/')
+  await expect(slide(page)).toBeVisible()
+
+  const dots = page.getByRole('group', { name: 'Escolher destaque' }).getByRole('button')
+
+  for (const index of [0, 1, 2]) {
+    await dots.nth(index).click()
+    await expect(slide(page)).toHaveAttribute('aria-label', `${index + 1} de 3`)
+    await expect(slide(page).getByRole('link')).toHaveCSS('background-color', 'rgb(252, 242, 218)')
+  }
+})

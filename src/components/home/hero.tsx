@@ -28,7 +28,7 @@ function HeroArt({ nft, preview, position, total }: { nft: Nft; preview?: Nft; p
       <Link
         to="/nft/$id"
         params={{ id: nft.id }}
-        className="group relative block size-full overflow-hidden rounded-2xl focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring md:rounded-3xl"
+        className="group relative block size-full overflow-hidden rounded-2xl bg-hero-art focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring md:rounded-3xl"
       >
         <img
           src={nft.imageUrl}
@@ -36,7 +36,7 @@ function HeroArt({ nft, preview, position, total }: { nft: Nft; preview?: Nft; p
           width={600}
           height={600}
           fetchPriority="high"
-          className="size-full object-cover"
+          className="size-full object-cover md:object-contain"
         />
         {/* No Figma a arte não tem texto sobreposto: nome e preço ficam só para leitores de tela. */}
         <span className="sr-only">
