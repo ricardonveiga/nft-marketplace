@@ -1,13 +1,15 @@
-import { useState } from 'react'
+import { useState, type ReactNode } from 'react'
 
 type NftGalleryProps = {
   images: string[]
   name: string
   soldOut: boolean
+  /** Conteúdo sobre o canto superior direito da imagem principal (ex.: favorito). */
+  overlay?: ReactNode
 }
 
 /** Imagem principal + miniaturas selecionáveis (botões, acessíveis por teclado). */
-export function NftGallery({ images, name, soldOut }: NftGalleryProps) {
+export function NftGallery({ images, name, soldOut, overlay }: NftGalleryProps) {
   const [active, setActive] = useState(0)
 
   return (
@@ -22,6 +24,7 @@ export function NftGallery({ images, name, soldOut }: NftGalleryProps) {
           data-testid="gallery-main"
           className={`size-full object-cover ${soldOut ? 'opacity-60' : ''}`}
         />
+        {overlay && <div className="absolute top-4 right-4">{overlay}</div>}
         {soldOut && (
           <span className="absolute top-4 left-4 rounded-full bg-background/90 px-3 py-1 text-xs font-bold uppercase tracking-wide">
             Esgotado

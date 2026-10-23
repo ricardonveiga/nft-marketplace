@@ -6,7 +6,7 @@ import { useSession } from '@/hooks/use-session'
 import { getSafeRedirect } from '@/lib/redirect'
 
 const buttonClass =
-  'grid size-11 place-items-center rounded-full border border-border-soft text-foreground transition-colors hover:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring'
+  'grid size-11 place-items-center rounded-full border border-border-soft bg-background/80 text-foreground backdrop-blur transition-colors hover:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring'
 
 /**
  * Coração de favoritos. Visitantes são levados ao login e voltam para o mesmo NFT;

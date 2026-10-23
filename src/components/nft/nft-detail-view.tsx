@@ -37,22 +37,19 @@ export function NftDetailView({ nft }: { nft: NftDetail }) {
 
   return (
     <div className="grid gap-8 lg:grid-cols-[minmax(0,560px)_1fr] lg:gap-12">
-      <NftGallery key={nft.id} images={nft.gallery} name={nft.name} soldOut={soldOut} />
+      <NftGallery
+        key={nft.id}
+        images={nft.gallery}
+        name={nft.name}
+        soldOut={soldOut}
+        overlay={<FavoriteButton nftId={nft.id} name={nft.name} />}
+      />
 
       <div className="flex min-w-0 flex-col gap-6">
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex min-w-0 flex-col gap-2">
-            <p className="text-sm text-text-secondary">{nft.collection}</p>
-            <h1 className="text-heading md:text-[32px] md:leading-10">{nft.name}</h1>
-          </div>
-          <FavoriteButton nftId={nft.id} name={nft.name} />
+        <div className="flex min-w-0 flex-col gap-2">
+          <p className="text-sm text-text-secondary">{nft.collection}</p>
+          <h1 className="text-heading md:text-[32px] md:leading-10">{nft.name}</h1>
         </div>
-
-        <ul aria-label="Características" className="flex flex-wrap gap-2">
-          <Chip>{rarityLabel[nft.rarity]}</Chip>
-          <Chip>{nft.network}</Chip>
-          <Chip>{nft.category}</Chip>
-        </ul>
 
         <div className="flex flex-col gap-1">
           <p className="flex flex-wrap items-baseline gap-3">
@@ -72,6 +69,12 @@ export function NftDetailView({ nft }: { nft: NftDetail }) {
               : `Edição ${nft.edition} · ${nft.availableQuantity} ${nft.availableQuantity === 1 ? 'unidade disponível' : 'unidades disponíveis'}`}
           </p>
         </div>
+
+        <ul aria-label="Características" className="flex flex-wrap gap-2">
+          <Chip>{rarityLabel[nft.rarity]}</Chip>
+          <Chip>{nft.network}</Chip>
+          <Chip>{nft.category}</Chip>
+        </ul>
 
         <PurchasePanel key={nft.id} nft={nft} />
 
