@@ -5,7 +5,7 @@ export default defineConfig({
   fullyParallel: true,
   reporter: 'html',
   use: {
-    baseURL: 'http://localhost:5173',
+    baseURL: 'http://localhost:5199',
     trace: 'on-first-retry',
   },
   projects: [
@@ -19,8 +19,10 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'npm run dev',
-    url: 'http://localhost:5173',
+    // Porta própria dos testes: não reaproveita (nem atrapalha) o servidor de desenvolvimento
+    // que alguém tenha aberto em 5173.
+    command: 'npm run dev -- --port 5199 --strictPort',
+    url: 'http://localhost:5199',
     reuseExistingServer: !process.env.CI,
     env: {
       VITE_ENABLE_MOCKS: 'true',
