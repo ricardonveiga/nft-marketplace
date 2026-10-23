@@ -1,6 +1,6 @@
 import type { User } from '@/types/auth'
 
-export type MockUser = User & { password: string }
+export type MockUser = Pick<User, 'id' | 'name' | 'email'> & { password: string }
 
 // Credenciais de demonstração. Existem apenas na camada de mocks.
 export const mockUsers: readonly MockUser[] = [

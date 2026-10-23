@@ -188,3 +188,73 @@ export function validateWallet(values: WalletFields): FieldErrors<WalletFields> 
 
   return errors
 }
+
+export type ProfileFields = {
+  name: string
+  email: string
+  phone: string
+}
+
+/** Perfil: como no checkout, mas o telefone é opcional. */
+export function validateProfile(values: ProfileFields): FieldErrors<ProfileFields> {
+  const errors: FieldErrors<ProfileFields> = {}
+  const email = values.email.trim()
+
+  errors.name = validateName(values.name)
+
+  if (!email) {
+    errors.email = 'Informe seu e-mail.'
+  } else if (!isEmail(email)) {
+    errors.email = 'Informe um e-mail válido.'
+  }
+
+  if (values.phone.trim()) {
+    errors.phone = validatePhone(values.phone)
+  }
+
+  for (const key of Object.keys(errors) as Array<keyof ProfileFields>) {
+    if (!errors[key]) {
+      delete errors[key]
+    }
+  }
+
+  return errors
+}
+
+export type PasswordChangeFields = {
+  currentPassword: string
+  newPassword: string
+  confirmPassword: string
+}
+
+export function validatePasswordChange(values: PasswordChangeFields): FieldErrors<PasswordChangeFields> {
+  const errors: FieldErrors<PasswordChangeFields> = {}
+
+  if (!values.currentPassword) {
+    errors.currentPassword = 'Informe sua senha atual.'
+  }
+
+  if (!values.newPassword) {
+    errors.newPassword = 'Crie uma nova senha.'
+  } else {
+    errors.newPassword =
+      validatePassword(values.newPassword) ??
+      (values.newPassword === values.currentPassword
+        ? 'A nova senha deve ser diferente da atual.'
+        : undefined)
+  }
+
+  if (!values.confirmPassword) {
+    errors.confirmPassword = 'Confirme a nova senha.'
+  } else if (values.confirmPassword !== values.newPassword) {
+    errors.confirmPassword = 'As senhas não conferem.'
+  }
+
+  for (const key of Object.keys(errors) as Array<keyof PasswordChangeFields>) {
+    if (!errors[key]) {
+      delete errors[key]
+    }
+  }
+
+  return errors
+}

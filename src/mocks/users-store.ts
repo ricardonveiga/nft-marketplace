@@ -1,4 +1,8 @@
 import { mockUsers, type MockUser } from './fixtures/users'
+import { readProfile } from './profiles-store'
+
+/** Usuário com o perfil já aplicado por cima (nome, e-mail, telefone, foto e senha editados). */
+export type StoredUser = MockUser & { phone: string | null; avatarUrl: string | null }
 
 // Usuários criados pelo cadastro. Ficam no localStorage para sobreviver ao refresh
 // e voltam ao cenário conhecido (só os usuários das fixtures) com resetRegisteredUsers().
@@ -14,8 +18,19 @@ function readRegistered(): MockUser[] {
   }
 }
 
-export function listUsers(): MockUser[] {
-  return [...mockUsers, ...readRegistered()]
+export function listUsers(): StoredUser[] {
+  return [...mockUsers, ...readRegistered()].map((user) => {
+    const profile = readProfile(user.id)
+
+    return {
+      ...user,
+      name: profile.name ?? user.name,
+      email: profile.email ?? user.email,
+      password: profile.password ?? user.password,
+      phone: profile.phone ?? null,
+      avatarUrl: profile.avatarUrl ?? null,
+    }
+  })
 }
 
 export function findUserByEmail(email: string) {

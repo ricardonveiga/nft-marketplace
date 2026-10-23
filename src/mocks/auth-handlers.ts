@@ -8,12 +8,12 @@ import type {
   User,
 } from '@/types/auth'
 import { getScenario } from './scenario'
-import { addUser, findUserByEmail, listUsers } from './users-store'
+import { addUser, findUserByEmail, listUsers, type StoredUser } from './users-store'
 
 const SESSION_TTL_MS = 8 * 60 * 60 * 1000
 
-function toPublicUser({ id, name, email }: User): User {
-  return { id, name, email }
+function toPublicUser({ id, name, email, phone, avatarUrl }: StoredUser): User {
+  return { id, name, email, phone, avatarUrl }
 }
 
 // Token sem estado ("kurio.<usuário>.<expira em ms>"): sobrevive ao refresh dos mocks.
@@ -120,7 +120,7 @@ export const authHandlers = [
 
     const user = addUser({ name, email, password })
     const response: LoginResponse = {
-      user: toPublicUser(user),
+      user: toPublicUser({ ...user, phone: null, avatarUrl: null }),
       token: createToken(user.id),
     }
 

@@ -2,6 +2,21 @@ export type User = {
   id: string
   name: string
   email: string
+  /** Telefone com DDD, só dígitos; opcional no perfil. */
+  phone: string | null
+  /** Foto do perfil como data URL (WebP/JPEG/PNG reduzido); null = sem foto. */
+  avatarUrl: string | null
+}
+
+export type ProfileUpdateRequest = {
+  name: string
+  email: string
+  phone: string
+}
+
+export type PasswordChangeRequest = {
+  currentPassword: string
+  newPassword: string
 }
 
 export type LoginRequest = {
@@ -24,5 +39,19 @@ export type LoginResponse = {
 export type ApiErrorBody = {
   code: string
   message?: string
-  errors?: Partial<Record<'name' | 'email' | 'password' | 'label' | 'address' | 'networks', string>>
+  errors?: Partial<
+    Record<
+      | 'name'
+      | 'email'
+      | 'password'
+      | 'phone'
+      | 'avatar'
+      | 'currentPassword'
+      | 'newPassword'
+      | 'label'
+      | 'address'
+      | 'networks',
+      string
+    >
+  >
 }
