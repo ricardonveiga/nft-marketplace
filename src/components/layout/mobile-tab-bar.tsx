@@ -7,6 +7,7 @@ import homeIcon from '@/assets/tabbar/home.svg'
 import scanIcon from '@/assets/tabbar/scan.svg'
 import shopIcon from '@/assets/tabbar/shop.svg'
 import userIcon from '@/assets/tabbar/user.svg'
+import { useCart } from '@/hooks/use-cart'
 import { useSession } from '@/hooks/use-session'
 import { getSafeRedirect } from '@/lib/redirect'
 
@@ -50,6 +51,7 @@ function Notch() {
 
 export function MobileTabBar() {
   const session = useSession()
+  const cartItemCount = useCart().data?.itemCount ?? 0
   const href = useRouterState({ select: (state) => state.location.href })
   const redirect = getSafeRedirect(href)
 
@@ -92,9 +94,25 @@ export function MobileTabBar() {
           </SoonItem>
         </li>
         <li className="flex gap-[22px] pr-[30px]">
-          <SoonItem label="Carrinho">
+          <Link
+            to="/carrinho"
+            aria-label={
+              cartItemCount > 0
+                ? `Carrinho, ${cartItemCount} ${cartItemCount === 1 ? 'item' : 'itens'}`
+                : 'Carrinho'
+            }
+            className={`${itemClass} relative`}
+          >
             <img src={shopIcon} alt="" className="size-5" />
-          </SoonItem>
+            {cartItemCount > 0 && (
+              <span
+                aria-hidden="true"
+                className="absolute top-0.5 right-0 grid min-w-4 place-items-center rounded-full bg-primary px-1 text-tiny font-medium text-primary-foreground"
+              >
+                {cartItemCount}
+              </span>
+            )}
+          </Link>
           {session.data ? (
             <AccountMenu user={session.data} variant="tab-bar" />
           ) : (

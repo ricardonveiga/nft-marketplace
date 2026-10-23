@@ -6,15 +6,12 @@ import { AccountMenu } from '@/components/auth/account-menu'
 import { useFiltersDrawer } from '@/components/catalog/filters-drawer'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
+import { useCart } from '@/hooks/use-cart'
 import { useCatalogSearch } from '@/hooks/use-catalog-search'
 import { useSession } from '@/hooks/use-session'
 import { getSafeRedirect } from '@/lib/redirect'
 import { getSessionToken } from '@/lib/session-token'
 import { SearchField } from './search-field'
-
-type SiteHeaderProps = {
-  cartItemCount?: number
-}
 
 const navItemClass =
   'relative flex h-full items-center text-base text-foreground transition-colors hover:text-text-accent focus-visible:outline-2 focus-visible:outline-ring'
@@ -35,12 +32,13 @@ function NavLabel({ isActive, children }: { isActive: boolean; children: string 
   )
 }
 
-export function SiteHeader({ cartItemCount = 0 }: SiteHeaderProps) {
+export function SiteHeader() {
   const { search, update } = useCatalogSearch()
   const { openFilters } = useFiltersDrawer()
   const onHome = useRouterState({ select: (state) => state.location.pathname === '/' })
   const currentHref = useRouterState({ select: (state) => state.location.href })
   const session = useSession()
+  const cartItemCount = useCart().data?.itemCount ?? 0
   const redirect = getSafeRedirect(currentHref)
 
   function handleSearch(query: string) {
@@ -96,8 +94,8 @@ export function SiteHeader({ cartItemCount = 0 }: SiteHeaderProps) {
             className="h-[35px] w-[170px] rounded-md border border-border bg-card lg:w-[220px]"
           />
 
-          <button
-            type="button"
+          <Link
+            to="/carrinho"
             aria-label={
               cartItemCount > 0
                 ? `Carrinho, ${cartItemCount} ${cartItemCount === 1 ? 'item' : 'itens'}`
@@ -114,7 +112,7 @@ export function SiteHeader({ cartItemCount = 0 }: SiteHeaderProps) {
                 {cartItemCount}
               </span>
             )}
-          </button>
+          </Link>
 
           {session.data ? (
             <AccountMenu user={session.data} variant="header" />
