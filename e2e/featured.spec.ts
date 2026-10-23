@@ -18,9 +18,9 @@ test('card de destaque mostra o NFT mais caro entre os disponíveis', async ({ p
   const card = page.getByTestId('featured-nft')
   await expect(card.getByRole('heading', { name: 'NFT em destaque' })).toBeVisible()
   await expect(card.getByText('Oferta limitada')).toBeVisible()
-  // Nome e preço visíveis na tela (não só no texto alternativo da imagem).
-  await expect(card.getByText(expected.name, { exact: true })).toBeVisible()
-  await expect(card.getByText(`${expected.priceEth} ETH`, { exact: true })).toBeVisible()
+  // Como no Figma, sem texto sobre a foto: nome e preço só para leitores de tela.
+  await expect(card.getByRole('link')).toContainText(`${expected.name}, ${expected.priceEth} ETH`)
+  await expect(card.getByText(`${expected.name}, ${expected.priceEth} ETH`)).toHaveClass(/sr-only/)
   await expect(card.getByRole('img')).toHaveAttribute('alt', new RegExp(expected.name))
 })
 

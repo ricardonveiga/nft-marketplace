@@ -225,3 +225,40 @@ test('gaveta de filtros: foco entra no diálogo e volta ao botão ao fechar', as
   await expect(dialog).toBeHidden()
   await expect(trigger).toBeFocused()
 })
+
+test('contagens mantêm o estilo do Figma: "(N)" à direita, mesma fonte e cor do rótulo, negrito só em Coleções', async ({
+  page,
+}) => {
+  await page.goto('/')
+  await waitForGrid(page)
+
+  const filters = await openFilters(page)
+
+  for (const [title, weight] of [
+    ['Coleções', '700'],
+    ['Rede', '400'],
+  ] as const) {
+    const row = filters.getByRole('group', { name: title }).getByRole('checkbox').first().locator('xpath=ancestor::label')
+    const [name, count] = [row.locator('> span').nth(0), row.locator('> span').nth(1)]
+
+    await expect(count).toHaveText(/^\s*,?\s*\(\d+\)$/)
+
+    const styles = await row.evaluate((label) => {
+      const [nameEl, countEl] = Array.from(label.querySelectorAll(':scope > span')) as HTMLElement[]
+      const read = (el: HTMLElement) => {
+        const { fontFamily, fontSize, color, fontWeight } = getComputedStyle(el)
+
+        return { fontFamily, fontSize, color, fontWeight, x: el.getBoundingClientRect().x }
+      }
+
+      return { name: read(nameEl), count: read(countEl) }
+    })
+
+    expect(styles.count.fontFamily).toBe(styles.name.fontFamily)
+    expect(styles.count.fontSize).toBe(styles.name.fontSize)
+    expect(styles.count.color).toBe(styles.name.color)
+    expect(styles.count.fontWeight).toBe(weight)
+    expect(styles.count.x).toBeGreaterThan(styles.name.x)
+    await expect(name).not.toHaveText(/\(\d+\)/)
+  }
+})

@@ -12,9 +12,17 @@ tudo o que difere dele (ou que ele não define) está listado aqui.
   catálogo está esgotado, para provar a exclusão.
 - **Abas da Início**: "Novos lançamentos" = listados nos últimos 30 dias (data de referência
   fixa dos mocks, `REFERENCE_DATE`); "Em alta" = popularidade ≥ 70.
+- **Card "NFT em destaque"**: como no Figma, só o título, o rótulo "Oferta limitada" e a foto, sem
+  texto sobre a imagem (o overlay de nome e preço foi removido, como no hero). Nome e preço seguem
+  no link, só para leitores de tela (`sr-only`), para o link ter nome acessível.
 - **Contagens dos filtros** vêm da API e refletem os 27 NFTs reais do mock. Cada contagem
   ignora o próprio filtro (mostra quanto a opção adicionaria). As contagens do Figma
   (33, 12, 65…) eram placeholder e não foram usadas.
+  **Desvio intencional**: só o número muda em relação ao Figma. O estilo é o mesmo (formato
+  `(N)`, à direita da linha, mesma fonte, tamanho e cor do rótulo, negrito só nas contagens de
+  Coleções), e um teste confere isso (`e2e/filters.spec.ts`). Usar os números fixos do Figma
+  mostraria contagens erradas ao usuário. Estilo conferido pelo código e pelo teste, com base na
+  implementação feita quando o Figma ainda era legível; não houve nova comparação visual.
 - **Valores em ETH** são sempre string decimal. Comparações usam BigInt (18 casas); o slider de
   preço usa inteiros de 0,01 ETH só para a interface. O serializador de search params
   (`src/lib/search-params.ts`) não converte valores em número, para `0.10` não virar `0.1`.
