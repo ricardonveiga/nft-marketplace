@@ -48,14 +48,23 @@ depois de o worker subir e a API responder.
 O MSW é parte obrigatória da entrega (os mocks são o backend da demonstração), então o custo do
 cenário medido é real. Em produção com API de verdade ele não existiria.
 
-## O que ainda poderia melhorar (não aplicado)
+## Segunda rodada de tentativas (encerrada sem mudar o código)
 
-- Um primeiro desenho estático no `index.html` (cabeçalho e esqueleto em HTML/CSS) baixaria o FCP
-  para ~1 s, com estimativa de +5 a +8 pontos, mas não resolve o LCP nem o TBT, então não chega a 90.
-- Para chegar a 90 no mobile seria preciso reduzir o bundle de entrada (dividir o que a Início não
-  usa, trocar bibliotecas pesadas) e tirar o MSW do caminho crítico: um trabalho maior, que muda a
-  arquitetura dos mocks. Fica como decisão do projeto, dada a prioridade (fluxo de compra e
-  fidelidade visual antes de Lighthouse).
+- **Divisão por rota: já existia.** O roteador usa `autoCodeSplitting`: Pagamento, Carrinho, Pedido,
+  Carteiras, Perfil, Detalhe, Login, Cadastro e Explorador são chunks próprios, e a Início só baixa
+  o dela (~14 KB). O `index.html` pré-carrega apenas o runtime e 4 chunks compartilhados. O peso
+  da entrada (~124 KB gzip + ~63 KB do chunk compartilhado) é o núcleo: React, roteador, TanStack
+  Query, Axios, ícones e as primitivas Radix usadas pelo cabeçalho (menu da conta) e pela gaveta
+  de filtros (diálogo e slider).
+- **MSW fora do caminho crítico: já está parcialmente** (a tela renderiza antes dele e só as
+  requisições esperam). Experimento de controle: tirar os handlers de tempo real (Socket.IO) do
+  boot do MSW **não melhorou** nada (Início 67, Detalhe 72, 1 medição; revertido). O custo restante
+  do MSW é inevitável no cenário medido: os dados da primeira tela vêm dele.
+- **Teto sem mocks:** o build sem MSW dá 79 (Início) e 67 (Detalhe). Passar de 90 exigiria cortar
+  o núcleo do bundle (carregar sob demanda o menu da conta e a gaveta de filtros do Radix, por
+  exemplo) **e** um primeiro desenho estático, com ganho estimado de poucos pontos cada e risco de
+  regressão em foco, acessibilidade e testes. Não compensa, então **não foi feito**.
 
-Os números oficiais (todas as medições, ambiente, versões) estão em `reports/lighthouse/SUMMARY.md`.
-Variáveis `LH_PROFILE`, `LH_RUNS` e `LH_OUT` do script servem só para experimentos locais.
+Conclusão: **Performance mobile fica em ~73–75**; as demais metas e o desktop (99) passam.
+Se for prioridade depois, o caminho é: Radix sob demanda → HTML estático de primeiro desenho →
+medir de novo.
