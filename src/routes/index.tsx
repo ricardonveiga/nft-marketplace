@@ -3,6 +3,7 @@ import { useEffect } from 'react'
 import { CatalogPagination } from '@/components/catalog/catalog-pagination'
 import { CatalogToolbar } from '@/components/catalog/catalog-toolbar'
 import { FiltersPanel } from '@/components/catalog/filters-panel'
+import { Hero } from '@/components/home/hero'
 import { FeaturedNftCard } from '@/components/nft/featured-nft-card'
 import { NftCard, NftCardSkeleton } from '@/components/nft/nft-card'
 import { Button } from '@/components/ui/button'
@@ -36,12 +37,13 @@ function HomePage() {
 
   return (
     <div className="mx-auto w-full max-w-[1264px] px-6 py-8 md:px-8 md:py-12">
-      <h1 className="sr-only">Descubra NFTs</h1>
+      <Hero />
 
       <section
         id="mercado"
+        tabIndex={-1}
         aria-label="Catálogo de NFTs"
-        className="scroll-mt-24 xl:grid xl:grid-cols-[310px_1fr] xl:gap-12"
+        className="mt-4 scroll-mt-24 outline-none md:mt-[120px] xl:grid xl:grid-cols-[310px_1fr] xl:gap-12"
       >
         <div className="hidden flex-col gap-6 xl:flex">
           <aside aria-label="Filtros">
