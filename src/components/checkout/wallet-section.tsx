@@ -1,3 +1,4 @@
+import { Link } from '@tanstack/react-router'
 import { useId, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -60,7 +61,14 @@ export function WalletSection({
     return (
       <div id="checkout-wallet" tabIndex={-1} className="flex flex-col gap-2 outline-none">
         <p className="rounded-md bg-surface-dark p-4 text-sm text-text-secondary">
-          Você ainda não tem carteiras cadastradas. O cadastro de carteiras será liberado em breve.
+          Você ainda não tem carteiras cadastradas.{' '}
+          <Link
+            to="/carteiras"
+            search={{ redirect: '/pagamento' }}
+            className="font-bold text-text-accent underline underline-offset-4"
+          >
+            Cadastrar carteira
+          </Link>
         </p>
         {walletError && (
           <p role="alert" className="text-xs text-destructive">
@@ -164,6 +172,14 @@ export function WalletSection({
           </p>
         )}
       </fieldset>
+
+      <Link
+        to="/carteiras"
+        search={{ redirect: '/pagamento' }}
+        className="w-fit text-sm text-text-secondary underline underline-offset-4 hover:text-foreground"
+      >
+        Gerenciar carteiras
+      </Link>
 
       <div className="flex flex-wrap items-center gap-3">
         {connected ? (

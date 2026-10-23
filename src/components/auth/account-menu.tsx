@@ -1,3 +1,4 @@
+import { Link } from '@tanstack/react-router'
 import { ChevronDown } from 'lucide-react'
 import { DropdownMenu } from 'radix-ui'
 import userIcon from '@/assets/tabbar/user.svg'
@@ -49,6 +50,9 @@ export function AccountMenu({ user, variant }: AccountMenuProps) {
           <DropdownMenu.Label className="px-3 py-2 text-xs text-text-secondary">
             {user.email}
           </DropdownMenu.Label>
+          <DropdownMenu.Item asChild className={itemClass}>
+            <Link to="/carteiras">Minhas carteiras</Link>
+          </DropdownMenu.Item>
           <DropdownMenu.Item disabled className={itemClass}>
             Meu perfil (em breve)
           </DropdownMenu.Item>
