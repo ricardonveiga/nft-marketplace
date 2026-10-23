@@ -1,6 +1,8 @@
-export type MockScenario = 'success' | 'empty' | 'error'
+export type MockScenario = 'success' | 'empty' | 'error' | 'session-expired'
 
 export const SCENARIO_STORAGE_KEY = 'mock-scenario'
+
+const SCENARIOS: readonly MockScenario[] = ['empty', 'error', 'session-expired']
 
 /**
  * Cenário ativo dos mocks. Os handlers rodam no navegador, então o cenário é
@@ -10,8 +12,8 @@ export function getScenario(): MockScenario {
   try {
     const value = window.localStorage.getItem(SCENARIO_STORAGE_KEY)
 
-    if (value === 'empty' || value === 'error') {
-      return value
+    if (SCENARIOS.includes(value as MockScenario)) {
+      return value as MockScenario
     }
   } catch {
     // localStorage indisponível: segue com o cenário padrão.
