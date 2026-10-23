@@ -1,71 +1,121 @@
 import { Link } from '@tanstack/react-router'
-import { Search, ShoppingCart } from 'lucide-react'
+import { SlidersHorizontal } from 'lucide-react'
+import cartIcon from '@/assets/icons/cart.svg'
+import loginIcon from '@/assets/icons/login.svg'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
+import { SearchField } from './search-field'
 
-const navLinkClass =
-  'rounded-md px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-ring'
+type SiteHeaderProps = {
+  cartItemCount?: number
+}
 
-const soonClass = `${navLinkClass} cursor-not-allowed opacity-60`
+const navItemClass =
+  'relative flex h-full items-center text-base text-foreground transition-colors hover:text-text-accent focus-visible:outline-2 focus-visible:outline-ring'
 
-export function SiteHeader() {
+const soonClass = `${navItemClass} cursor-not-allowed opacity-60 hover:text-foreground`
+
+function NavLabel({ isActive, children }: { isActive: boolean; children: string }) {
   return (
-    <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur">
-      <div className="mx-auto flex w-full max-w-7xl flex-wrap items-center gap-x-6 gap-y-2 px-4 py-3 md:px-8">
-        <Link
-          to="/"
-          className="text-2xl font-bold uppercase tracking-widest text-primary"
-        >
-          Kurio
-        </Link>
+    <>
+      {children}
+      {isActive && (
+        <span
+          aria-hidden="true"
+          className="absolute inset-x-0 bottom-0 h-[3px] bg-primary"
+        />
+      )}
+    </>
+  )
+}
 
-        <nav
-          aria-label="Principal"
-          className="order-last -mx-1 flex w-full gap-1 overflow-x-auto md:order-none md:mx-0 md:w-auto"
-        >
+export function SiteHeader({ cartItemCount = 0 }: SiteHeaderProps) {
+  return (
+    <header className="sticky top-0 z-50 border-b border-border bg-background">
+      {/* Desktop */}
+      <div className="mx-auto hidden h-[45px] w-full max-w-[1264px] items-stretch justify-between px-8 md:flex">
+        <div className="flex w-40 items-center">
           <Link
             to="/"
-            className={navLinkClass}
-            activeProps={{ className: 'text-foreground' }}
-            activeOptions={{ exact: true }}
+            className="text-sm font-bold tracking-[1.4px] text-foreground"
           >
-            Início
+            KURIO
           </Link>
-          <Link to="/" hash="mercado" className={navLinkClass}>
-            Mercado
+        </div>
+
+        <nav aria-label="Principal" className="flex gap-10">
+          <Link
+            to="/"
+            activeOptions={{ exact: true, includeHash: true }}
+            activeProps={{ className: 'font-bold text-text-accent' }}
+            className={navItemClass}
+          >
+            {({ isActive }) => <NavLabel isActive={isActive}>Início</NavLabel>}
+          </Link>
+          <Link
+            to="/"
+            hash="mercado"
+            activeOptions={{ exact: true, includeHash: true }}
+            activeProps={{ className: 'font-bold text-text-accent' }}
+            className={navItemClass}
+          >
+            {({ isActive }) => <NavLabel isActive={isActive}>Mercado</NavLabel>}
           </Link>
           <span aria-disabled="true" title="Em breve" className={soonClass}>
             Criadores
           </span>
           <span aria-disabled="true" title="Em breve" className={soonClass}>
-            Aprender
+            Aprenda
           </span>
         </nav>
 
-        <form
-          role="search"
-          onSubmit={(event) => event.preventDefault()}
-          className="relative ml-auto min-w-0 flex-1 md:max-w-xs"
-        >
-          <Search
-            aria-hidden="true"
-            className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
-          />
-          <Input
-            type="search"
-            name="q"
-            aria-label="Buscar NFTs"
+        <div className="flex items-center gap-7">
+          <SearchField
+            label="Buscar NFTs"
             placeholder="Buscar NFTs"
-            className="pl-9"
+            className="h-[35px] w-[220px] rounded-md border border-border bg-card"
           />
-        </form>
 
-        <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon-lg" aria-label="Carrinho">
-            <ShoppingCart />
+          <button
+            type="button"
+            aria-label={
+              cartItemCount > 0
+                ? `Carrinho, ${cartItemCount} ${cartItemCount === 1 ? 'item' : 'itens'}`
+                : 'Carrinho'
+            }
+            className="relative size-6 shrink-0 rounded-sm focus-visible:outline-2 focus-visible:outline-ring"
+          >
+            <img src={cartIcon} alt="" className="size-6" />
+            {cartItemCount > 0 && (
+              <span
+                aria-hidden="true"
+                className="absolute -top-0.5 left-[13px] grid size-5 place-items-center rounded-full border-2 border-background bg-primary text-tiny font-medium text-primary-foreground"
+              >
+                {cartItemCount}
+              </span>
+            )}
+          </button>
+
+          <Button className="h-[35px] w-[100px] gap-1 rounded-md px-0 text-base font-medium">
+            <img src={loginIcon} alt="" className="size-5 object-contain" />
+            Entrar
           </Button>
-          <Button size="lg">Entrar</Button>
         </div>
+      </div>
+
+      {/* Mobile */}
+      <div className="flex items-center gap-2 px-6 py-4 md:hidden">
+        <SearchField
+          label="Explorar coleções"
+          placeholder="Explorar coleções"
+          className="h-[45px] flex-1 rounded-xl bg-card"
+        />
+        <button
+          type="button"
+          aria-label="Filtros"
+          className="grid size-[45px] shrink-0 place-items-center rounded-xl bg-linear-to-br from-primary to-surface-dark text-primary-foreground focus-visible:outline-2 focus-visible:outline-ring"
+        >
+          <SlidersHorizontal className="size-[22px]" aria-hidden="true" />
+        </button>
       </div>
     </header>
   )
