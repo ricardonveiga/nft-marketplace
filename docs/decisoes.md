@@ -152,8 +152,22 @@ tudo o que difere dele (ou que ele não define) está listado aqui.
   carrinho; recusado mantém carrinho e rascunho.
 - **Pedido = retrato (snapshot)** dos itens, valores, carteira e dados do colecionador; mudanças
   no catálogo não o alteram. Pedidos são privados: outro usuário recebe "não encontrado".
-- **Confirmação provisória** (`/pedido/:id`): só os dados essenciais (número, referência de
-  transação simulada, itens, valores, carteira, rede). O recibo completo vem na próxima etapa.
+- **Recibo** (`/pedido/:id`, confirmado): número do pedido, datas (feito/confirmado, em UTC para ser
+  determinístico), itens (quantidade × preço unitário e total da linha), valores (subtotal,
+  desconto com o código do cupom, taxa de rede, total), carteira e rede, dados do colecionador e a
+  referência da transação. É o **retrato** do pedido: itens, preços e valores foram copiados na
+  criação, então mudanças posteriores no catálogo (preço, estoque) não o alteram; só o link de cada
+  item leva ao NFT atual.
+- **Referência e explorador (simulados)**: o hash tem 64 caracteres hexadecimais, é derivado do
+  número do pedido e pode ser copiado. O link "Ver no explorador (simulado)" abre uma página do
+  próprio app (`/explorador/:hash`, pública, como um explorador real) que mostra rede, status, bloco,
+  data, origem (a carteira), destino (um contrato do marketplace fictício), valor e taxa. Ela não
+  expõe nada do colecionador nem o número do pedido. Nenhuma rede real é consultada e a página
+  avisa isso.
+- **Recusado**: mostra o motivo, os itens do retrato e "Tentar novamente"; não tem referência de
+  transação nem botão de imprimir. Pendente: aviso de processamento e os mesmos blocos.
+- **Imprimir recibo**: chama `window.print()`; os estilos de impressão (`print:hidden`, `@media
+  print`) escondem header, footer, barra inferior e botões e usam papel claro.
 - **Cenários**: `payment-declined` (o próximo pagamento é recusado), `order-timeout` (cria o
   pedido mas a resposta não chega, uma vez).
 
@@ -255,6 +269,7 @@ Páginas editoriais, suporte e atividade, "Esqueceu a senha?", login social, ite
   MCP): estrutura, campos e medidas inferidos.
 - Tela Carteiras montada sem ler o frame do Figma (limite do MCP): estrutura inferida.
 - Tela de Perfil montada sem ler o frame do Figma (limite do MCP): estrutura inferida.
-- Falta o recibo completo do pedido e os extras da Início (promoções, blog).
+- Recibo/confirmação montados sem ler o frame do Figma (limite do MCP): estrutura inferida.
+- Falta só os extras da Início (promoções, blog) no que é funcional.
 - Login (mobile) e Cadastro foram montados sem ler os frames do Figma (limite do MCP):
   estrutura e campos do Cadastro são inferidos a partir do Login.
