@@ -7,13 +7,17 @@ import {
   type CatalogTab,
 } from '@/lib/catalog-search'
 import { compareEth } from '@/lib/eth'
-import type { Nft, NftFacets, NftListResponse } from '@/types/nft'
+import type { Nft, NftDetail, NftFacets, NftListResponse } from '@/types/nft'
 import {
   REFERENCE_DATE,
   categoryOrder,
+  creatorOf,
+  descriptionOf,
+  galleryOf,
   networkOrder,
   nfts,
 } from './fixtures/nfts'
+import { MAX_QUANTITY_PER_ORDER } from './limits'
 import { getScenario } from './scenario'
 
 const DEFAULT_PAGE_SIZE = 12
@@ -159,6 +163,33 @@ export const nftsHandlers = [
     return featured
       ? HttpResponse.json({ nft: featured })
       : HttpResponse.json({ code: 'not_found' }, { status: 404 })
+  }),
+
+  http.get('/api/nfts/:id', ({ params }) => {
+    const scenario = getScenario()
+
+    if (scenario === 'error') {
+      return HttpResponse.json({ message: 'Serviço indisponível' }, { status: 503 })
+    }
+
+    const nft = scenario === 'empty' ? undefined : nfts.find((candidate) => candidate.id === params.id)
+
+    if (!nft) {
+      return HttpResponse.json(
+        { code: 'nft_not_found', message: 'NFT não encontrado.' },
+        { status: 404 },
+      )
+    }
+
+    const detail: NftDetail = {
+      ...nft,
+      description: descriptionOf(nft),
+      creator: creatorOf(nft),
+      gallery: galleryOf(nft),
+      maxQuantity: Math.min(MAX_QUANTITY_PER_ORDER, nft.availableQuantity),
+    }
+
+    return HttpResponse.json({ nft: detail })
   }),
 
   http.get('/api/nfts', ({ request }) => {

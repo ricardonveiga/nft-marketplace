@@ -30,6 +30,16 @@ export type Nft = {
   popularity: number
 }
 
+/** Dados extras da tela de detalhe. */
+export type NftDetail = Nft & {
+  description: string
+  creator: string
+  /** Imagens da galeria; a primeira é a arte principal. */
+  gallery: string[]
+  /** Máximo por pedido: menor entre o limite da loja e o estoque da edição. */
+  maxQuantity: number
+}
+
 export type NftFacetOption = {
   name: string
   count: number

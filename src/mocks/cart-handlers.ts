@@ -6,9 +6,9 @@ import { authenticate } from './auth-handlers'
 import { deleteCart, readCart, writeCart, type StoredCart } from './cart-store'
 import { mockCoupons } from './fixtures/coupons'
 import { REFERENCE_DATE, nfts } from './fixtures/nfts'
+import { MAX_QUANTITY_PER_ORDER } from './limits'
 import { getScenario } from './scenario'
 
-const MAX_QUANTITY_PER_ORDER = 5
 // Taxa de rede fixa por pedido (qualquer carrinho com itens à venda).
 const NETWORK_FEE_ETH = '0.0045'
 

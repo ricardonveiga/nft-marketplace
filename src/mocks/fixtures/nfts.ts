@@ -106,3 +106,27 @@ export const nfts: readonly Nft[] = seeds.map(
     popularity: (index * 53 + 17) % 100,
   }),
 )
+
+const creatorByCollection: Record<string, string> = {
+  'Emerald Apes': 'Luma Studio',
+  'Sage Nomads': 'Atelier Verde',
+  'Neon Vessels': 'Neon Forge',
+  'Golden Signals': 'Ouro Digital',
+}
+
+const artworks = ['emerald', 'sage', 'neon', 'golden'] as const
+
+export function creatorOf(nft: Nft) {
+  return creatorByCollection[nft.collection] ?? 'Kurio Studio'
+}
+
+export function descriptionOf(nft: Nft) {
+  return `${nft.name} faz parte da coleção ${nft.collection}, de ${creatorOf(nft)}. Arte digital da categoria ${nft.category}, emitida na rede ${nft.network} em edição limitada: cada unidade é única e verificável.`
+}
+
+/** Galeria do detalhe: a arte do NFT primeiro, seguida das demais artes do catálogo. */
+export function galleryOf(nft: Nft) {
+  const own = nft.imageUrl
+
+  return [own, ...artworks.map((name) => `/nfts/${name}.webp`).filter((url) => url !== own)]
+}

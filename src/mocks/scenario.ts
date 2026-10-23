@@ -1,8 +1,18 @@
-export type MockScenario = 'success' | 'empty' | 'error' | 'session-expired'
+export type MockScenario =
+  | 'success'
+  | 'empty'
+  | 'error'
+  | 'session-expired'
+  | 'favorites-error'
 
 export const SCENARIO_STORAGE_KEY = 'mock-scenario'
 
-const SCENARIOS: readonly MockScenario[] = ['empty', 'error', 'session-expired']
+const SCENARIOS: readonly MockScenario[] = [
+  'empty',
+  'error',
+  'session-expired',
+  'favorites-error',
+]
 
 /**
  * Cenário ativo dos mocks. Os handlers rodam no navegador, então o cenário é

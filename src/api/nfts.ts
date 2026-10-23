@@ -1,5 +1,5 @@
 import { api } from '@/lib/api'
-import type { Nft, NftListParams, NftListResponse } from '@/types/nft'
+import type { Nft, NftDetail, NftListParams, NftListResponse } from '@/types/nft'
 
 export async function fetchNfts({
   category,
@@ -27,6 +27,16 @@ export async function fetchFeaturedNft() {
 
   if (!response.data?.nft) {
     throw new Error('Resposta de /nfts/featured fora do formato esperado')
+  }
+
+  return response.data.nft
+}
+
+export async function fetchNft(id: string) {
+  const response = await api.get<{ nft: NftDetail }>(`/nfts/${encodeURIComponent(id)}`)
+
+  if (!response.data?.nft) {
+    throw new Error('Resposta de /nfts/:id fora do formato esperado')
   }
 
   return response.data.nft
