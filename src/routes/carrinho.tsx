@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { CartItemRow } from '@/components/cart/cart-item-row'
 import { CartSkeleton } from '@/components/cart/cart-skeleton'
 import { CartSummary } from '@/components/cart/cart-summary'
+import { RealtimeNotices } from '@/components/realtime/realtime-notices'
 import { Button } from '@/components/ui/button'
 import { CART_MUTATION_KEY, useCart } from '@/hooks/use-cart'
 
@@ -27,6 +28,10 @@ function CartPage() {
             {cart.itemCount} {cart.itemCount === 1 ? 'item' : 'itens'}
           </p>
         )}
+      </div>
+
+      <div className="mb-6">
+        <RealtimeNotices nftIds={cart?.items.map((item) => item.nft.id)} />
       </div>
 
       {/* Sucesso é anunciado só para leitores de tela; erros ficam visíveis. */}

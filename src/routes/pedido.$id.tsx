@@ -3,6 +3,7 @@ import { Link, createFileRoute } from '@tanstack/react-router'
 import { isAxiosError } from 'axios'
 import { useEffect } from 'react'
 import { RequireAuth } from '@/components/auth/require-auth'
+import { RealtimeNotices } from '@/components/realtime/realtime-notices'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { CART_QUERY_KEY } from '@/hooks/use-cart'
@@ -154,6 +155,8 @@ function OrderContent() {
 
   return (
     <div className="flex flex-col gap-8">
+      <RealtimeNotices orderId={order.id} />
+
       {order.status === 'pending' && (
         <div role="status" data-testid="order-pending" className="flex flex-col gap-2">
           <h1 className="text-heading">Processando pagamento…</h1>

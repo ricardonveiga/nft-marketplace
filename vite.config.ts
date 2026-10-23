@@ -11,6 +11,11 @@ export default defineConfig({
     react(),
     tailwindcss(),
   ],
+  optimizeDeps: {
+    // Importado sob demanda (depois de o MSW ligar): sem isto o Vite o descobre no meio de
+    // uma sessão, reotimiza as dependências e recarrega a página.
+    include: ['socket.io-client'],
+  },
   resolve: {
     alias: {
       '@': path.resolve(import.meta.dirname, './src'),

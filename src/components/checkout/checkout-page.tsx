@@ -24,6 +24,7 @@ import {
 import type { User } from '@/types/auth'
 import type { NftNetwork } from '@/types/nft'
 import type { CreateOrderRequest, OrderErrorBody } from '@/types/order'
+import { RealtimeNotices } from '@/components/realtime/realtime-notices'
 import { CheckoutSummary } from './checkout-summary'
 import { WalletSection } from './wallet-section'
 
@@ -329,6 +330,8 @@ export function CheckoutPage({ user }: { user: User }) {
           </li>
         ))}
       </ol>
+
+      <RealtimeNotices nftIds={cart.items.map((item) => item.nft.id)} />
 
       {notice && (
         <p

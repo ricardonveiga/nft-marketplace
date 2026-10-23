@@ -2,6 +2,8 @@ import { Outlet, createRootRoute } from '@tanstack/react-router'
 import { AuthListener } from '@/components/auth/auth-listener'
 import { FiltersDrawerProvider } from '@/components/catalog/filters-drawer'
 import { MobileTabBar } from '@/components/layout/mobile-tab-bar'
+import { ConnectionBanner } from '@/components/realtime/connection-banner'
+import { RealtimeProvider } from '@/components/realtime/realtime-provider'
 import { SiteFooter } from '@/components/layout/site-footer'
 import { SiteHeader } from '@/components/layout/site-header'
 
@@ -13,6 +15,7 @@ function RootComponent() {
   return (
     <FiltersDrawerProvider>
       <AuthListener />
+      <RealtimeProvider />
       <div className="flex min-h-screen flex-col pb-[95px] md:pb-0">
         <a
           href="#conteudo"
@@ -21,6 +24,7 @@ function RootComponent() {
           Pular para o conteúdo
         </a>
         <SiteHeader />
+        <ConnectionBanner />
         <main id="conteudo" className="flex-1">
           <Outlet />
         </main>

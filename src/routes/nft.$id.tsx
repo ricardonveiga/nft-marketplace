@@ -6,6 +6,7 @@ import {
   NftDetailSkeleton,
   NftDetailView,
 } from '@/components/nft/nft-detail-view'
+import { RealtimeNotices } from '@/components/realtime/realtime-notices'
 import { Button } from '@/components/ui/button'
 import { useNft } from '@/hooks/use-nfts'
 
@@ -31,6 +32,9 @@ function NftDetailPage() {
   return (
     <div className="mx-auto w-full max-w-[1264px] px-6 py-8 md:px-8 md:py-12">
       <BackToMarket />
+      <div className="mb-6 empty:hidden">
+        <RealtimeNotices nftIds={[id]} />
+      </div>
 
       {isPending && <NftDetailSkeleton />}
 
