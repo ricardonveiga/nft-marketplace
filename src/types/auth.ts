@@ -24,5 +24,5 @@ export type LoginResponse = {
 export type ApiErrorBody = {
   code: string
   message?: string
-  errors?: Partial<Record<'name' | 'email' | 'password', string>>
+  errors?: Partial<Record<'name' | 'email' | 'password' | 'label' | 'address' | 'networks', string>>
 }

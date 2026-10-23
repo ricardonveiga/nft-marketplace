@@ -15,3 +15,12 @@ export type WalletsResponse = {
   /** Carteira conectada no momento (simulação), se houver. */
   connectedWalletId: string | null
 }
+
+export type WalletInput = {
+  label: string
+  address: string
+  networks: NftNetwork[]
+}
+
+/** Alterações parciais; `isPrimary: true` troca qual é a principal. */
+export type WalletUpdate = Partial<WalletInput> & { isPrimary?: boolean }

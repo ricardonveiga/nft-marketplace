@@ -1,14 +1,19 @@
 import { HttpResponse, delay, http } from 'msw'
+import { validateWallet, type WalletFields } from '@/lib/validation'
+import { MAX_WALLETS } from '@/lib/wallets'
+import { NETWORKS } from '@/lib/catalog-search'
 import type { ApiErrorBody } from '@/types/auth'
-import type { Wallet, WalletsResponse } from '@/types/wallet'
+import type { NftNetwork } from '@/types/nft'
+import type { Wallet, WalletInput, WalletsResponse, WalletUpdate } from '@/types/wallet'
 import { authenticate } from './auth-handlers'
-import { mockWallets, type MockWallet } from './fixtures/wallets'
+import type { MockWallet } from './fixtures/wallets'
+import { nextWalletId, readWallets, writeWallets } from './wallets-store'
 
 const CONNECTION_PREFIX = 'mock-wallet-connection:'
 const CONNECTION_DELAY_MS = 500
 
 export function walletsOf(userId: string): MockWallet[] {
-  return mockWallets.filter((wallet) => wallet.userId === userId)
+  return readWallets(userId)
 }
 
 export function readConnectedWalletId(userId: string): string | null {
@@ -39,20 +44,194 @@ function error(status: number, body: ApiErrorBody) {
   return HttpResponse.json(body, { status })
 }
 
+function snapshot(userId: string): WalletsResponse {
+  // A principal sempre vem primeiro.
+  const wallets = [...walletsOf(userId)].sort((a, b) => Number(b.isPrimary) - Number(a.isPrimary))
+
+  return {
+    wallets: wallets.map(toPublicWallet),
+    connectedWalletId: readConnectedWalletId(userId),
+  }
+}
+
+function sameAddress(a: string, b: string) {
+  return a.trim().toLowerCase() === b.trim().toLowerCase()
+}
+
+function parseNetworks(value: unknown): NftNetwork[] {
+  return Array.isArray(value)
+    ? [...new Set(value.filter((item): item is NftNetwork => NETWORKS.includes(item as NftNetwork)))]
+    : []
+}
+
+function validationError(fields: WalletFields) {
+  const errors = validateWallet(fields)
+
+  return Object.keys(errors).length > 0 ? error(422, { code: 'validation_error', errors }) : null
+}
+
 export const walletsHandlers = [
   http.get('/api/wallets', ({ request }) => {
+    const user = authenticate(request)
+
+    return user instanceof Response ? user : HttpResponse.json(snapshot(user.id))
+  }),
+
+  // Cadastro: a primeira carteira vira a principal; a segunda, a secundária; não há uma terceira.
+  http.post('/api/wallets', async ({ request }) => {
     const user = authenticate(request)
 
     if (user instanceof Response) {
       return user
     }
 
-    const body: WalletsResponse = {
-      wallets: walletsOf(user.id).map(toPublicWallet),
-      connectedWalletId: readConnectedWalletId(user.id),
+    const body = (await request.json().catch(() => null)) as Partial<WalletInput> | null
+    const input = {
+      label: typeof body?.label === 'string' ? body.label : '',
+      address: typeof body?.address === 'string' ? body.address : '',
+      networks: parseNetworks(body?.networks),
+    }
+    const invalid = validationError(input)
+
+    if (invalid) {
+      return invalid
     }
 
-    return HttpResponse.json(body)
+    const current = walletsOf(user.id)
+
+    if (current.length >= MAX_WALLETS) {
+      return error(409, {
+        code: 'wallet_limit',
+        message: 'Você já tem uma carteira principal e uma secundária. Remova uma para cadastrar outra.',
+      })
+    }
+
+    if (current.some((wallet) => sameAddress(wallet.address, input.address))) {
+      return error(409, {
+        code: 'wallet_duplicate',
+        message: 'Esta carteira já está cadastrada.',
+        errors: { address: 'Esta carteira já está cadastrada.' },
+      })
+    }
+
+    const wallet: MockWallet = {
+      id: nextWalletId(),
+      userId: user.id,
+      label: input.label.trim(),
+      address: input.address.trim(),
+      networks: input.networks,
+      isPrimary: current.length === 0,
+    }
+    writeWallets(user.id, [...current, wallet])
+
+    return HttpResponse.json(snapshot(user.id), { status: 201 })
+  }),
+
+  // Edição: apelido, endereço, redes e/ou troca da principal.
+  http.patch('/api/wallets/:id', async ({ request, params }) => {
+    const user = authenticate(request)
+
+    if (user instanceof Response) {
+      return user
+    }
+
+    const current = walletsOf(user.id)
+    const target = current.find((wallet) => wallet.id === params.id)
+
+    if (!target) {
+      return error(404, { code: 'wallet_not_found', message: 'Carteira não encontrada.' })
+    }
+
+    const body = (await request.json().catch(() => null)) as WalletUpdate | null
+    const next = {
+      label: typeof body?.label === 'string' ? body.label : target.label,
+      address: typeof body?.address === 'string' ? body.address : target.address,
+      networks: body?.networks === undefined ? target.networks : parseNetworks(body.networks),
+    }
+    const invalid = validationError(next)
+
+    if (invalid) {
+      return invalid
+    }
+
+    if (current.some((wallet) => wallet.id !== target.id && sameAddress(wallet.address, next.address))) {
+      return error(409, {
+        code: 'wallet_duplicate',
+        message: 'Esta carteira já está cadastrada.',
+        errors: { address: 'Esta carteira já está cadastrada.' },
+      })
+    }
+
+    const makePrimary = body?.isPrimary === true
+
+    writeWallets(
+      user.id,
+      current.map((wallet) => {
+        if (wallet.id === target.id) {
+          return {
+            ...wallet,
+            label: next.label.trim(),
+            address: next.address.trim(),
+            networks: next.networks,
+            isPrimary: makePrimary || wallet.isPrimary,
+          }
+        }
+
+        return makePrimary ? { ...wallet, isPrimary: false } : wallet
+      }),
+    )
+
+    // Trocar o endereço invalida a conexão que existia com a carteira.
+    if (
+      readConnectedWalletId(user.id) === target.id &&
+      !sameAddress(target.address, next.address)
+    ) {
+      writeConnectedWalletId(user.id, null)
+    }
+
+    return HttpResponse.json(snapshot(user.id))
+  }),
+
+  // Remoção: se era a principal, a outra assume; uma conexão com ela é encerrada.
+  http.delete('/api/wallets/connection', ({ request }) => {
+    const user = authenticate(request)
+
+    if (user instanceof Response) {
+      return user
+    }
+
+    writeConnectedWalletId(user.id, null)
+
+    return HttpResponse.json({ connectedWalletId: null })
+  }),
+
+  http.delete('/api/wallets/:id', ({ request, params }) => {
+    const user = authenticate(request)
+
+    if (user instanceof Response) {
+      return user
+    }
+
+    const current = walletsOf(user.id)
+    const target = current.find((wallet) => wallet.id === params.id)
+
+    if (!target) {
+      return error(404, { code: 'wallet_not_found', message: 'Carteira não encontrada.' })
+    }
+
+    const remaining = current.filter((wallet) => wallet.id !== target.id)
+
+    if (target.isPrimary && remaining.length > 0) {
+      remaining[0] = { ...remaining[0], isPrimary: true }
+    }
+
+    writeWallets(user.id, remaining)
+
+    if (readConnectedWalletId(user.id) === target.id) {
+      writeConnectedWalletId(user.id, null)
+    }
+
+    return HttpResponse.json(snapshot(user.id))
   }),
 
   // Simulação de conexão: demora um pouco e a carteira pode recusar.
@@ -81,17 +260,5 @@ export const walletsHandlers = [
     writeConnectedWalletId(user.id, wallet.id)
 
     return HttpResponse.json({ connectedWalletId: wallet.id })
-  }),
-
-  http.delete('/api/wallets/connection', ({ request }) => {
-    const user = authenticate(request)
-
-    if (user instanceof Response) {
-      return user
-    }
-
-    writeConnectedWalletId(user.id, null)
-
-    return HttpResponse.json({ connectedWalletId: null })
   }),
 ]

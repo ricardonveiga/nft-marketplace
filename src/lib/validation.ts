@@ -139,3 +139,52 @@ export function validateCollector(values: CollectorFields): FieldErrors<Collecto
 
   return errors
 }
+
+export type WalletFields = {
+  label: string
+  address: string
+  networks: string[]
+}
+
+export function validateWalletLabel(label: string): string | undefined {
+  const trimmed = label.trim()
+
+  if (!trimmed) {
+    return 'Informe um apelido para a carteira.'
+  }
+
+  return trimmed.length < 2 || trimmed.length > 30
+    ? 'O apelido deve ter de 2 a 30 caracteres.'
+    : undefined
+}
+
+export function validateWalletAddress(address: string): string | undefined {
+  const trimmed = address.trim()
+
+  if (!trimmed) {
+    return 'Informe o endereço da carteira.'
+  }
+
+  return /^0x[0-9a-fA-F]{40}$/.test(trimmed)
+    ? undefined
+    : 'Endereço inválido. Use 0x seguido de 40 caracteres hexadecimais.'
+}
+
+export function validateWallet(values: WalletFields): FieldErrors<WalletFields> {
+  const errors: FieldErrors<WalletFields> = {}
+
+  errors.label = validateWalletLabel(values.label)
+  errors.address = validateWalletAddress(values.address)
+
+  if (values.networks.length === 0) {
+    errors.networks = 'Selecione ao menos uma rede.'
+  }
+
+  for (const key of Object.keys(errors) as Array<keyof WalletFields>) {
+    if (!errors[key]) {
+      delete errors[key]
+    }
+  }
+
+  return errors
+}
