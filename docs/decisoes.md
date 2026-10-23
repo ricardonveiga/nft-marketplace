@@ -387,6 +387,10 @@ passa a falhar na rodada inteira sem que o código tenha mudado. Casos vistos e 
   teste (não há espera fixa curta); é cadeia longa (cadastro, carteira, pagamento e recibo) sujeita
   a atraso sob carga. **Não corrigido; documentado.** Ao ver essa falha numa rodada completa,
   rode o teste isolado antes de investigar o código.
+- `scenarios.spec.ts` "autenticação: login e cadastro mostram a falha e ficam na tela" (desktop,
+  cenário `error`): falhou uma vez na suíte completa de um clone limpo (a página de login não
+  mostrou o campo de e-mail em 30 s) e passa em 16 de 16 execuções isoladas. **Não corrigido;
+  documentado.** Mesma orientação: rode isolado antes de investigar o código.
 - `checkout.spec.ts` "o pedido de um usuário não aparece para outro": já falhou sob carga em
   outra época; nas 3 rodadas completas seguidas de 2026-10-23 passou todas as vezes.
 
