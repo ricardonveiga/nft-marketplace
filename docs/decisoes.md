@@ -110,6 +110,9 @@ tudo o que difere dele (ou que ele não define) está listado aqui.
   DDD quando informado. "Salvar alterações" só habilita quando algo muda. E-mail de outra conta
   é conflito (409) e o erro aparece no campo. Trocar o e-mail vale para o próximo login.
 - **Telefone no pagamento**: vem preenchido com o do perfil.
+- **Rascunho do pagamento é por usuário**: fica em `sessionStorage` com o `userId` do dono, é apagado
+  no logout e nunca é mostrado a outra conta (corrige um vazamento de nome, e-mail e telefone na
+  troca de usuário na mesma aba). Detalhes em "Política de sessão" do `ARCHITECTURE.md`.
 - **Foto**: aceita PNG, JPEG ou WebP até 2 MB. O navegador recorta o quadrado central e reduz para
   256 × 256 em WebP (~15 KB) antes de enviar; o que fica guardado é esse data URL, nunca o arquivo
   original (`lib/image.ts`). Tipo inválido, arquivo grande e imagem corrompida têm mensagem
@@ -364,6 +367,24 @@ resumo. Como cada campo foi tratado:
   baseline desktop foi regenerada (a tela mudou de propósito), então só vale como regressão.
 - **Pendente de conferir**: a descrição do Figma desktop é em texto; espaçamentos e ordem exata
   dos campos não foram comparados com o frame.
+
+## Flakes conhecidos sob carga
+
+A suíte completa leva de 6 a 11 minutos e, com a máquina carregada, um teste isolado às vezes
+passa a falhar na rodada inteira sem que o código tenha mudado. Casos vistos e como foram tratados:
+
+- `filters.spec.ts` "filtros se combinam": lia a contagem de cards logo depois de a URL mudar,
+  antes de a lista nova chegar (o catálogo mantém a página anterior de propósito). **Corrigido**
+  com `expect.poll`; passa 12 vezes seguidas.
+- `passwords.spec.ts` "trocar a senha no perfil": navegava para `/perfil` antes de o login
+  terminar. **Corrigido** esperando o menu da conta aparecer.
+- `wallets.spec.ts` "conta nova cadastra a carteira pelo pagamento e conclui a compra" (desktop):
+  falhou uma vez em uma rodada completa e passa em 8 de 8 execuções isoladas. Sem causa óbvia no
+  teste (não há espera fixa curta); é cadeia longa (cadastro, carteira, pagamento e recibo) sujeita
+  a atraso sob carga. **Não corrigido; documentado.** Ao ver essa falha numa rodada completa,
+  rode o teste isolado antes de investigar o código.
+- `checkout.spec.ts` "o pedido de um usuário não aparece para outro": já falhou sob carga em
+  outra época; nas 3 rodadas completas seguidas de 2026-10-23 passou todas as vezes.
 
 ## Fora do escopo (inertes e sinalizados com "Em breve")
 

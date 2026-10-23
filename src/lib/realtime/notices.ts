@@ -22,6 +22,12 @@ export function pushNotice(text: string, scope: RealtimeNotice['scope']) {
   emit()
 }
 
+/** Troca de usuário ou logout: avisos da sessão anterior não ficam para a próxima. */
+export function clearNotices() {
+  notices = []
+  emit()
+}
+
 export function dismissNotice(id: number) {
   notices = notices.filter((notice) => notice.id !== id)
   emit()

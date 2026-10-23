@@ -73,8 +73,9 @@ test('filtros se combinam (coleção + rede)', async ({ page }) => {
   await expect(page).toHaveURL(/category=Fotografia/)
   await expect(page).toHaveURL(/network=Ethereum/)
 
-  const total = await page.getByTestId('nft-card').count()
-  expect(total).toBeLessThan(4)
+  // A lista anterior fica na tela até a nova chegar (keepPreviousData): espera a contagem cair
+  // em vez de lê-la na hora, que é o que fazia o teste falhar sob carga.
+  await expect.poll(() => page.getByTestId('nft-card').count()).toBeLessThan(4)
 })
 
 test('mudar qualquer filtro reinicia a paginação para a página 1', async ({ page }) => {

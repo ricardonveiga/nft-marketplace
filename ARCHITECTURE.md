@@ -111,6 +111,16 @@ Transporte, limitações do ambiente de mocks e o painel `__mockControl`: seçã
   (`resetQueries`) zera todo o cache, exceto `nfts` (público) e a sessão, e refaz as consultas em
   uso com a identidade nova. O cliente Socket.IO cancela a assinatura da sessão anterior e assina
   a nova; o servidor só entrega `order.updated` ao dono.
+- **Dados privados fora do cache do Query:** o rascunho do pagamento (`sessionStorage
+  ['kurio.checkout-draft']`: nome, e-mail, telefone, opcionais, carteira) e a chave de idempotência
+  (`['kurio.checkout-key']`, cuja "impressão digital" é o pedido inteiro) pertencem a um usuário
+  (`userId`). O logout os apaga; ao entrar, o que for de outra conta é apagado; e, mesmo que a
+  limpeza não rode (aba abandonada), `loadDraft`/`getIdempotencyKey` nunca devolvem dado de outro
+  usuário. Na expiração de sessão o rascunho do **mesmo** usuário é mantido (retomada do
+  pagamento). Os avisos em tempo real em memória são zerados junto com o cache. Outras chaves do
+  navegador não têm dado privado: `kurio.session` (token, removido no logout e na expiração) e
+  `kurio.guest-cart` (id do carrinho do visitante; o merge apaga esse carrinho). Testes:
+  `e2e/privacy.spec.ts`.
 - **Carrinho do visitante** (`X-Guest-Cart`, UUID em `localStorage['kurio.guest-cart']`): ao
   entrar ou cadastrar, `POST /cart/merge` o passa para a conta. Cada conta tem o seu, persistido.
 

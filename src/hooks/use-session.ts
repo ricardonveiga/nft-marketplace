@@ -6,6 +6,8 @@ import {
 } from '@tanstack/react-query'
 import { fetchSession, login, logout, register } from '@/api/auth'
 import { mergeGuestCart } from '@/api/cart'
+import { clearCheckoutState, clearCheckoutStateOfOthers } from '@/lib/checkout-draft'
+import { clearNotices } from '@/lib/realtime/notices'
 import { clearSessionToken, setSessionToken } from '@/lib/session-token'
 import type { LoginResponse } from '@/types/auth'
 
@@ -22,6 +24,8 @@ const PRESERVED_QUERY_KEYS = new Set(['nfts', SESSION_QUERY_KEY[0]])
  * a identidade nova; `removeQueries` deixaria a interface presa à versão antiga.
  */
 export function clearPrivateData(queryClient: QueryClient) {
+  clearNotices()
+
   return queryClient.resetQueries({
     predicate: (query) => !PRESERVED_QUERY_KEYS.has(String(query.queryKey[0])),
   })
@@ -50,6 +54,8 @@ function useStartSession() {
       // Sem a mesclagem o carrinho da conta continua valendo; nada a desfazer.
     }
 
+    // O rascunho do pagamento de outra conta não pode aparecer para quem acabou de entrar.
+    clearCheckoutStateOfOthers(user.id)
     await clearPrivateData(queryClient)
   }
 }
@@ -74,6 +80,8 @@ export function useLogout() {
     onSettled: () => {
       // Mesmo que a API falhe, o dispositivo deixa de ter a sessão.
       clearSessionToken()
+      // Sair apaga também o rascunho do pagamento (nome, e-mail e telefone digitados).
+      clearCheckoutState()
       clearPrivateData(queryClient)
       queryClient.setQueryData(SESSION_QUERY_KEY, null)
     },

@@ -68,7 +68,7 @@ export function CheckoutPage({ user }: { user: User }) {
   // O frame mobile do Figma não tem os campos opcionais: só aparecem (e só valem) a partir de 768 px.
   const showExtras = useMediaQuery(EXTRAS_MEDIA_QUERY)
 
-  const [initial] = useState(loadDraft)
+  const [initial] = useState(() => loadDraft(user.id))
   const [collector, setCollector] = useState<CollectorFields>({
     name: user.name,
     email: user.email,
@@ -113,8 +113,8 @@ export function CheckoutPage({ user }: { user: User }) {
   const connected = Boolean(selectedWallet) && wallets?.connectedWalletId === selectedWallet?.id
 
   useEffect(() => {
-    saveDraft({ collector, walletId, network })
-  }, [collector, walletId, network])
+    saveDraft(user.id, { collector, walletId, network })
+  }, [user.id, collector, walletId, network])
 
   // Carteira padrão: a principal; rede padrão: a primeira que a carteira aceita.
   useEffect(() => {
@@ -265,7 +265,7 @@ export function CheckoutPage({ user }: { user: User }) {
       quote,
     }
     // Mesmo conteúdo = mesma chave: reenviar depois de um timeout recupera o mesmo pedido.
-    const key = getIdempotencyKey(JSON.stringify(request))
+    const key = getIdempotencyKey(user.id, JSON.stringify(request))
 
     submitLock.current = true
     create.mutate(
