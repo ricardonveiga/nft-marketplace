@@ -19,6 +19,27 @@ tudo o que difere dele (ou que ele não define) está listado aqui.
   preço usa inteiros de 0,01 ETH só para a interface. O serializador de search params
   (`src/lib/search-params.ts`) não converte valores em número, para `0.10` não virar `0.1`.
 
+## Hero da Início
+
+- **Critério de "destaque"** (hero e card da barra lateral): o NFT mais caro entre os
+  disponíveis. `GET /api/nfts/highlights` devolve os 3 mais caros (empate pelo id); o primeiro é
+  exatamente o NFT do card `GET /api/nfts/featured`, então os dois nunca divergem. Esgotado
+  nunca é destaque. Eventos `nft.updated` fazem o hero se recalcular (se o destaque esgota, o
+  próximo assume).
+- **Carrossel** com 3 destaques e indicadores (os 3 pontos do Figma). **Sem rotação automática**:
+  conteúdo que se move sozinho exige botão de pausa e atrapalha quem usa leitor de tela; a troca é
+  só pelos indicadores (botões, com `aria-current` e posição "N de 3"). Sem animação de troca, o
+  que também respeita `prefers-reduced-motion`.
+- **Textos do Figma**: desktop "Seja dono do futuro da arte digital" + parágrafo longo; mobile
+  "Seja dono da cultura digital" + parágrafo curto. As duas variantes existem no DOM e só a visível
+  entra na árvore de acessibilidade. O título do hero é o único `h1` da página.
+- **Nome e preço do NFT** aparecem sobre a imagem no desktop; no mobile (arte de 138 px) ficam só
+  para leitores de tela. A miniatura de 58 px sobreposta (mobile) é o próximo destaque, decorativa.
+- **EXPLORAR** rola até o catálogo e leva o foco para a seção (sem mexer na URL nem nos filtros).
+- **Dimensões**: 1200 × 450 no desktop e 366 × 190 no mobile (medidas do Figma). O fundo e os
+  círculos decorativos são inferidos (cor `surface-dark` e círculos translúcidos).
+- Sem destaques (catálogo vazio ou erro) o hero mantém texto e botão, sem arte.
+
 ## Carrinho
 
 - **A API calcula tudo**: subtotal, desconto, taxa de rede e total chegam prontos (strings
@@ -160,7 +181,6 @@ socket (`order.updated`), ~1,2 s depois da criação.
   com mensagens de erro ligadas por `aria-describedby` e foco no primeiro campo inválido.
 - Gaveta de filtros (mobile e tablet) com foco preso, fechamento por Esc e retorno do foco
   ao botão que a abriu.
-- Título "Descubra NFTs" oculto (`sr-only`) até o hero existir.
 
 ## Mocks (MSW)
 
@@ -181,7 +201,7 @@ Páginas editoriais, suporte e atividade, "Esqueceu a senha?", login social, ite
 
 ## Pendências conhecidas
 
-- Seções do Figma ainda não implementadas na Início: hero, promoções e blog.
+- Seções do Figma ainda não implementadas na Início: promoções e blog.
 - Carrinho, Detalhe do NFT, Pagamento e Pedido montados sem ler os frames do Figma (limite do
   MCP): estrutura, campos e medidas inferidos.
 - Falta o cadastro/edição de carteiras (tela Carteiras), o recibo completo do pedido, o
