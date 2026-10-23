@@ -1,6 +1,7 @@
 import { HttpResponse, http } from 'msw'
 import { authHandlers } from './auth-handlers'
 import { cartHandlers } from './cart-handlers'
+import { editorialHandlers } from './editorial-handlers'
 import { explorerHandlers } from './explorer-handlers'
 import { favoritesHandlers } from './favorites-handlers'
 import { nftsHandlers } from './nfts-handlers'
@@ -20,6 +21,7 @@ export const handlers = [
   ...profileHandlers,
   ...cartHandlers,
   ...favoritesHandlers,
+  ...editorialHandlers,
   ...explorerHandlers,
   ...nftsHandlers,
   ...walletsHandlers,

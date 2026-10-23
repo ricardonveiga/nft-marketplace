@@ -3,7 +3,9 @@ import { useEffect } from 'react'
 import { CatalogPagination } from '@/components/catalog/catalog-pagination'
 import { CatalogToolbar } from '@/components/catalog/catalog-toolbar'
 import { FiltersPanel } from '@/components/catalog/filters-panel'
+import { BlogSection } from '@/components/home/blog-section'
 import { Hero } from '@/components/home/hero'
+import { PromotionsSection } from '@/components/home/promotions-section'
 import { FeaturedNftCard } from '@/components/nft/featured-nft-card'
 import { NftCard, NftCardSkeleton } from '@/components/nft/nft-card'
 import { Button } from '@/components/ui/button'
@@ -129,6 +131,9 @@ function HomePage() {
           )}
         </div>
       </section>
+
+      <PromotionsSection />
+      <BlogSection />
     </div>
   )
 }
