@@ -24,7 +24,7 @@ const collectionByArtwork: Record<Artwork, string> = {
   golden: 'Golden Signals',
 }
 
-const categories = [
+export const categoryOrder = [
   'Arte digital',
   'Fotografia',
   'Música',
@@ -36,7 +36,15 @@ const categories = [
   'Utilidade',
 ] as const
 
-const networks: readonly NftNetwork[] = ['Ethereum', 'Polygon', 'Solana']
+export const networkOrder: readonly NftNetwork[] = [
+  'Ethereum',
+  'Polygon',
+  'Solana',
+]
+
+/** "Hoje" fixo dos mocks: mantém "Novos lançamentos" determinístico. */
+export const REFERENCE_DATE = Date.UTC(2026, 9, 22)
+const DAY = 24 * 60 * 60 * 1000
 
 // Os 9 primeiros seguem a primeira página do frame Desktop / Início do Figma.
 const seeds: readonly Seed[] = [
@@ -77,13 +85,16 @@ export const nfts: readonly Nft[] = seeds.map(
     id: `nft-${String(index + 1).padStart(2, '0')}`,
     name,
     collection: collectionByArtwork[artwork],
-    category: categories[index % categories.length],
-    network: networks[index % networks.length],
+    category: categoryOrder[(index * 4 + Math.floor(index / 5)) % categoryOrder.length],
+    network: networkOrder[(index + Math.floor(index / 3)) % networkOrder.length],
     imageUrl: `/nfts/${artwork}.webp`,
     priceEth,
     ...(previousPriceEth ? { previousPriceEth } : {}),
     edition,
     rarity,
     availability,
+    // Quanto menor o índice, mais recente: a ordem padrão reproduz o Figma.
+    listedAt: new Date(REFERENCE_DATE - index * 2 * DAY).toISOString(),
+    popularity: (index * 53 + 17) % 100,
   }),
 )
