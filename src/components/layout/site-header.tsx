@@ -2,9 +2,14 @@ import { Link, useRouterState } from '@tanstack/react-router'
 import { SlidersHorizontal } from 'lucide-react'
 import cartIcon from '@/assets/icons/cart.svg'
 import loginIcon from '@/assets/icons/login.svg'
+import { AccountMenu } from '@/components/auth/account-menu'
 import { useFiltersDrawer } from '@/components/catalog/filters-drawer'
 import { Button } from '@/components/ui/button'
+import { Skeleton } from '@/components/ui/skeleton'
 import { useCatalogSearch } from '@/hooks/use-catalog-search'
+import { useSession } from '@/hooks/use-session'
+import { getSafeRedirect } from '@/lib/redirect'
+import { getSessionToken } from '@/lib/session-token'
 import { SearchField } from './search-field'
 
 type SiteHeaderProps = {
@@ -34,6 +39,9 @@ export function SiteHeader({ cartItemCount = 0 }: SiteHeaderProps) {
   const { search, update } = useCatalogSearch()
   const { openFilters } = useFiltersDrawer()
   const onHome = useRouterState({ select: (state) => state.location.pathname === '/' })
+  const currentHref = useRouterState({ select: (state) => state.location.href })
+  const session = useSession()
+  const redirect = getSafeRedirect(currentHref)
 
   function handleSearch(query: string) {
     update({ q: query.trim() || undefined })
@@ -108,10 +116,24 @@ export function SiteHeader({ cartItemCount = 0 }: SiteHeaderProps) {
             )}
           </button>
 
-          <Button className="h-[35px] w-[100px] gap-1 rounded-md px-0 text-base font-medium">
-            <img src={loginIcon} alt="" className="size-5 object-contain" />
-            Entrar
-          </Button>
+          {session.data ? (
+            <AccountMenu user={session.data} variant="header" />
+          ) : session.isPending && getSessionToken() ? (
+            <Skeleton className="h-[35px] w-[100px] rounded-md" />
+          ) : (
+            <Button
+              asChild
+              className="h-[35px] w-[100px] gap-1 rounded-md px-0 text-base font-medium"
+            >
+              <Link
+                to="/login"
+                search={redirect === '/' ? {} : { redirect }}
+              >
+                <img src={loginIcon} alt="" className="size-5 object-contain" />
+                Entrar
+              </Link>
+            </Button>
+          )}
         </div>
       </div>
 

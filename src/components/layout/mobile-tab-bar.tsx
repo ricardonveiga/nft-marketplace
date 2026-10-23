@@ -1,11 +1,14 @@
-import { Link } from '@tanstack/react-router'
+import { Link, useRouterState } from '@tanstack/react-router'
 import type { ReactNode } from 'react'
+import { AccountMenu } from '@/components/auth/account-menu'
 import ellipseBackground from '@/assets/tabbar/ellipse.svg'
 import heartIcon from '@/assets/tabbar/heart.svg'
 import homeIcon from '@/assets/tabbar/home.svg'
 import scanIcon from '@/assets/tabbar/scan.svg'
 import shopIcon from '@/assets/tabbar/shop.svg'
 import userIcon from '@/assets/tabbar/user.svg'
+import { useSession } from '@/hooks/use-session'
+import { getSafeRedirect } from '@/lib/redirect'
 
 const itemClass =
   'grid size-10 place-items-center rounded-md focus-visible:outline-2 focus-visible:outline-ring'
@@ -46,6 +49,10 @@ function Notch() {
 }
 
 export function MobileTabBar() {
+  const session = useSession()
+  const href = useRouterState({ select: (state) => state.location.href })
+  const redirect = getSafeRedirect(href)
+
   return (
     <nav
       aria-label="Navegação inferior"
@@ -88,9 +95,18 @@ export function MobileTabBar() {
           <SoonItem label="Carrinho">
             <img src={shopIcon} alt="" className="size-5" />
           </SoonItem>
-          <SoonItem label="Perfil">
-            <img src={userIcon} alt="" className="size-5" />
-          </SoonItem>
+          {session.data ? (
+            <AccountMenu user={session.data} variant="tab-bar" />
+          ) : (
+            <Link
+              to="/login"
+              search={redirect === '/' ? {} : { redirect }}
+              aria-label="Entrar"
+              className={itemClass}
+            >
+              <img src={userIcon} alt="" className="size-5" />
+            </Link>
+          )}
         </li>
       </ul>
     </nav>

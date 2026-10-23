@@ -1,4 +1,5 @@
 import { Outlet, createRootRoute } from '@tanstack/react-router'
+import { AuthListener } from '@/components/auth/auth-listener'
 import { FiltersDrawerProvider } from '@/components/catalog/filters-drawer'
 import { MobileTabBar } from '@/components/layout/mobile-tab-bar'
 import { SiteFooter } from '@/components/layout/site-footer'
@@ -11,6 +12,7 @@ export const Route = createRootRoute({
 function RootComponent() {
   return (
     <FiltersDrawerProvider>
+      <AuthListener />
       <div className="flex min-h-screen flex-col pb-[95px] md:pb-0">
         <a
           href="#conteudo"
