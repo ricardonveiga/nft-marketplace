@@ -205,6 +205,6 @@ Páginas editoriais, suporte e atividade, "Esqueceu a senha?", login social, ite
 - Carrinho, Detalhe do NFT, Pagamento e Pedido montados sem ler os frames do Figma (limite do
   MCP): estrutura, campos e medidas inferidos.
 - Falta o cadastro/edição de carteiras (tela Carteiras), o recibo completo do pedido, o
-  perfil do colecionador e os extras da Início (hero, promoções, blog).
+  perfil do colecionador e os extras da Início (promoções, blog).
 - Login (mobile) e Cadastro foram montados sem ler os frames do Figma (limite do MCP):
   estrutura e campos do Cadastro são inferidos a partir do Login.
