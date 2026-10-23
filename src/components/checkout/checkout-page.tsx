@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { storeCart, useCart } from '@/hooks/use-cart'
 import { useCreateOrder } from '@/hooks/use-orders'
+import { useMediaQuery } from '@/hooks/use-media-query'
 import { useWallets } from '@/hooks/use-wallets'
 import { shortAddress } from '@/lib/address'
 import { formatPhone } from '@/lib/phone'
@@ -40,6 +41,7 @@ const stepLabels: Record<Step, string> = {
   review: 'Revisão',
 }
 
+const EXTRAS_MEDIA_QUERY = '(min-width: 768px)'
 const OPTIONAL_FIELDS = ['username', 'ensName', 'referralCode', 'notes'] as const
 
 /** Campos opcionais preenchidos (aparados); vazios não vão no pedido. */
@@ -63,6 +65,8 @@ export function CheckoutPage({ user }: { user: User }) {
   const cartQuery = useCart()
   const walletsQuery = useWallets()
   const create = useCreateOrder()
+  // O frame mobile do Figma não tem os campos opcionais: só aparecem (e só valem) a partir de 768 px.
+  const showExtras = useMediaQuery(EXTRAS_MEDIA_QUERY)
 
   const [initial] = useState(loadDraft)
   const [collector, setCollector] = useState<CollectorFields>({
@@ -99,6 +103,10 @@ export function CheckoutPage({ user }: { user: User }) {
     notes: useRef<HTMLTextAreaElement>(null),
   }
 
+  // Escondidos, os campos opcionais não são validados nem enviados (o valor digitado fica guardado).
+  const effectiveCollector: CollectorFields = showExtras
+    ? collector
+    : { ...collector, username: '', ensName: '', referralCode: '', notes: '' }
   const cart = cartQuery.data
   const wallets = walletsQuery.data
   const selectedWallet = wallets?.wallets.find((wallet) => wallet.id === walletId)
@@ -190,7 +198,7 @@ export function CheckoutPage({ user }: { user: User }) {
     event.preventDefault()
     setNotice(null)
 
-    const found: FormErrors = { ...validateCollector(collector) }
+    const found: FormErrors = { ...validateCollector(effectiveCollector) }
 
     if (!selectedWallet) {
       found.wallet = 'Selecione uma carteira.'
@@ -250,7 +258,7 @@ export function CheckoutPage({ user }: { user: User }) {
         name: collector.name.trim(),
         email: collector.email.trim(),
         phone: normalizePhone(collector.phone),
-        ...optionalFields(collector),
+        ...optionalFields(effectiveCollector),
       },
       walletId: selectedWallet.id,
       network,
@@ -421,61 +429,65 @@ export function CheckoutPage({ user }: { user: User }) {
                 onChange={(value) => setCollectorField('phone', value)}
                 inputRef={refs.phone}
               />
-              <AuthField
-                showLabel
-                label="Nome de usuário (opcional)"
-                name="username"
-                placeholder="seu_usuario"
-                autoComplete="username"
-                value={collector.username}
-                error={errors.username}
-                onChange={(value) => setCollectorField('username', value)}
-                inputRef={refs.username}
-              />
-              <AuthField
-                showLabel
-                label="Nome ENS (opcional)"
-                name="ensName"
-                placeholder="nome.eth"
-                autoComplete="off"
-                value={collector.ensName}
-                error={errors.ensName}
-                onChange={(value) => setCollectorField('ensName', value)}
-                inputRef={refs.ensName}
-              />
-              <AuthField
-                showLabel
-                label="Código de indicação (opcional)"
-                name="referralCode"
-                placeholder="KURIO2026"
-                autoComplete="off"
-                value={collector.referralCode}
-                error={errors.referralCode}
-                onChange={(value) => setCollectorField('referralCode', value)}
-                inputRef={refs.referralCode}
-              />
-              <div className="flex flex-col gap-1">
-                <label htmlFor="checkout-notes" className="text-sm">
-                  Observação (opcional)
-                </label>
-                <textarea
-                  id="checkout-notes"
-                  ref={refs.notes}
-                  name="notes"
-                  rows={3}
-                  maxLength={NOTES_MAX_LENGTH}
-                  value={collector.notes}
-                  onChange={(event) => setCollectorField('notes', event.target.value)}
-                  aria-invalid={errors.notes ? true : undefined}
-                  aria-describedby={errors.notes ? 'checkout-notes-error' : undefined}
-                  className="w-full resize-y rounded-md bg-surface-dark px-4 py-2 text-sm text-foreground outline-none placeholder:text-brand-secondary focus-visible:ring-2 focus-visible:ring-ring aria-[invalid=true]:ring-2 aria-[invalid=true]:ring-destructive"
-                />
-                {errors.notes && (
-                  <p id="checkout-notes-error" className="text-xs text-destructive">
-                    {errors.notes}
-                  </p>
-                )}
-              </div>
+              {showExtras && (
+                <>
+                  <AuthField
+                    showLabel
+                    label="Nome de usuário (opcional)"
+                    name="username"
+                    placeholder="seu_usuario"
+                    autoComplete="username"
+                    value={collector.username}
+                    error={errors.username}
+                    onChange={(value) => setCollectorField('username', value)}
+                    inputRef={refs.username}
+                  />
+                  <AuthField
+                    showLabel
+                    label="Nome ENS (opcional)"
+                    name="ensName"
+                    placeholder="nome.eth"
+                    autoComplete="off"
+                    value={collector.ensName}
+                    error={errors.ensName}
+                    onChange={(value) => setCollectorField('ensName', value)}
+                    inputRef={refs.ensName}
+                  />
+                  <AuthField
+                    showLabel
+                    label="Código de indicação (opcional)"
+                    name="referralCode"
+                    placeholder="KURIO2026"
+                    autoComplete="off"
+                    value={collector.referralCode}
+                    error={errors.referralCode}
+                    onChange={(value) => setCollectorField('referralCode', value)}
+                    inputRef={refs.referralCode}
+                  />
+                  <div className="flex flex-col gap-1">
+                    <label htmlFor="checkout-notes" className="text-sm">
+                      Observação (opcional)
+                    </label>
+                    <textarea
+                      id="checkout-notes"
+                      ref={refs.notes}
+                      name="notes"
+                      rows={3}
+                      maxLength={NOTES_MAX_LENGTH}
+                      value={collector.notes}
+                      onChange={(event) => setCollectorField('notes', event.target.value)}
+                      aria-invalid={errors.notes ? true : undefined}
+                      aria-describedby={errors.notes ? 'checkout-notes-error' : undefined}
+                      className="w-full resize-y rounded-md bg-surface-dark px-4 py-2 text-sm text-foreground outline-none placeholder:text-brand-secondary focus-visible:ring-2 focus-visible:ring-ring aria-[invalid=true]:ring-2 aria-[invalid=true]:ring-destructive"
+                    />
+                    {errors.notes && (
+                      <p id="checkout-notes-error" className="text-xs text-destructive">
+                        {errors.notes}
+                      </p>
+                    )}
+                  </div>
+                </>
+              )}
             </section>
 
             <section aria-labelledby="carteira" className="flex flex-col gap-4">
@@ -493,6 +505,7 @@ export function CheckoutPage({ user }: { user: User }) {
                   setNetwork(value)
                   setErrors((current) => ({ ...current, network: undefined }))
                 }}
+                extras={showExtras}
                 walletError={errors.wallet}
                 networkError={errors.network}
               />
@@ -518,8 +531,8 @@ export function CheckoutPage({ user }: { user: User }) {
                 <dd>{collector.name.trim()}</dd>
                 <dd className="text-sm">{collector.email.trim()}</dd>
                 <dd className="text-sm">{formatPhone(collector.phone)}</dd>
-                {collector.username.trim() && <dd className="text-sm">@{collector.username.trim()}</dd>}
-                {collector.ensName.trim() && <dd className="text-sm">{collector.ensName.trim()}</dd>}
+                {effectiveCollector.username.trim() && <dd className="text-sm">@{effectiveCollector.username.trim()}</dd>}
+                {effectiveCollector.ensName.trim() && <dd className="text-sm">{effectiveCollector.ensName.trim()}</dd>}
               </div>
               <div>
                 <dt className="text-sm text-text-secondary">Carteira</dt>

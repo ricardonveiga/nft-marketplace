@@ -133,6 +133,7 @@ test('carteira: conectar, desconectar e escolher a rede entre as que ela aceita'
 })
 
 test('carteira que recusa a conexão mostra o erro e continua desconectada', async ({ page }) => {
+  await page.setViewportSize({ width: 1024, height: 900 })
   await startCheckout(page)
 
   await page.getByLabel('Usar outra carteira?').check()
@@ -428,6 +429,8 @@ test('sem rolagem horizontal no pagamento e na confirmação em 390, 768 e 1440 
 })
 
 test('perfil do colecionador: campos opcionais validam, vão na revisão e ficam no recibo', async ({ page }) => {
+  // Os campos opcionais existem a partir de 768 px (o frame mobile do Figma não os tem).
+  await page.setViewportSize({ width: 1024, height: 900 })
   await startCheckout(page)
   await main(page).getByLabel('Telefone').fill('(11) 91234-5678')
   await connectPrimaryWallet(page)
@@ -460,6 +463,7 @@ test('perfil do colecionador: campos opcionais validam, vão na revisão e ficam
 })
 
 test('"Usar outra carteira?": a principal vem sozinha, a outra aparece ao marcar e some ao desmarcar', async ({ page }) => {
+  await page.setViewportSize({ width: 1024, height: 900 })
   await startCheckout(page)
 
   const details = page.getByTestId('checkout-wallet-details')
@@ -476,4 +480,35 @@ test('"Usar outra carteira?": a principal vem sozinha, a outra aparece ao marcar
   await expect(page.getByRole('radio')).toHaveCount(1)
   await expect(page.getByRole('radio', { name: /Carteira principal/ })).toBeChecked()
   await expect(details).toContainText('Principal')
+})
+
+test('mobile (abaixo de 768 px): sem campos opcionais, e o valor digitado antes não é enviado', async ({ page }) => {
+  await page.setViewportSize({ width: 1024, height: 900 })
+  await startCheckout(page)
+  await main(page).getByLabel('Telefone').fill('(11) 91234-5678')
+  await connectPrimaryWallet(page)
+  // Valor inválido de propósito: escondido, não pode travar o envio.
+  await main(page).getByLabel('Nome de usuário (opcional)').fill('a')
+
+  await page.setViewportSize({ width: 390, height: 844 })
+  await expect(main(page).getByLabel('Nome de usuário (opcional)')).toHaveCount(0)
+  await expect(main(page).getByLabel('Nome ENS (opcional)')).toHaveCount(0)
+  await expect(main(page).getByLabel('Código de indicação (opcional)')).toHaveCount(0)
+  await expect(main(page).getByLabel('Observação (opcional)')).toHaveCount(0)
+
+  await page.getByRole('button', { name: 'Revisar pedido' }).click()
+  await page.getByLabel('Li e aceito os termos de compra de NFTs.').check()
+  await page.getByRole('button', { name: 'Confirmar compra' }).click()
+
+  await expect(page.getByTestId('order-confirmed')).toBeVisible({ timeout: 10_000 })
+  await expect(page.getByTestId('order-collector-username')).toHaveCount(0)
+})
+
+test('mobile (abaixo de 768 px): todas as carteiras aparecem, sem "Usar outra carteira?" nem tipo/endereço', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 })
+  await startCheckout(page)
+
+  await expect(page.getByRole('radio')).toHaveCount(2)
+  await expect(page.getByLabel('Usar outra carteira?')).toHaveCount(0)
+  await expect(page.getByTestId('checkout-wallet-details')).toHaveCount(0)
 })

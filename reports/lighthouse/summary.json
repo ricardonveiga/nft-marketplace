@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-23T03:56:27.819Z",
+  "generatedAt": "2026-10-23T17:30:59.860Z",
   "runsPerPageAndProfile": 3,
   "host": {
     "os": "Windows_NT 10.0.19045 (x64)",
@@ -14,67 +14,67 @@
       "path": "/",
       "profile": "Mobile",
       "median": {
-        "performance": 73,
+        "performance": 78,
         "accessibility": 98,
         "best-practices": 100,
         "seo": 100,
-        "lcpMs": 4227,
+        "lcpMs": 4184,
         "cls": 0.017,
-        "tbtMs": 313,
-        "fcpMs": 3079,
-        "speedIndexMs": 3079
+        "tbtMs": 172,
+        "fcpMs": 3055,
+        "speedIndexMs": 3055
       },
       "runs": [
         {
           "scores": {
-            "performance": 73,
+            "performance": 77,
             "accessibility": 98,
             "best-practices": 100,
             "seo": 100
           },
           "metrics": {
-            "lcpMs": 4268,
+            "lcpMs": 4179,
             "cls": 0.017,
-            "tbtMs": 295,
-            "fcpMs": 3105,
-            "speedIndexMs": 3105
+            "tbtMs": 198,
+            "fcpMs": 3054,
+            "speedIndexMs": 3054
           }
         },
         {
           "scores": {
-            "performance": 72,
+            "performance": 78,
             "accessibility": 98,
             "best-practices": 100,
             "seo": 100
           },
           "metrics": {
-            "lcpMs": 4227,
+            "lcpMs": 4184,
             "cls": 0.017,
-            "tbtMs": 338,
-            "fcpMs": 3079,
-            "speedIndexMs": 3079
+            "tbtMs": 168,
+            "fcpMs": 3057,
+            "speedIndexMs": 3057
           }
         },
         {
           "scores": {
-            "performance": 73,
+            "performance": 78,
             "accessibility": 98,
             "best-practices": 100,
             "seo": 100
           },
           "metrics": {
-            "lcpMs": 4208,
+            "lcpMs": 4184,
             "cls": 0.017,
-            "tbtMs": 313,
-            "fcpMs": 3066,
-            "speedIndexMs": 3066
+            "tbtMs": 172,
+            "fcpMs": 3055,
+            "speedIndexMs": 3055
           }
         }
       ],
       "environment": {
         "lighthouse": "13.5.0",
         "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36",
-        "benchmarkIndex": 1113.5,
+        "benchmarkIndex": 1864.5,
         "throttlingMethod": "simulate",
         "throttling": {
           "rttMs": 150,
@@ -103,11 +103,11 @@
         "accessibility": 99,
         "best-practices": 100,
         "seo": 100,
-        "lcpMs": 884,
+        "lcpMs": 916,
         "cls": 0.001,
         "tbtMs": 0,
-        "fcpMs": 640,
-        "speedIndexMs": 652
+        "fcpMs": 636,
+        "speedIndexMs": 636
       },
       "runs": [
         {
@@ -118,11 +118,11 @@
             "seo": 100
           },
           "metrics": {
-            "lcpMs": 920,
+            "lcpMs": 924,
             "cls": 0.001,
-            "tbtMs": 3,
-            "fcpMs": 651,
-            "speedIndexMs": 686
+            "tbtMs": 0,
+            "fcpMs": 642,
+            "speedIndexMs": 642
           }
         },
         {
@@ -133,11 +133,11 @@
             "seo": 100
           },
           "metrics": {
-            "lcpMs": 884,
+            "lcpMs": 916,
             "cls": 0.001,
             "tbtMs": 0,
-            "fcpMs": 640,
-            "speedIndexMs": 652
+            "fcpMs": 635,
+            "speedIndexMs": 635
           }
         },
         {
@@ -148,18 +148,18 @@
             "seo": 100
           },
           "metrics": {
-            "lcpMs": 884,
+            "lcpMs": 916,
             "cls": 0.001,
             "tbtMs": 0,
-            "fcpMs": 640,
-            "speedIndexMs": 649
+            "fcpMs": 636,
+            "speedIndexMs": 636
           }
         }
       ],
       "environment": {
         "lighthouse": "13.5.0",
         "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36",
-        "benchmarkIndex": 1376.5,
+        "benchmarkIndex": 1898.5,
         "throttlingMethod": "simulate",
         "throttling": {
           "rttMs": 40,
@@ -184,67 +184,67 @@
       "path": "/nft/nft-03",
       "profile": "Mobile",
       "median": {
-        "performance": 75,
+        "performance": 78,
         "accessibility": 100,
         "best-practices": 100,
         "seo": 100,
-        "lcpMs": 4305,
+        "lcpMs": 4247,
         "cls": 0,
-        "tbtMs": 231,
-        "fcpMs": 3146,
-        "speedIndexMs": 3146
+        "tbtMs": 147,
+        "fcpMs": 3046,
+        "speedIndexMs": 3046
       },
       "runs": [
         {
           "scores": {
-            "performance": 75,
+            "performance": 78,
             "accessibility": 100,
             "best-practices": 100,
             "seo": 100
           },
           "metrics": {
-            "lcpMs": 4307,
+            "lcpMs": 4247,
             "cls": 0,
-            "tbtMs": 241,
-            "fcpMs": 3147,
-            "speedIndexMs": 3147
+            "tbtMs": 147,
+            "fcpMs": 3046,
+            "speedIndexMs": 3046
           }
         },
         {
           "scores": {
-            "performance": 76,
+            "performance": 78,
             "accessibility": 100,
             "best-practices": 100,
             "seo": 100
           },
           "metrics": {
-            "lcpMs": 4216,
+            "lcpMs": 4238,
             "cls": 0,
-            "tbtMs": 231,
-            "fcpMs": 3071,
-            "speedIndexMs": 3071
+            "tbtMs": 139,
+            "fcpMs": 3040,
+            "speedIndexMs": 3040
           }
         },
         {
           "scores": {
-            "performance": 75,
+            "performance": 78,
             "accessibility": 100,
             "best-practices": 100,
             "seo": 100
           },
           "metrics": {
-            "lcpMs": 4305,
+            "lcpMs": 4255,
             "cls": 0,
-            "tbtMs": 229,
-            "fcpMs": 3146,
-            "speedIndexMs": 3146
+            "tbtMs": 150,
+            "fcpMs": 3050,
+            "speedIndexMs": 3050
           }
         }
       ],
       "environment": {
         "lighthouse": "13.5.0",
         "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36",
-        "benchmarkIndex": 1320,
+        "benchmarkIndex": 1917,
         "throttlingMethod": "simulate",
         "throttling": {
           "rttMs": 150,
@@ -273,11 +273,11 @@
         "accessibility": 100,
         "best-practices": 100,
         "seo": 100,
-        "lcpMs": 892,
+        "lcpMs": 913,
         "cls": 0,
-        "tbtMs": 1,
-        "fcpMs": 664,
-        "speedIndexMs": 664
+        "tbtMs": 0,
+        "fcpMs": 656,
+        "speedIndexMs": 656
       },
       "runs": [
         {
@@ -288,7 +288,7 @@
             "seo": 100
           },
           "metrics": {
-            "lcpMs": 877,
+            "lcpMs": 875,
             "cls": 0,
             "tbtMs": 0,
             "fcpMs": 656,
@@ -303,11 +303,11 @@
             "seo": 100
           },
           "metrics": {
-            "lcpMs": 894,
+            "lcpMs": 924,
             "cls": 0,
-            "tbtMs": 1,
-            "fcpMs": 667,
-            "speedIndexMs": 667
+            "tbtMs": 0,
+            "fcpMs": 684,
+            "speedIndexMs": 684
           }
         },
         {
@@ -318,18 +318,18 @@
             "seo": 100
           },
           "metrics": {
-            "lcpMs": 892,
+            "lcpMs": 913,
             "cls": 0,
-            "tbtMs": 4,
-            "fcpMs": 664,
-            "speedIndexMs": 664
+            "tbtMs": 0,
+            "fcpMs": 653,
+            "speedIndexMs": 653
           }
         }
       ],
       "environment": {
         "lighthouse": "13.5.0",
         "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36",
-        "benchmarkIndex": 1350.5,
+        "benchmarkIndex": 1927,
         "throttlingMethod": "simulate",
         "throttling": {
           "rttMs": 40,

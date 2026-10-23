@@ -326,9 +326,17 @@ resumo. Como cada campo foi tratado:
 - **Botão** "Confirmar pagamento" passou a "Confirmar compra" (texto do Figma). O fluxo continua em
   duas etapas (dados, depois revisão com aceite dos termos): a revisão antes do envio é exigida
   pelo desafio, e o Figma descreve só a tela de dados.
-- **Pendente de conferir**: a descrição do Figma é em texto; espaçamentos, ordem exata e o visual
-  mobile dos novos campos não foram comparados com o frame. As baselines de Pagamento foram
-  regeneradas, então só valem como regressão, não como prova de fidelidade.
+- **Só a partir de 768 px**: o frame mobile (414 px) do Figma não tem nada disto. Abaixo de 768 px
+  (`useMediaQuery`, ponto em que o app já troca de layout) os quatro campos opcionais, o
+  "Usar outra carteira?" e o bloco Tipo/Endereço não aparecem, e todas as carteiras ficam listadas
+  como antes. Escondido não vale: os campos não são validados nem enviados (o valor digitado fica
+  guardado e volta se a tela for alargada), então um valor inválido nunca trava o envio de forma
+  invisível.
+- **Regressão visual**: a baseline mobile do Pagamento é a original (a que já tinha sido conferida
+  com o Figma) e continua batendo; o layout mobile ficou idêntico ao de antes dos campos novos. A
+  baseline desktop foi regenerada (a tela mudou de propósito), então só vale como regressão.
+- **Pendente de conferir**: a descrição do Figma desktop é em texto; espaçamentos e ordem exata
+  dos campos não foram comparados com o frame.
 
 ## Fora do escopo (inertes e sinalizados com "Em breve")
 

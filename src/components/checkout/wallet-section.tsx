@@ -14,6 +14,8 @@ type WalletSectionProps = {
   onNetworkChange: (network: NftNetwork) => void
   walletError?: string
   networkError?: string
+  /** "Usar outra carteira?" e tipo/endereço: só no desktop (o frame mobile do Figma não os tem). */
+  extras?: boolean
 }
 
 type Message = { kind: 'success' | 'error'; text: string }
@@ -29,6 +31,7 @@ export function WalletSection({
   onNetworkChange,
   walletError,
   networkError,
+  extras = true,
 }: WalletSectionProps) {
   const { data, isPending, isError, error, refetch } = useWallets()
   const connect = useConnectWallet()
@@ -89,8 +92,8 @@ export function WalletSection({
   const selected = data.wallets.find((wallet) => wallet.id === walletId)
   const primary = data.wallets.find((wallet) => wallet.isPrimary)
   // Com a principal selecionada só ela aparece; "Usar outra carteira?" libera as demais.
-  const canChoose = data.wallets.length > 1
-  const showAll = canChoose && (otherRequested || Boolean(selected && !selected.isPrimary))
+  const canChoose = extras && data.wallets.length > 1
+  const showAll = !extras || (canChoose && (otherRequested || Boolean(selected && !selected.isPrimary)))
   const shownId = (selected ?? primary)?.id
   const visibleWallets = showAll ? data.wallets : data.wallets.filter((wallet) => wallet.id === shownId)
   const connected = Boolean(selected) && data.connectedWalletId === selected?.id
@@ -206,7 +209,7 @@ export function WalletSection({
         </label>
       )}
 
-      {selected && (
+      {extras && selected && (
         <dl data-testid="checkout-wallet-details" className="grid gap-3 text-sm sm:grid-cols-2">
           <div>
             <dt className="text-text-secondary">Tipo de carteira</dt>
