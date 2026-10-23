@@ -33,11 +33,15 @@ tudo o que difere dele (ou que ele não define) está listado aqui.
 - **Textos do Figma**: desktop "Seja dono do futuro da arte digital" + parágrafo longo; mobile
   "Seja dono da cultura digital" + parágrafo curto. As duas variantes existem no DOM e só a visível
   entra na árvore de acessibilidade. O título do hero é o único `h1` da página.
-- **Nome e preço do NFT** aparecem sobre a imagem no desktop; no mobile (arte de 138 px) ficam só
-  para leitores de tela. A miniatura de 58 px sobreposta (mobile) é o próximo destaque, decorativa.
+- **Nome e preço do NFT**: no Figma a arte do hero é só a imagem, sem texto sobreposto (conferido
+  por print). Por isso o overlay visível foi removido, nos dois tamanhos. Nome e preço continuam no
+  DOM, só para leitores de tela (`sr-only`), para o link do destaque ter nome acessível e o valor
+  atualizado por `nft.updated` seguir verificável. A miniatura de 58 px sobreposta (mobile) é o
+  próximo destaque, decorativa.
 - **EXPLORAR** rola até o catálogo e leva o foco para a seção (sem mexer na URL nem nos filtros).
-- **Dimensões**: 1200 × 450 no desktop e 366 × 190 no mobile (medidas do Figma). O fundo e os
-  círculos decorativos são inferidos (cor `surface-dark` e círculos translúcidos).
+- **Dimensões**: 1200 × 450 no desktop e 366 × 190 no mobile (medidas do Figma). O fundo é
+  `surface-dark`. Os círculos decorativos atrás do texto foram removidos: não existem no Figma
+  (eram uma adição própria, a partir de um palpite sobre as elipses do mobile).
 - Sem destaques (catálogo vazio ou erro) o hero mantém texto e botão, sem arte.
 
 ## Carrinho

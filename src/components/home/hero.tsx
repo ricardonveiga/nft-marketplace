@@ -38,14 +38,10 @@ function HeroArt({ nft, preview, position, total }: { nft: Nft; preview?: Nft; p
           fetchPriority="high"
           className="size-full object-cover"
         />
-        {/* Nome e preço: visíveis no desktop; no mobile ficam só para leitores de tela. */}
-        <span className="absolute inset-x-0 bottom-0 flex flex-col gap-1 bg-linear-to-t from-background/90 via-background/60 to-transparent px-6 pt-16 pb-6 max-md:sr-only">
-          <span data-testid="hero-name" className="text-base leading-4 font-bold text-foreground">
-            {nft.name}
-          </span>
-          <span data-testid="hero-price" className="text-lg leading-5 font-bold text-text-accent">
-            {nft.priceEth} ETH
-          </span>
+        {/* No Figma a arte não tem texto sobreposto: nome e preço ficam só para leitores de tela. */}
+        <span className="sr-only">
+          <span data-testid="hero-name">{nft.name}</span>
+          <span data-testid="hero-price">{nft.priceEth} ETH</span>
         </span>
       </Link>
 
@@ -84,10 +80,6 @@ export function Hero() {
       aria-label="Destaques"
       className="relative h-[190px] overflow-hidden rounded-[20px] bg-surface-dark md:h-[450px] md:rounded-xl"
     >
-      {/* Círculos decorativos (Figma: Ellipse 49/50 no mobile). */}
-      <div aria-hidden="true" className="pointer-events-none absolute -top-8 -left-20 size-[248px] rounded-full bg-primary/10 md:-top-24 md:-left-24 md:size-[420px]" />
-      <div aria-hidden="true" className="pointer-events-none absolute -top-2.5 left-[73px] size-[248px] rounded-full bg-primary/10 md:top-auto md:-bottom-32 md:left-1/3 md:size-[380px]" />
-
       <div className="relative flex h-full items-center justify-between gap-2 px-4 md:gap-4 md:px-10">
         <div className="flex max-w-[188px] flex-col gap-3 md:max-w-[600px] md:gap-6">
           <div className="flex flex-col gap-1.5 md:gap-4">
