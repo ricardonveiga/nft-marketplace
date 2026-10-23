@@ -27,3 +27,67 @@ export function validateLogin(values: LoginFields): FieldErrors<LoginFields> {
 
   return errors
 }
+
+export type RegisterFields = {
+  name: string
+  email: string
+  password: string
+  confirmPassword: string
+}
+
+const PASSWORD_MIN_LENGTH = 8
+
+/** Regra de senha usada no cadastro (cliente) e na API simulada (servidor). */
+export function validatePassword(password: string): string | undefined {
+  if (password.length < PASSWORD_MIN_LENGTH) {
+    return `A senha deve ter pelo menos ${PASSWORD_MIN_LENGTH} caracteres.`
+  }
+
+  if (!/[A-Za-z]/.test(password) || !/\d/.test(password)) {
+    return 'Use letras e números na senha.'
+  }
+
+  return undefined
+}
+
+export function validateName(name: string): string | undefined {
+  const trimmed = name.trim()
+
+  if (!trimmed) {
+    return 'Informe seu nome.'
+  }
+
+  return trimmed.length < 2 ? 'O nome deve ter pelo menos 2 caracteres.' : undefined
+}
+
+export function validateRegister(values: RegisterFields): FieldErrors<RegisterFields> {
+  const errors: FieldErrors<RegisterFields> = {}
+  const email = values.email.trim()
+
+  errors.name = validateName(values.name)
+
+  if (!email) {
+    errors.email = 'Informe seu e-mail.'
+  } else if (!isEmail(email)) {
+    errors.email = 'Informe um e-mail válido.'
+  }
+
+  errors.password = values.password
+    ? validatePassword(values.password)
+    : 'Crie uma senha.'
+
+  if (!values.confirmPassword) {
+    errors.confirmPassword = 'Confirme sua senha.'
+  } else if (values.confirmPassword !== values.password) {
+    errors.confirmPassword = 'As senhas não conferem.'
+  }
+
+  // Remove as chaves sem erro para `Object.keys(errors).length` refletir a validade.
+  for (const key of Object.keys(errors) as Array<keyof RegisterFields>) {
+    if (!errors[key]) {
+      delete errors[key]
+    }
+  }
+
+  return errors
+}

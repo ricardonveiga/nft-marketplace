@@ -13,3 +13,23 @@ export function getSafeRedirect(value: unknown) {
 
   return isInternalPath && !isLogin ? value : '/'
 }
+
+export type AuthSearch = {
+  /** Página para onde voltar depois de entrar. */
+  redirect?: string
+  reason?: 'expired'
+}
+
+/**
+ * Validação dos search params das telas de login e cadastro. As chaves ausentes
+ * ficam como `undefined` explícito: o roteador herda os search params crus da rota
+ * pai, e um `redirect` malicioso sobreviveria.
+ */
+export function validateAuthSearch(raw: Record<string, unknown>): AuthSearch {
+  const redirect = getSafeRedirect(raw.redirect)
+
+  return {
+    redirect: redirect !== '/' ? redirect : undefined,
+    reason: raw.reason === 'expired' ? 'expired' : undefined,
+  }
+}

@@ -9,6 +9,12 @@ export type LoginRequest = {
   password: string
 }
 
+export type RegisterRequest = {
+  name: string
+  email: string
+  password: string
+}
+
 export type LoginResponse = {
   user: User
   token: string
@@ -18,5 +24,5 @@ export type LoginResponse = {
 export type ApiErrorBody = {
   code: string
   message?: string
-  errors?: Partial<Record<'email' | 'password', string>>
+  errors?: Partial<Record<'name' | 'email' | 'password', string>>
 }

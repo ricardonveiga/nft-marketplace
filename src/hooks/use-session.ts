@@ -4,8 +4,9 @@ import {
   useQueryClient,
   type QueryClient,
 } from '@tanstack/react-query'
-import { fetchSession, login, logout } from '@/api/auth'
+import { fetchSession, login, logout, register } from '@/api/auth'
 import { clearSessionToken, setSessionToken } from '@/lib/session-token'
+import type { LoginResponse } from '@/types/auth'
 
 export const SESSION_QUERY_KEY = ['session'] as const
 
@@ -30,18 +31,27 @@ export function useSession() {
   })
 }
 
-export function useLogin() {
+/** Abre a sessão (login ou cadastro): nada do usuário anterior pode vazar para a nova. */
+function useStartSession() {
   const queryClient = useQueryClient()
 
-  return useMutation({
-    mutationFn: login,
-    onSuccess: ({ user, token }) => {
-      // Troca de usuário: nada do anterior pode vazar para a nova sessão.
-      clearPrivateData(queryClient)
-      setSessionToken(token)
-      queryClient.setQueryData(SESSION_QUERY_KEY, user)
-    },
-  })
+  return ({ user, token }: LoginResponse) => {
+    clearPrivateData(queryClient)
+    setSessionToken(token)
+    queryClient.setQueryData(SESSION_QUERY_KEY, user)
+  }
+}
+
+export function useLogin() {
+  const startSession = useStartSession()
+
+  return useMutation({ mutationFn: login, onSuccess: startSession })
+}
+
+export function useRegister() {
+  const startSession = useStartSession()
+
+  return useMutation({ mutationFn: register, onSuccess: startSession })
 }
 
 export function useLogout() {
