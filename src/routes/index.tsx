@@ -3,6 +3,7 @@ import { useEffect } from 'react'
 import { CatalogPagination } from '@/components/catalog/catalog-pagination'
 import { CatalogToolbar } from '@/components/catalog/catalog-toolbar'
 import { FiltersPanel } from '@/components/catalog/filters-panel'
+import { FeaturedNftCard } from '@/components/nft/featured-nft-card'
 import { NftCard, NftCardSkeleton } from '@/components/nft/nft-card'
 import { Button } from '@/components/ui/button'
 import {
@@ -42,9 +43,12 @@ function HomePage() {
         aria-label="Catálogo de NFTs"
         className="scroll-mt-24 xl:grid xl:grid-cols-[310px_1fr] xl:gap-12"
       >
-        <aside aria-label="Filtros" className="hidden xl:block">
-          <FiltersPanel />
-        </aside>
+        <div className="hidden flex-col gap-6 xl:flex">
+          <aside aria-label="Filtros">
+            <FiltersPanel />
+          </aside>
+          <FeaturedNftCard />
+        </div>
 
         <div className="flex flex-col gap-8">
           <CatalogToolbar />
