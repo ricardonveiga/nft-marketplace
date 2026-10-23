@@ -149,3 +149,26 @@
     @apply font-bold;
     }
 }
+
+/* Impressão do recibo: papel claro, sem a "casca" do site. */
+@media print {
+  :root {
+    color-scheme: light;
+  }
+
+  body {
+    background: #fff !important;
+    color: #000 !important;
+  }
+
+  .receipt,
+  .receipt * {
+    background: transparent !important;
+    color: #000 !important;
+    box-shadow: none !important;
+  }
+
+  .receipt section {
+    border: 1px solid #999;
+  }
+}

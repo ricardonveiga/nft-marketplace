@@ -46,7 +46,7 @@ export function SiteHeader() {
   }
 
   return (
-    <header className="sticky top-0 z-50 border-b border-border bg-background">
+    <header className="sticky top-0 z-50 border-b border-border bg-background print:hidden">
       {/* Desktop */}
       <div className="mx-auto hidden h-[45px] w-full max-w-[1264px] items-stretch justify-between px-8 md:flex">
         <div className="flex items-center lg:w-40">

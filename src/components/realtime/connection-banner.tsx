@@ -12,7 +12,7 @@ export function ConnectionBanner() {
     <p
       role="status"
       data-testid="connection-banner"
-      className="bg-card px-4 py-1.5 text-center text-sm text-text-secondary"
+      className="bg-card px-4 py-1.5 text-center text-sm text-text-secondary print:hidden"
     >
       Sem conexão em tempo real. Tentando reconectar…
     </p>
