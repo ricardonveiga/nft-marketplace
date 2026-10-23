@@ -26,6 +26,9 @@ export function AccountMenu({ user, variant }: AccountMenuProps) {
             aria-label={`Conta de ${user.name}`}
             className="flex h-[35px] items-center gap-2 rounded-md border border-border-soft px-3 text-base font-medium focus-visible:outline-2 focus-visible:outline-ring"
           >
+            {user.avatarUrl && (
+              <img src={user.avatarUrl} alt="" width={24} height={24} className="size-6 rounded-full object-cover" />
+            )}
             <span className="max-w-[120px] truncate">Olá, {firstName}</span>
             <ChevronDown className="size-4" aria-hidden="true" />
           </button>
@@ -35,7 +38,11 @@ export function AccountMenu({ user, variant }: AccountMenuProps) {
             aria-label={`Conta de ${user.name}`}
             className="grid size-10 place-items-center rounded-md focus-visible:outline-2 focus-visible:outline-ring"
           >
-            <img src={userIcon} alt="" className="size-5" />
+            {user.avatarUrl ? (
+              <img src={user.avatarUrl} alt="" width={28} height={28} className="size-7 rounded-full object-cover" />
+            ) : (
+              <img src={userIcon} alt="" className="size-5" />
+            )}
           </button>
         )}
       </DropdownMenu.Trigger>
@@ -53,8 +60,8 @@ export function AccountMenu({ user, variant }: AccountMenuProps) {
           <DropdownMenu.Item asChild className={itemClass}>
             <Link to="/carteiras">Minhas carteiras</Link>
           </DropdownMenu.Item>
-          <DropdownMenu.Item disabled className={itemClass}>
-            Meu perfil (em breve)
+          <DropdownMenu.Item asChild className={itemClass}>
+            <Link to="/perfil">Meu perfil</Link>
           </DropdownMenu.Item>
           <DropdownMenu.Item
             className={itemClass}

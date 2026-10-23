@@ -9,6 +9,7 @@ import { storeCart, useCart } from '@/hooks/use-cart'
 import { useCreateOrder } from '@/hooks/use-orders'
 import { useWallets } from '@/hooks/use-wallets'
 import { shortAddress } from '@/lib/address'
+import { formatPhone } from '@/lib/phone'
 import {
   clearIdempotencyKey,
   getIdempotencyKey,
@@ -33,16 +34,6 @@ type Quote = { version: number; totalEth: string }
 type Notice = { kind: 'error' | 'warning'; text: string }
 type FormErrors = FieldErrors<CollectorFields> & { wallet?: string; network?: string }
 
-function formatPhone(value: string) {
-  const digits = normalizePhone(value)
-
-  return digits.length === 11
-    ? `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`
-    : digits.length === 10
-      ? `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`
-      : value
-}
-
 const stepLabels: Record<Step, string> = {
   form: 'Dados e carteira',
   review: 'Revisão',
@@ -57,7 +48,11 @@ export function CheckoutPage({ user }: { user: User }) {
 
   const [initial] = useState(loadDraft)
   const [collector, setCollector] = useState<CollectorFields>(
-    initial.collector ?? { name: user.name, email: user.email, phone: '' },
+    initial.collector ?? {
+      name: user.name,
+      email: user.email,
+      phone: user.phone ? formatPhone(user.phone) : '',
+    },
   )
   const [walletId, setWalletId] = useState<string | null>(initial.walletId ?? null)
   const [network, setNetwork] = useState<NftNetwork | ''>(initial.network ?? '')
