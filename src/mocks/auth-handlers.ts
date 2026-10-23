@@ -1,8 +1,14 @@
 import { HttpResponse, http } from 'msw'
-import { isEmail } from '@/lib/validation'
-import type { ApiErrorBody, LoginRequest, LoginResponse, User } from '@/types/auth'
-import { mockUsers } from './fixtures/users'
+import { isEmail, validateName, validatePassword } from '@/lib/validation'
+import type {
+  ApiErrorBody,
+  LoginRequest,
+  LoginResponse,
+  RegisterRequest,
+  User,
+} from '@/types/auth'
 import { getScenario } from './scenario'
+import { addUser, findUserByEmail, listUsers } from './users-store'
 
 const SESSION_TTL_MS = 8 * 60 * 60 * 1000
 
@@ -33,7 +39,7 @@ export function authenticate(request: Request): User | Response {
     return error(401, { code: 'session_expired', message: 'Sua sessão expirou.' })
   }
 
-  const user = mockUsers.find((candidate) => candidate.id === userId)
+  const user = listUsers().find((candidate) => candidate.id === userId)
 
   return user
     ? toPublicUser(user)
@@ -60,11 +66,8 @@ export const authHandlers = [
       return error(422, { code: 'validation_error', errors })
     }
 
-    const user = mockUsers.find(
-      (candidate) =>
-        candidate.email.toLowerCase() === email.toLowerCase() &&
-        candidate.password === password,
-    )
+    const found = findUserByEmail(email)
+    const user = found?.password === password ? found : undefined
 
     if (!user) {
       return error(401, {
@@ -79,6 +82,49 @@ export const authHandlers = [
     }
 
     return HttpResponse.json(response)
+  }),
+
+  http.post('/api/auth/register', async ({ request }) => {
+    const body = (await request.json().catch(() => null)) as Partial<RegisterRequest> | null
+    const name = typeof body?.name === 'string' ? body.name.trim() : ''
+    const email = typeof body?.email === 'string' ? body.email.trim() : ''
+    const password = typeof body?.password === 'string' ? body.password : ''
+
+    const errors: NonNullable<ApiErrorBody['errors']> = {}
+    const nameError = validateName(name)
+    const passwordError = validatePassword(password)
+
+    if (nameError) {
+      errors.name = nameError
+    }
+
+    if (!isEmail(email)) {
+      errors.email = 'Informe um e-mail válido.'
+    }
+
+    if (passwordError) {
+      errors.password = passwordError
+    }
+
+    if (Object.keys(errors).length > 0) {
+      return error(422, { code: 'validation_error', errors })
+    }
+
+    if (findUserByEmail(email)) {
+      return error(409, {
+        code: 'email_taken',
+        message: 'Este e-mail já está cadastrado.',
+        errors: { email: 'Este e-mail já está cadastrado.' },
+      })
+    }
+
+    const user = addUser({ name, email, password })
+    const response: LoginResponse = {
+      user: toPublicUser(user),
+      token: createToken(user.id),
+    }
+
+    return HttpResponse.json(response, { status: 201 })
   }),
 
   http.get('/api/auth/session', ({ request }) => {
