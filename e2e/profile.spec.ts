@@ -316,3 +316,22 @@ test('sem rolagem horizontal em 390, 768 e 1440 px', async ({ page }) => {
     expect(overflow, `largura ${width}`).toBe(0)
   }
 })
+
+test('menu lateral "Meu perfil": navega entre perfil e carteiras e deixa o resto como "Em breve"', async ({ page }) => {
+  await signIn(page, ana)
+
+  const menu = main(page).getByRole('navigation', { name: 'Meu perfil' })
+  await expect(menu.getByRole('link', { name: 'Dados do perfil' })).toHaveAttribute('aria-current', 'page')
+
+  for (const label of ['Atividade', 'Lista de interesse', 'Ofertas', 'Arquivos baixados', 'Suporte']) {
+    await expect(menu.getByText(label, { exact: true })).toHaveAttribute('aria-disabled', 'true')
+    await expect(menu.getByRole('link', { name: label })).toHaveCount(0)
+  }
+
+  await menu.getByRole('link', { name: 'Carteiras' }).click()
+  await expect(page).toHaveURL('/carteiras')
+  await expect(menu.getByRole('link', { name: 'Carteiras' })).toHaveAttribute('aria-current', 'page')
+
+  await menu.getByRole('button', { name: 'Sair' }).click()
+  await expect(page.getByRole('button', { name: `Conta de ${ana.name}` })).toBeHidden()
+})

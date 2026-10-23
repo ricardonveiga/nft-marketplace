@@ -2,6 +2,7 @@ import { useIsMutating } from '@tanstack/react-query'
 import { Link, createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
 import { RequireAuth } from '@/components/auth/require-auth'
+import { AccountSidebar } from '@/components/profile/account-sidebar'
 import { WalletCard } from '@/components/wallets/wallet-card'
 import { WalletFormDialog } from '@/components/wallets/wallet-form-dialog'
 import { Button } from '@/components/ui/button'
@@ -23,8 +24,11 @@ function WalletsPage() {
   return (
     <RequireAuth>
       {() => (
-        <div className="mx-auto w-full max-w-[1264px] px-6 py-8 md:px-8 md:py-12">
-          <WalletsContent />
+        <div className="mx-auto grid w-full max-w-[1264px] items-start gap-6 px-6 py-8 md:px-8 md:py-12 lg:grid-cols-[240px_1fr]">
+          <AccountSidebar />
+          <div>
+            <WalletsContent />
+          </div>
         </div>
       )}
     </RequireAuth>

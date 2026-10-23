@@ -235,7 +235,7 @@ test.describe('erro geral (500)', () => {
     await switchTo(page, 'error')
 
     // Navegação interna: a sessão está em cache, só a lista de carteiras é pedida.
-    await main(page).getByRole('link', { name: 'carteiras' }).click()
+    await main(page).getByRole('link', { name: 'carteiras', exact: true }).click()
     await expect(main(page).getByRole('alert')).toContainText('Não foi possível carregar suas carteiras.')
 
     await switchTo(page, null)

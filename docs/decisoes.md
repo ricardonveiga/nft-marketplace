@@ -290,6 +290,20 @@ socket (`order.updated`), ~1,2 s depois da criação.
 - Lista vazia (cenário `empty`) esconde a seção; erro mostra aviso com "Tentar novamente" só na
   seção, sem afetar o catálogo. Datas em UTC (`formatDate`), imagens decorativas (`alt=""`).
 
+## Menu lateral "Meu perfil" (Perfil e Carteiras)
+
+- Conferido contra os prints do Figma (sem o MCP): as duas telas têm um menu lateral fixo, que
+  não existia. Componente `AccountSidebar` (`src/components/profile/account-sidebar.tsx`), usado em
+  `/perfil` e `/carteiras`.
+- Itens: **Dados do perfil** e **Carteiras** (links, com `aria-current="page"` no ativo) e **Sair**
+  (botão, mesma ação do menu da conta). **Atividade, Lista de interesse, Ofertas, Arquivos baixados
+  e Suporte** estão fora do escopo do desafio: `aria-disabled`, `title="Em breve"` e cursor
+  bloqueado, como no cabeçalho e no rodapé (não são links).
+- Desktop (≥ 1024 px): coluna de 240 px à esquerda; Perfil fica em três colunas (menu, foto,
+  formulários). Abaixo disso o menu vira um bloco no topo da página. O Figma não tem frame mobile
+  dessas telas, então essa adaptação é nossa.
+- Hero da Início e Pagamento mobile foram conferidos com prints e batem com o Figma (sem mudanças).
+
 ## Fora do escopo (inertes e sinalizados com "Em breve")
 
 Páginas editoriais, suporte e atividade, "Esqueceu a senha?", login social, itens do menu
