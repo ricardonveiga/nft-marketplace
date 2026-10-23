@@ -12,6 +12,8 @@ async function signIn(page: Page, user: { email: string; password: string }) {
   await main.getByLabel('E-mail', { exact: true }).fill(user.email)
   await main.getByLabel('Senha', { exact: true }).fill(user.password)
   await main.getByRole('button', { name: 'Entrar', exact: true }).click()
+  // Só segue quando o login terminou; navegar antes aborta a requisição e a sessão não é gravada.
+  await expect(page).not.toHaveURL(/\/login/)
 }
 
 function favorite(page: Page) {

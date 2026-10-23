@@ -39,6 +39,8 @@ async function signIn(page: Page, redirect: string) {
   await main.getByLabel('E-mail', { exact: true }).fill(ana.email)
   await main.getByLabel('Senha', { exact: true }).fill(ana.password)
   await main.getByRole('button', { name: 'Entrar', exact: true }).click()
+  // Só segue quando o login terminou; navegar antes aborta a requisição e a sessão não é gravada.
+  await expect(page).not.toHaveURL(/\/login/)
 }
 
 const seededCart = {

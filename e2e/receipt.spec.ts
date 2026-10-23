@@ -15,6 +15,8 @@ async function signIn(page: Page, redirect = '/') {
   await main(page).getByLabel('E-mail', { exact: true }).fill(ana.email)
   await main(page).getByLabel('Senha', { exact: true }).fill(ana.password)
   await main(page).getByRole('button', { name: 'Entrar', exact: true }).click()
+  // Só segue quando o login terminou; navegar antes aborta a requisição e a sessão não é gravada.
+  await expect(page).not.toHaveURL(/\/login/)
 }
 
 async function addToCart(page: Page, nftId: string, times = 1) {
