@@ -369,12 +369,17 @@ Páginas editoriais, suporte e atividade, "Esqueceu a senha?", login social, ite
 
 ## Pendências conhecidas
 
-- Promoções e "Diário da Cunhagem" da Início montados sem ler o frame do Figma (limite do MCP):
-  estrutura (3 cards em linha, depois do catálogo) e textos inferidos.
-- Carrinho, Detalhe do NFT, Pagamento e Pedido montados sem ler os frames do Figma (limite do
-  MCP): estrutura, campos e medidas inferidos.
-- Tela Carteiras montada sem ler o frame do Figma (limite do MCP): estrutura inferida.
-- Tela de Perfil montada sem ler o frame do Figma (limite do MCP): estrutura inferida.
-- Recibo/confirmação montados sem ler o frame do Figma (limite do MCP): estrutura inferida.
-- Login (mobile) e Cadastro foram montados sem ler os frames do Figma (limite do MCP):
-  estrutura e campos do Cadastro são inferidos a partir do Login.
+Lista atual (a visão completa, com as limitações do ambiente, está em
+[`ARCHITECTURE.md`](../ARCHITECTURE.md#limitações-e-pendências)). O MCP do Figma segue sem cota;
+a conferência vem de prints enviados pelo usuário.
+
+- **Conferido com prints e ajustado:** hero da Início (desktop e mobile), card "NFT em destaque",
+  Pagamento mobile e o menu lateral "Meu perfil" (Perfil e Carteiras).
+- **Pagamento desktop:** campos vindos de uma descrição em texto. Ordem, espaçamento vertical,
+  agrupamento e alinhamento com o resumo ainda **não foram comparados**; aguardam o print do frame.
+- **Em aberto:** cor da moldura da arte do hero (hoje creme fixo `#fcf2da`, medido em print).
+- **Sem conferir com o frame (estrutura inferida):** Promoções e Diário da Cunhagem, Carrinho,
+  Detalhe do NFT, Recibo/confirmação, Login mobile, Cadastro, e as telas Carteiras e Perfil além
+  do menu lateral.
+- **Fora do Figma:** senhas em texto no mock, rota inexistente sem tela própria e Performance
+  mobile do Lighthouse abaixo da meta (ver `ARCHITECTURE.md`).
