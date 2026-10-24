@@ -206,9 +206,27 @@ export function validateCollector(values: CollectorFields): FieldErrors<Collecto
 }
 
 export type WalletFields = {
+  displayName: string
   label: string
+  network: string
+  profileName: string
   address: string
-  networks: string[]
+  secondary: string
+  walletType: string
+  referralCode: string
+  email: string
+  /** Nome ENS completo, com o sufixo (ex.: "ana.eth"). */
+  ensName: string
+}
+
+export function validateDisplayName(value: string): string | undefined {
+  const trimmed = value.trim()
+
+  if (!trimmed) {
+    return 'Informe o nome de exibição.'
+  }
+
+  return trimmed.length < 2 || trimmed.length > 40 ? 'O nome deve ter de 2 a 40 caracteres.' : undefined
 }
 
 export function validateWalletLabel(label: string): string | undefined {
@@ -236,13 +254,18 @@ export function validateWalletAddress(address: string): string | undefined {
 }
 
 export function validateWallet(values: WalletFields): FieldErrors<WalletFields> {
-  const errors: FieldErrors<WalletFields> = {}
-
-  errors.label = validateWalletLabel(values.label)
-  errors.address = validateWalletAddress(values.address)
-
-  if (values.networks.length === 0) {
-    errors.networks = 'Selecione ao menos uma rede.'
+  const email = values.email.trim()
+  const errors: FieldErrors<WalletFields> = {
+    displayName: validateDisplayName(values.displayName),
+    label: validateWalletLabel(values.label),
+    network: values.network ? undefined : 'Selecione uma rede.',
+    profileName: validateProfileName(values.profileName),
+    address: validateWalletAddress(values.address),
+    secondary: validateSecondary(values.secondary),
+    walletType: validateWalletType(values.walletType),
+    referralCode: validateReferralCode(values.referralCode),
+    email: !email ? 'Informe seu e-mail.' : isEmail(email) ? undefined : 'Informe um e-mail válido.',
+    ensName: validateEnsName(values.ensName),
   }
 
   for (const key of Object.keys(errors) as Array<keyof WalletFields>) {

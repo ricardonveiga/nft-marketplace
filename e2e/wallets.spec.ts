@@ -8,6 +8,18 @@ const NEW_ADDRESS = '0x1111111111111111111111111111111111111111'
 // O endereço da carteira principal do Bruno, em minúsculas (duplicata).
 const BRUNO_ADDRESS_LOWER = '0x3fd2a8c7b1e90d4a6c5b2e7f8a1c9d3e0b4a7c6d'
 
+const VALID_WALLET = {
+  displayName: 'Carla Mendes',
+  label: 'Minha carteira',
+  network: 'Ethereum',
+  profileName: 'Carla',
+  address: NEW_ADDRESS,
+  walletType: 'MetaMask',
+  referralCode: 'KURIO10',
+  email: 'carla@exemplo.com',
+  ensName: 'carla',
+}
+
 function main(page: Page) {
   return page.getByRole('main')
 }
@@ -31,38 +43,43 @@ async function registerCarla(page: Page) {
   await expect(page).toHaveURL('/carteiras')
 }
 
-function walletCard(page: Page, role: 'principal' | 'secundária') {
-  return page
-    .getByTestId('wallet-card')
-    .filter({ has: page.getByRole('heading', { name: `Carteira ${role}`, exact: true }) })
+function section(page: Page, role: 'principal' | 'secundária') {
+  return page.getByRole('region', { name: `Carteira ${role}`, exact: true })
 }
 
-function emptySlot(page: Page, role: 'principal' | 'secundária') {
-  return page
-    .getByTestId('wallet-empty-slot')
-    .filter({ has: page.getByRole('heading', { name: `Carteira ${role}`, exact: true }) })
+// Os rótulos obrigatórios levam um "*" depois do texto: o começo do rótulo basta.
+function field(scope: Locator, label: string) {
+  return scope.getByLabel(new RegExp(`^${label}`))
 }
 
-function dialog(page: Page) {
-  return page.getByRole('dialog')
-}
+async function fillWallet(scope: Locator, values: Partial<typeof VALID_WALLET>) {
+  const text: Array<[string, string | undefined]> = [
+    ['Nome de exibição', values.displayName],
+    ['Apelido da carteira', values.label],
+    ['Nome do perfil', values.profileName],
+    ['Endereço da carteira', values.address],
+    ['Código de indicação', values.referralCode],
+    ['E-mail', values.email],
+    ['Nome ENS', values.ensName],
+  ]
 
-async function fillWallet(dialogLocator: Locator, values: { label?: string; address?: string; networks?: string[] }) {
-  if (values.label !== undefined) {
-    await dialogLocator.getByLabel('Apelido').fill(values.label)
+  for (const [label, value] of text) {
+    if (value !== undefined) {
+      await field(scope, label).fill(value)
+    }
   }
 
-  if (values.address !== undefined) {
-    await dialogLocator.getByLabel('Endereço da carteira').fill(values.address)
+  if (values.network !== undefined) {
+    await field(scope, 'Rede').selectOption(values.network)
   }
 
-  for (const network of values.networks ?? []) {
-    await dialogLocator.getByRole('checkbox', { name: network }).check()
+  if (values.walletType !== undefined) {
+    await field(scope, 'Tipo de carteira').selectOption(values.walletType)
   }
 }
 
-async function saveWallet(page: Page) {
-  await dialog(page).getByRole('button', { name: 'Salvar' }).click()
+function saveWallet(scope: Locator) {
+  return scope.getByRole('button', { name: 'Salvar carteira' })
 }
 
 test('visitante vai ao login e volta para as carteiras', async ({ page }) => {
@@ -74,112 +91,143 @@ test('visitante vai ao login e volta para as carteiras', async ({ page }) => {
   await main(page).getByRole('button', { name: 'Entrar', exact: true }).click()
 
   await expect(page).toHaveURL('/carteiras')
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Carteiras')
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Carteira principal')
 })
 
 test('mostra a carteira principal e a secundária com os dados cadastrados', async ({ page }) => {
   await signIn(page, ana)
 
-  const primary = walletCard(page, 'principal')
-  await expect(primary.getByTestId('wallet-label')).toHaveText('Carteira principal')
-  await expect(primary.getByTestId('wallet-address')).toHaveText('0x71C7…976F')
-  await expect(primary.getByTestId('wallet-networks')).toHaveText('Ethereum, Polygon')
+  const primary = section(page, 'principal')
+  await expect(field(primary, 'Apelido da carteira')).toHaveValue('Carteira principal')
+  await expect(field(primary, 'Endereço da carteira')).toHaveValue('0x71C7656EC7ab88b098defB751B7401B5f6d8976F')
+  await expect(field(primary, 'Rede')).toHaveValue('Ethereum')
+  await expect(field(primary, 'Tipo de carteira')).toHaveValue('MetaMask')
+  await expect(field(primary, 'Nome ENS')).toHaveValue('ana-souza')
   await expect(primary.getByTestId('wallet-connection')).toHaveText('Desconectada')
 
-  const secondary = walletCard(page, 'secundária')
-  await expect(secondary.getByTestId('wallet-address')).toHaveText('0x9aF3…1a2B')
-  await expect(secondary.getByTestId('wallet-networks')).toHaveText('Polygon, Solana')
+  const secondary = section(page, 'secundária')
+  await expect(field(secondary, 'Endereço da carteira')).toHaveValue('0x9aF3C1d5E2b84A07fB6C3e1D28a9B05c4e7F1a2B')
+  await expect(field(secondary, 'Rede')).toHaveValue('Polygon')
 
   // Com as duas cadastradas, não há como adicionar uma terceira.
   await expect(page.getByTestId('wallet-empty-slot')).toHaveCount(0)
-  await expect(page.getByRole('button', { name: /^Adicionar carteira/ })).toHaveCount(0)
+  await expect(page.getByRole('button', { name: /^Adicionar/ })).toHaveCount(0)
 })
 
-test('quem tem só uma carteira vê o espaço para a secundária', async ({ page }) => {
+test('o texto de apoio e a secundária vazia seguem o Figma', async ({ page }) => {
   await signIn(page, bruno)
 
-  await expect(walletCard(page, 'principal')).toBeVisible()
-  await expect(emptySlot(page, 'secundária')).toBeVisible()
-  await expect(walletCard(page, 'secundária')).toHaveCount(0)
+  await expect(
+    page.getByText('Estas carteiras ficam disponíveis no pagamento e para receber NFTs comprados.'),
+  ).toBeVisible()
+  await expect(section(page, 'principal').getByTestId('wallet-connection')).toBeVisible()
+  await expect(section(page, 'secundária').getByText('Você ainda não adicionou uma carteira secundária.')).toBeVisible()
+  await expect(section(page, 'secundária').getByText('Igual à carteira principal')).toBeVisible()
+})
+
+test('"Igual à carteira principal" dispensa a secundária', async ({ page }) => {
+  await signIn(page, bruno)
+  const secondary = section(page, 'secundária')
+
+  await secondary.getByText('Igual à carteira principal').click()
+
+  await expect(secondary.getByText('A carteira secundária é a mesma da principal.')).toBeVisible()
+  await expect(secondary.getByRole('button', { name: /^Adicionar/ })).toBeDisabled()
 })
 
 test('cadastrar a carteira secundária: validação, sucesso e persistência', async ({ page }) => {
   await signIn(page, bruno)
-  await page.getByRole('button', { name: 'Adicionar carteira secundária' }).click()
+  const secondary = section(page, 'secundária')
+  await secondary.getByRole('button', { name: /^Adicionar/ }).click()
 
   // Campos vazios: erros associados, foco no primeiro.
-  await saveWallet(page)
-  await expect(dialog(page).getByLabel('Apelido')).toBeFocused()
-  await expect(dialog(page).getByLabel('Apelido')).toHaveAttribute('aria-invalid', 'true')
-  await expect(dialog(page).getByText('Informe um apelido para a carteira.')).toBeVisible()
-  await expect(dialog(page).getByText('Informe o endereço da carteira.')).toBeVisible()
-  await expect(dialog(page).getByText('Selecione ao menos uma rede.')).toBeVisible()
+  await saveWallet(secondary).click()
+  await expect(field(secondary, 'Nome de exibição')).toBeFocused()
+  await expect(field(secondary, 'Nome de exibição')).toHaveAttribute('aria-invalid', 'true')
+  await expect(secondary.getByText('Informe o nome de exibição.')).toBeVisible()
+  await expect(secondary.getByText('Informe um apelido para a carteira.')).toBeVisible()
+  await expect(secondary.getByText('Selecione uma rede.')).toBeVisible()
+  await expect(secondary.getByText('Informe o endereço da carteira.')).toBeVisible()
+  await expect(secondary.getByText('Selecione o tipo de carteira.')).toBeVisible()
+  await expect(secondary.getByText('Informe o código de indicação.')).toBeVisible()
+  await expect(secondary.getByText('Informe seu e-mail.')).toBeVisible()
+  await expect(secondary.getByText('Informe o nome ENS.')).toBeVisible()
 
-  await fillWallet(dialog(page), { label: 'Reserva', address: '0x123' })
-  await saveWallet(page)
-  await expect(dialog(page).getByText('Endereço inválido. Use 0x seguido de 40 caracteres hexadecimais.')).toBeVisible()
+  await fillWallet(secondary, { ...VALID_WALLET, label: 'Reserva', address: '0x123' })
+  await saveWallet(secondary).click()
+  await expect(secondary.getByText('Endereço inválido. Use 0x seguido de 40 caracteres hexadecimais.')).toBeVisible()
 
-  await fillWallet(dialog(page), { address: NEW_ADDRESS, networks: ['Polygon', 'Solana'] })
-  await saveWallet(page)
+  await fillWallet(secondary, { network: 'Polygon' })
+  await field(secondary, 'Endereço da carteira').fill(NEW_ADDRESS)
+  await saveWallet(secondary).click()
 
-  await expect(dialog(page)).toHaveCount(0)
   await expect(page.getByRole('status').filter({ hasText: 'Carteira cadastrada.' })).toBeAttached()
-  const secondary = walletCard(page, 'secundária')
-  await expect(secondary.getByTestId('wallet-label')).toHaveText('Reserva')
-  await expect(secondary.getByTestId('wallet-address')).toHaveText('0x1111…1111')
-  await expect(secondary.getByTestId('wallet-networks')).toHaveText('Polygon, Solana')
+  await expect(field(secondary, 'Apelido da carteira')).toHaveValue('Reserva')
+  await expect(field(secondary, 'Rede')).toHaveValue('Polygon')
   await expect(page.getByTestId('wallet-empty-slot')).toHaveCount(0)
 
   await page.reload()
-  await expect(walletCard(page, 'secundária').getByTestId('wallet-label')).toHaveText('Reserva')
+  await expect(field(section(page, 'secundária'), 'Apelido da carteira')).toHaveValue('Reserva')
+})
+
+test('cancelar o cadastro da secundária volta ao estado vazio', async ({ page }) => {
+  await signIn(page, bruno)
+  const secondary = section(page, 'secundária')
+
+  await secondary.getByRole('button', { name: /^Adicionar/ }).click()
+  await expect(saveWallet(secondary)).toBeVisible()
+  await secondary.getByRole('button', { name: 'Cancelar' }).click()
+
+  await expect(saveWallet(secondary)).toHaveCount(0)
+  await expect(secondary.getByText('Você ainda não adicionou uma carteira secundária.')).toBeVisible()
 })
 
 test('conflito: endereço já cadastrado (sem diferenciar maiúsculas) fica no campo', async ({ page }) => {
   await signIn(page, bruno)
-  await page.getByRole('button', { name: 'Adicionar carteira secundária' }).click()
-  await fillWallet(dialog(page), { label: 'Duplicada', address: BRUNO_ADDRESS_LOWER, networks: ['Ethereum'] })
-  await saveWallet(page)
+  const secondary = section(page, 'secundária')
+  await secondary.getByRole('button', { name: /^Adicionar/ }).click()
+  await fillWallet(secondary, { ...VALID_WALLET, label: 'Duplicada', address: BRUNO_ADDRESS_LOWER })
+  await saveWallet(secondary).click()
 
-  await expect(dialog(page).getByText('Esta carteira já está cadastrada.')).toBeVisible()
-  await expect(dialog(page).getByLabel('Endereço da carteira')).toHaveAttribute('aria-invalid', 'true')
-  await expect(dialog(page).getByLabel('Endereço da carteira')).toBeFocused()
-  await expect(walletCard(page, 'secundária')).toHaveCount(0)
+  await expect(secondary.getByText('Esta carteira já está cadastrada.')).toBeVisible()
+  await expect(field(secondary, 'Endereço da carteira')).toHaveAttribute('aria-invalid', 'true')
+  await expect(field(secondary, 'Endereço da carteira')).toBeFocused()
 })
 
 test('a primeira carteira de uma conta nova vira a principal', async ({ page }) => {
   await registerCarla(page)
-  await expect(emptySlot(page, 'principal')).toBeVisible()
+  const primary = section(page, 'principal')
+  await expect(page.getByTestId('wallet-empty-slot')).toHaveCount(2)
   // Sem a principal, ainda não se oferece a secundária.
-  await expect(emptySlot(page, 'secundária')).toHaveCount(0)
+  await expect(section(page, 'secundária').getByRole('button', { name: /^Adicionar/ })).toBeDisabled()
 
-  await page.getByRole('button', { name: 'Adicionar carteira principal' }).click()
-  await fillWallet(dialog(page), { label: 'Minha carteira', address: NEW_ADDRESS, networks: ['Ethereum'] })
-  await saveWallet(page)
+  await primary.getByRole('button', { name: /^Adicionar/ }).click()
+  await expect(field(primary, 'Nome de exibição')).toBeFocused()
+  await fillWallet(primary, VALID_WALLET)
+  await saveWallet(primary).click()
 
-  await expect(walletCard(page, 'principal').getByTestId('wallet-label')).toHaveText('Minha carteira')
-  await expect(emptySlot(page, 'secundária')).toBeVisible()
+  await expect(page.getByRole('status').filter({ hasText: 'Carteira cadastrada.' })).toBeAttached()
+  await expect(primary.getByTestId('wallet-connection')).toHaveText('Desconectada')
+  await expect(section(page, 'secundária').getByRole('button', { name: /^Adicionar/ })).toBeEnabled()
 })
 
-test('editar apelido e redes, com validação', async ({ page }) => {
+test('editar a carteira, com validação', async ({ page }) => {
   await signIn(page, bruno)
-  const card = walletCard(page, 'principal')
+  const primary = section(page, 'principal')
 
-  await card.getByRole('button', { name: /^Editar/ }).click()
-  await expect(dialog(page).getByLabel('Apelido')).toHaveValue('Carteira principal')
-  await expect(dialog(page).getByRole('checkbox', { name: 'Solana' })).toBeChecked()
+  await expect(field(primary, 'Apelido da carteira')).toHaveValue('Carteira principal')
+  await field(primary, 'Apelido da carteira').fill('')
+  await saveWallet(primary).click()
+  await expect(primary.getByText('Informe um apelido para a carteira.')).toBeVisible()
 
-  await dialog(page).getByLabel('Apelido').fill('')
-  await saveWallet(page)
-  await expect(dialog(page).getByText('Informe um apelido para a carteira.')).toBeVisible()
+  await field(primary, 'Apelido da carteira').fill('Cofre')
+  await field(primary, 'Rede').selectOption('Solana')
+  await saveWallet(primary).click()
 
-  await fillWallet(dialog(page), { label: 'Cofre' })
-  await dialog(page).getByRole('checkbox', { name: 'Solana' }).uncheck()
-  await saveWallet(page)
-
-  await expect(dialog(page)).toHaveCount(0)
-  await expect(card.getByTestId('wallet-label')).toHaveText('Cofre')
-  await expect(card.getByTestId('wallet-networks')).toHaveText('Ethereum, Polygon')
   await expect(page.getByRole('status').filter({ hasText: 'Carteira atualizada.' })).toBeAttached()
+  await page.reload()
+  await expect(field(section(page, 'principal'), 'Apelido da carteira')).toHaveValue('Cofre')
+  await expect(field(section(page, 'principal'), 'Rede')).toHaveValue('Solana')
 })
 
 test('trocar o endereço de uma carteira conectada encerra a conexão', async ({ page }) => {
@@ -195,61 +243,69 @@ test('trocar o endereço de uma carteira conectada encerra a conexão', async ({
     })
   })
   await page.reload()
-  await expect(walletCard(page, 'principal').getByTestId('wallet-connection')).toHaveText('Conectada')
+  const primary = section(page, 'principal')
+  await expect(primary.getByTestId('wallet-connection')).toHaveText('Conectada')
 
-  await walletCard(page, 'principal').getByRole('button', { name: /^Editar/ }).click()
-  await dialog(page).getByLabel('Endereço da carteira').fill(NEW_ADDRESS)
-  await saveWallet(page)
+  await field(primary, 'Endereço da carteira').fill(NEW_ADDRESS)
+  await saveWallet(primary).click()
 
-  await expect(walletCard(page, 'principal').getByTestId('wallet-connection')).toHaveText('Desconectada')
+  await expect(primary.getByTestId('wallet-connection')).toHaveText('Desconectada')
 })
 
 test('definir a secundária como principal troca os papéis', async ({ page }) => {
   await signIn(page, ana)
 
-  await walletCard(page, 'secundária').getByRole('button', { name: /^Definir como principal/ }).click()
+  await section(page, 'secundária').getByRole('button', { name: /^Definir como principal/ }).click()
 
-  await expect(walletCard(page, 'principal').getByTestId('wallet-address')).toHaveText('0x9aF3…1a2B')
-  await expect(walletCard(page, 'secundária').getByTestId('wallet-address')).toHaveText('0x71C7…976F')
+  await expect(field(section(page, 'principal'), 'Endereço da carteira')).toHaveValue(
+    '0x9aF3C1d5E2b84A07fB6C3e1D28a9B05c4e7F1a2B',
+  )
+  await expect(field(section(page, 'secundária'), 'Endereço da carteira')).toHaveValue(
+    '0x71C7656EC7ab88b098defB751B7401B5f6d8976F',
+  )
   await expect(page.getByRole('status').filter({ hasText: 'agora é a carteira principal.' })).toBeAttached()
 
   await page.reload()
-  await expect(walletCard(page, 'principal').getByTestId('wallet-address')).toHaveText('0x9aF3…1a2B')
+  await expect(field(section(page, 'principal'), 'Endereço da carteira')).toHaveValue(
+    '0x9aF3C1d5E2b84A07fB6C3e1D28a9B05c4e7F1a2B',
+  )
 })
 
 test('remover pede confirmação; cancelar mantém a carteira', async ({ page }) => {
   await signIn(page, ana)
-  const secondary = walletCard(page, 'secundária')
+  const secondary = section(page, 'secundária')
 
   await secondary.getByRole('button', { name: /^Remover/ }).click()
   await expect(page.getByRole('alertdialog')).toContainText('Remover Carteira secundária?')
   await page.getByRole('alertdialog').getByRole('button', { name: 'Cancelar' }).click()
-  await expect(secondary).toBeVisible()
+  await expect(saveWallet(secondary)).toBeVisible()
 
   await secondary.getByRole('button', { name: /^Remover/ }).click()
   await page.getByRole('alertdialog').getByRole('button', { name: 'Remover' }).click()
 
-  await expect(walletCard(page, 'secundária')).toHaveCount(0)
-  await expect(emptySlot(page, 'secundária')).toBeVisible()
+  await expect(saveWallet(section(page, 'secundária'))).toHaveCount(0)
+  await expect(page.getByTestId('wallet-empty-slot')).toHaveCount(1)
   await expect(page.getByRole('status').filter({ hasText: 'removida.' })).toBeAttached()
 })
 
 test('remover a principal promove a secundária', async ({ page }) => {
   await signIn(page, ana)
 
-  await walletCard(page, 'principal').getByRole('button', { name: /^Remover/ }).click()
+  await section(page, 'principal').getByRole('button', { name: /^Remover/ }).click()
   await expect(page.getByRole('alertdialog')).toContainText('passará a ser a principal')
   await page.getByRole('alertdialog').getByRole('button', { name: 'Remover' }).click()
 
-  await expect(walletCard(page, 'principal').getByTestId('wallet-address')).toHaveText('0x9aF3…1a2B')
-  await expect(walletCard(page, 'secundária')).toHaveCount(0)
+  await expect(field(section(page, 'principal'), 'Endereço da carteira')).toHaveValue(
+    '0x9aF3C1d5E2b84A07fB6C3e1D28a9B05c4e7F1a2B',
+  )
+  await expect(saveWallet(section(page, 'secundária'))).toHaveCount(0)
 })
 
 test('a API recusa uma terceira carteira e dados inválidos, mesmo fora da interface', async ({ page }) => {
   await signIn(page, ana)
-  await expect(walletCard(page, 'principal')).toBeVisible()
+  await expect(section(page, 'principal')).toBeVisible()
 
-  const result = await page.evaluate(async () => {
+  const result = await page.evaluate(async (valid) => {
     const headers = {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${localStorage.getItem('kurio.session')}`,
@@ -259,17 +315,34 @@ test('a API recusa uma terceira carteira e dados inválidos, mesmo fora da inter
 
       return { status: response.status, body: await response.json() }
     }
+    const { network, ensName, ...rest } = valid
 
     return {
-      third: await post({ label: 'Terceira', address: `0x${'2'.repeat(40)}`, networks: ['Ethereum'] }),
+      third: await post({
+        ...rest,
+        label: 'Terceira',
+        address: `0x${'2'.repeat(40)}`,
+        networks: [network],
+        ensName: `${ensName}.eth`,
+      }),
       invalid: await post({ label: '', address: 'xyz', networks: [] }),
     }
-  })
+  }, VALID_WALLET)
 
   expect(result.third.status).toBe(409)
   expect(result.third.body.code).toBe('wallet_limit')
   expect(result.invalid.status).toBe(422)
-  expect(Object.keys(result.invalid.body.errors).sort()).toEqual(['address', 'label', 'networks'])
+  expect(Object.keys(result.invalid.body.errors).sort()).toEqual([
+    'address',
+    'displayName',
+    'email',
+    'ensName',
+    'label',
+    'network',
+    'profileName',
+    'referralCode',
+    'walletType',
+  ])
 })
 
 test('conta nova cadastra a carteira pelo pagamento e conclui a compra', async ({ page }) => {
@@ -283,9 +356,9 @@ test('conta nova cadastra a carteira pelo pagamento e conclui a compra', async (
   await page.getByRole('link', { name: 'Cadastrar carteira' }).click()
 
   await expect(page).toHaveURL(/\/carteiras\?redirect=%2Fpagamento/)
-  await page.getByRole('button', { name: 'Adicionar carteira principal' }).click()
-  await fillWallet(dialog(page), { label: 'Minha carteira', address: NEW_ADDRESS, networks: ['Ethereum'] })
-  await saveWallet(page)
+  const primary = section(page, 'principal')
+  await fillWallet(primary, VALID_WALLET)
+  await saveWallet(primary).click()
 
   // O caminho de volta ao pagamento aparece sozinho.
   await page.getByRole('link', { name: 'Voltar ao pagamento' }).click()
@@ -308,35 +381,34 @@ test('o menu da conta leva às carteiras', async ({ page }) => {
   await expect(page).toHaveURL('/carteiras')
 })
 
-test('diálogo: foco entra ao abrir, Esc fecha e o foco volta ao botão', async ({ page }) => {
-  await signIn(page, bruno)
-  const opener = page.getByRole('button', { name: 'Adicionar carteira secundária' })
-
-  await opener.click()
-  await expect(dialog(page)).toBeVisible()
-  await expect(dialog(page).locator(':focus')).toHaveCount(1)
-
-  await page.keyboard.press('Escape')
-  await expect(dialog(page)).toHaveCount(0)
-  await expect(opener).toBeFocused()
-
-  // Reabrir começa em branco, sem sobras da tentativa anterior.
-  await opener.click()
-  await expect(dialog(page).getByLabel('Apelido')).toHaveValue('')
-})
-
 test('sem rolagem horizontal em 390, 768 e 1440 px', async ({ page }) => {
   await signIn(page, ana)
-  await expect(walletCard(page, 'principal')).toBeVisible()
+  await expect(section(page, 'principal')).toBeVisible()
 
   for (const width of [390, 768, 1440]) {
     await page.setViewportSize({ width, height: 900 })
     await page.goto('/carteiras')
-    await expect(walletCard(page, 'principal')).toBeVisible()
+    await expect(section(page, 'principal')).toBeVisible()
 
     const overflow = await page.evaluate(
       () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
     )
     expect(overflow, `largura ${width}`).toBe(0)
   }
+})
+
+test('carteiras (Figma): colunas de 417 px, campos de 40 px e botão de 131 × 40 no desktop', async ({ page }) => {
+  test.skip((page.viewportSize()?.width ?? 0) < 1264, 'duas colunas só a partir de 1264 px')
+  await registerCarla(page)
+  const primary = section(page, 'principal')
+
+  const name = (await field(primary, 'Nome de exibição').boundingBox())!
+  const nickname = (await field(primary, 'Apelido da carteira').boundingBox())!
+  const save = (await saveWallet(primary).boundingBox())!
+
+  expect(name.width).toBe(417)
+  expect(name.height).toBe(40)
+  expect(nickname.x - (name.x + name.width)).toBe(28)
+  expect(save.width).toBe(131)
+  expect(save.height).toBe(40)
 })

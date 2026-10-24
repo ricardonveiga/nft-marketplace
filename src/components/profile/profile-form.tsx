@@ -189,7 +189,7 @@ export function ProfileForm({ user }: { user: User }) {
     <form onSubmit={handleSubmit} noValidate className="grid gap-x-[28px] gap-y-[29px] lg:grid-cols-2">
       <div className="flex flex-col gap-[29px]">
         <TextField
-          roomy
+          labelGap={17}
           required
           label="Nome de exibição"
           name="name"
@@ -200,7 +200,7 @@ export function ProfileForm({ user }: { user: User }) {
           inputRef={refs.name}
         />
         <TextField
-          roomy
+          labelGap={17}
           required
           label="E-mail"
           name="email"
@@ -212,7 +212,7 @@ export function ProfileForm({ user }: { user: User }) {
           inputRef={refs.email}
         />
         <TextField
-          roomy
+          labelGap={17}
           required
           label="Apelido da carteira"
           name="walletNickname"
@@ -225,7 +225,7 @@ export function ProfileForm({ user }: { user: User }) {
         <fieldset className="mt-px flex flex-col gap-[23px]">
           <legend className="mb-[21px] text-base leading-5 font-bold">Alterar senha</legend>
           <TextField
-            snug
+            labelGap={11}
             reveal
             label="Senha atual"
             name="currentPassword"
@@ -236,7 +236,7 @@ export function ProfileForm({ user }: { user: User }) {
             inputRef={refs.currentPassword}
           />
           <TextField
-            snug
+            labelGap={11}
             reveal
             label="Nova senha"
             name="newPassword"
@@ -247,7 +247,7 @@ export function ProfileForm({ user }: { user: User }) {
             inputRef={refs.newPassword}
           />
           <TextField
-            snug
+            labelGap={11}
             reveal
             label="Confirmar nova senha"
             name="confirmPassword"
@@ -282,7 +282,7 @@ export function ProfileForm({ user }: { user: User }) {
 
       <div className="flex flex-col gap-[29px]">
         <TextField
-          roomy
+          labelGap={17}
           required
           label="Nome de usuário"
           name="username"
@@ -293,7 +293,7 @@ export function ProfileForm({ user }: { user: User }) {
           inputRef={refs.username}
         />
         <EnsField
-          roomy
+          labelGap={17}
           required
           spacedStar
           label="Nome ENS"

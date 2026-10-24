@@ -1,16 +1,15 @@
 import { useIsMutating } from '@tanstack/react-query'
 import { Link, createFileRoute } from '@tanstack/react-router'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { RequireAuth } from '@/components/auth/require-auth'
+import { RingCheck } from '@/components/forms/fields'
 import { AccountSidebar } from '@/components/profile/account-sidebar'
-import { WalletCard } from '@/components/wallets/wallet-card'
-import { WalletFormDialog } from '@/components/wallets/wallet-form-dialog'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
+import { WalletForm } from '@/components/wallets/wallet-form'
 import { useWallets } from '@/hooks/use-wallets'
 import { isForbidden } from '@/lib/api-error'
 import { getSafeRedirect, validateAuthSearch } from '@/lib/redirect'
-import { MAX_WALLETS } from '@/lib/wallets'
 
 export const Route = createFileRoute('/carteiras')({
   // Quem chega do pagamento volta para lá (mesmo `redirect` do login).
@@ -20,15 +19,16 @@ export const Route = createFileRoute('/carteiras')({
 
 type Feedback = { kind: 'success' | 'error'; text: string }
 
+const addLink =
+  'text-base font-bold text-text-accent focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring disabled:cursor-not-allowed disabled:opacity-60'
+
 function WalletsPage() {
   return (
     <RequireAuth>
       {() => (
-        <div className="mx-auto grid w-full max-w-[1264px] items-start gap-6 px-6 py-8 md:px-8 md:py-12 lg:grid-cols-[240px_1fr]">
+        <div className="mx-auto grid w-full max-w-[1264px] items-start gap-8 px-6 pt-[32px] pb-24 md:px-8 lg:grid-cols-[310px_1fr] lg:gap-x-[28px]">
           <AccountSidebar />
-          <div>
-            <WalletsContent />
-          </div>
+          <WalletsContent />
         </div>
       )}
     </RequireAuth>
@@ -41,20 +41,16 @@ function WalletsContent() {
   const { data, isPending, isError, error, refetch } = useWallets()
   const busy = useIsMutating({ mutationKey: ['wallets', 'mutation'] }) > 0
   const [feedback, setFeedback] = useState<Feedback | null>(null)
+  const [addingSecondary, setAddingSecondary] = useState(false)
+  const [sameAsPrimary, setSameAsPrimary] = useState(false)
+  const firstFieldRef = useRef<HTMLInputElement>(null)
 
   const wallets = data?.wallets ?? []
-  const [primary, secondary] = [wallets.find((wallet) => wallet.isPrimary), wallets.find((wallet) => !wallet.isPrimary)]
-  const canAdd = wallets.length < MAX_WALLETS
+  const primary = wallets.find((wallet) => wallet.isPrimary)
+  const secondary = wallets.find((wallet) => !wallet.isPrimary)
 
   return (
-    <>
-      <div className="mb-8 flex flex-col gap-2">
-        <h1 className="text-heading">Carteiras</h1>
-        <p className="text-sm text-text-secondary">
-          Cadastre uma carteira principal e uma secundária para pagar seus pedidos.
-        </p>
-      </div>
-
+    <div>
       {/* Sucesso é anunciado só para leitores de tela; erros ficam visíveis. */}
       <p role="status" className="sr-only">
         {feedback?.kind === 'success' ? feedback.text : ''}
@@ -75,9 +71,9 @@ function WalletsContent() {
       )}
 
       {isPending && (
-        <div role="status" aria-label="Carregando carteiras" className="grid gap-6 md:grid-cols-2">
-          <Skeleton className="h-64 w-full" />
-          <Skeleton className="h-64 w-full" />
+        <div role="status" aria-label="Carregando carteiras" className="flex flex-col gap-6">
+          <Skeleton className="h-8 w-64" />
+          <Skeleton className="h-96 w-full" />
         </div>
       )}
 
@@ -95,68 +91,108 @@ function WalletsContent() {
       )}
 
       {data && (
-        <ul className="grid items-start gap-6 md:grid-cols-2">
-          {primary ? (
-            <WalletCard
-              wallet={primary}
-              role="principal"
-              connected={data.connectedWalletId === primary.id}
-              busy={busy}
-              onFeedback={setFeedback}
-            />
-          ) : (
-            <EmptySlot role="principal" onSaved={(text) => setFeedback({ kind: 'success', text })} disabled={busy} />
-          )}
+        <>
+          <section
+            aria-labelledby="carteira-principal"
+            data-testid={primary ? 'wallet-card' : 'wallet-empty-slot'}
+          >
+            <div className="-mt-px flex items-start justify-between gap-4">
+              <h1 id="carteira-principal" className="text-[17px] leading-5 font-bold">
+                Carteira principal
+              </h1>
+              {!primary && (
+                <button
+                  type="button"
+                  onClick={() => firstFieldRef.current?.focus()}
+                  className={`${addLink} -mt-[3px]`}
+                >
+                  Adicionar
+                  <span className="sr-only"> carteira principal</span>
+                </button>
+              )}
+            </div>
+            <p className="mt-px text-sm leading-5 text-text-secondary">
+              Estas carteiras ficam disponíveis no pagamento e para receber NFTs comprados.
+            </p>
 
-          {secondary ? (
-            <WalletCard
-              wallet={secondary}
-              role="secundária"
-              connected={data.connectedWalletId === secondary.id}
-              busy={busy}
-              onFeedback={setFeedback}
-            />
-          ) : (
-            canAdd &&
-            primary && (
-              <EmptySlot role="secundária" onSaved={(text) => setFeedback({ kind: 'success', text })} disabled={busy} />
-            )
-          )}
-        </ul>
+            <div className="mt-[34px]">
+              <WalletForm
+                key={primary?.id ?? 'nova-principal'}
+                wallet={primary}
+                role="principal"
+                connected={Boolean(primary) && data.connectedWalletId === primary?.id}
+                busy={busy}
+                onFeedback={setFeedback}
+                firstFieldRef={firstFieldRef}
+              />
+            </div>
+          </section>
+
+          <section
+            aria-labelledby="carteira-secundaria"
+            data-testid={secondary ? 'wallet-card' : 'wallet-empty-slot'}
+            className="mt-[29px]"
+          >
+            <div className="flex items-center justify-between gap-4">
+              <h2 id="carteira-secundaria" className="text-[17px] leading-5 font-bold">
+                Carteira secundária
+              </h2>
+              {!secondary && (
+                <div className="-mt-px flex items-center gap-2.5 pr-1.5">
+                  <RingCheck checked={sameAsPrimary} onChange={setSameAsPrimary}>
+                    <span className="-ml-0.5 text-sm">Igual à carteira principal</span>
+                  </RingCheck>
+                  <button
+                    type="button"
+                    disabled={!primary || sameAsPrimary || addingSecondary}
+                    title={primary ? undefined : 'Cadastre a carteira principal primeiro.'}
+                    onClick={() => setAddingSecondary(true)}
+                    className={addLink}
+                  >
+                    Adicionar
+                    <span className="sr-only"> carteira secundária</span>
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {secondary ? (
+              <div className="mt-[30px]">
+                <WalletForm
+                  key={secondary.id}
+                  wallet={secondary}
+                  role="secundária"
+                  connected={data.connectedWalletId === secondary.id}
+                  busy={busy}
+                  onFeedback={setFeedback}
+                />
+              </div>
+            ) : addingSecondary ? (
+              <div className="mt-[30px]">
+                <WalletForm
+                  key="nova-secundaria"
+                  role="secundária"
+                  busy={busy}
+                  onFeedback={(next) => {
+                    setFeedback(next)
+
+                    if (next.kind === 'success') {
+                      setAddingSecondary(false)
+                    }
+                  }}
+                  onCancel={() => setAddingSecondary(false)}
+                />
+              </div>
+            ) : (
+              <p className="mt-1.5 text-sm leading-5 text-text-secondary">
+                {sameAsPrimary
+                  ? 'A carteira secundária é a mesma da principal.'
+                  : 'Você ainda não adicionou uma carteira secundária.'}
+              </p>
+            )}
+          </section>
+        </>
       )}
-    </>
-  )
-}
-
-function EmptySlot({
-  role,
-  disabled,
-  onSaved,
-}: {
-  role: 'principal' | 'secundária'
-  disabled: boolean
-  onSaved: (message: string) => void
-}) {
-  return (
-    <li
-      data-testid="wallet-empty-slot"
-      className="flex flex-col items-start gap-4 rounded-lg border-2 border-dashed border-border-soft p-6"
-    >
-      <h2 className="text-base leading-5">Carteira {role}</h2>
-      <p className="text-sm text-text-secondary">
-        {role === 'principal'
-          ? 'Você ainda não tem uma carteira cadastrada.'
-          : 'Adicione uma segunda carteira como reserva.'}
-      </p>
-      <WalletFormDialog
-        role={role}
-        onSaved={onSaved}
-        trigger={
-          <Button type="button" disabled={disabled} className="h-10 rounded-md px-5 text-sm font-bold">
-            Adicionar carteira {role}
-          </Button>
-        }
-      />
-    </li>
+    </div>
   )
 }

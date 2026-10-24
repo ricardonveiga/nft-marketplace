@@ -57,6 +57,12 @@ export type ApiErrorBody = {
       | 'currentPassword'
       | 'newPassword'
       | 'label'
+      | 'displayName'
+      | 'profileName'
+      | 'secondary'
+      | 'walletType'
+      | 'referralCode'
+      | 'network'
       | 'address'
       | 'networks',
       string

@@ -101,3 +101,12 @@ test('Perfil do colecionador', async ({ page }) => {
 
   await expect(page).toHaveScreenshot('perfil.png', { fullPage: true })
 })
+
+test('Carteiras', async ({ page }) => {
+  await signIn(page, '/carteiras')
+  await expect(page.getByRole('heading', { name: 'Carteira principal' })).toBeVisible()
+  await expect(page.getByLabel(/^Apelido da carteira/).first()).toHaveValue('Carteira principal')
+  await settle(page)
+
+  await expect(page).toHaveScreenshot('carteiras.png', { fullPage: true })
+})

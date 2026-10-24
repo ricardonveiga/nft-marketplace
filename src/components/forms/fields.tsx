@@ -4,11 +4,9 @@ import { useId, useState, type ReactNode, type RefObject } from 'react'
 // Campos dos formulários de perfil, carteiras e pagamento (Figma): rótulo de 15 px com asterisco
 // laranja nos obrigatórios, caixa de 40 px com borda de 1 px que fica laranja no foco.
 const boxClass =
-  'h-10 w-full rounded-[2px] border border-border bg-transparent px-3.5 text-sm text-foreground outline-none placeholder:text-brand-secondary focus-visible:border-primary aria-[invalid=true]:border-destructive disabled:cursor-not-allowed disabled:opacity-70 read-only:cursor-default'
+  'h-10 w-full rounded-[2px] border border-border bg-transparent text-sm text-foreground outline-none placeholder:text-brand-secondary focus-visible:border-primary aria-[invalid=true]:border-destructive disabled:cursor-not-allowed disabled:opacity-70 read-only:cursor-default'
 
-function gapOf(roomy?: boolean, snug?: boolean) {
-  return roomy ? 'gap-[17px]' : snug ? 'gap-[11px]' : 'gap-[7px]'
-}
+const LABEL_GAPS = { 3: 'gap-[3px]', 7: 'gap-[7px]', 11: 'gap-[11px]', 17: 'gap-[17px]' } as const
 
 type BaseProps = {
   label: string
@@ -16,10 +14,10 @@ type BaseProps = {
   error?: string
   hint?: string
   className?: string
-  /** Rótulo mais afastado do campo (telas de perfil e carteiras). */
-  roomy?: boolean
-  /** Distância intermediária (campos de senha do perfil). */
-  snug?: boolean
+  /** Distância, em px, entre o rótulo e o caixa (o Figma varia por tela). */
+  labelGap?: keyof typeof LABEL_GAPS
+  /** Texto a 12 px da borda em vez de 14 (formulário de Carteiras). */
+  compactPadding?: boolean
 }
 
 function Label({
@@ -93,8 +91,8 @@ export function TextField({
   error,
   hint,
   className,
-  roomy,
-  snug,
+  labelGap = 7,
+  compactPadding,
   name,
   value,
   onChange,
@@ -110,7 +108,7 @@ export function TextField({
   const [visible, setVisible] = useState(false)
 
   return (
-    <div className={`flex flex-col ${gapOf(roomy, snug)} ${className ?? ''}`}>
+    <div className={`flex flex-col ${LABEL_GAPS[labelGap]} ${className ?? ''}`}>
       <Label htmlFor={id} label={label} required={required} hidden={hideLabel} />
       <div className="relative">
         <input
@@ -126,7 +124,7 @@ export function TextField({
           aria-invalid={error ? true : undefined}
           aria-describedby={describedBy(id, error, hint)}
           onChange={(event) => onChange(event.target.value)}
-          className={`${boxClass} ${reveal ? 'pr-11' : ''}`}
+          className={`${boxClass} ${compactPadding ? 'px-3' : 'px-3.5'} ${reveal ? 'pr-11' : ''}`}
         />
         {reveal && (
           <button
@@ -157,6 +155,9 @@ type SelectFieldProps = BaseProps & {
   placeholder: string
   disabled?: boolean
   selectRef?: RefObject<HTMLSelectElement | null>
+  spacedStar?: boolean
+  /** Texto do "Selecione..." na cor dos placeholders (Carteiras). */
+  mutedPlaceholder?: boolean
 }
 
 /** Select nativo estilizado, com a seta do Figma. */
@@ -166,8 +167,8 @@ export function SelectField({
   error,
   hint,
   className,
-  roomy,
-  snug,
+  labelGap = 7,
+  compactPadding,
   name,
   value,
   onChange,
@@ -175,12 +176,14 @@ export function SelectField({
   placeholder,
   disabled,
   selectRef,
+  spacedStar,
+  mutedPlaceholder,
 }: SelectFieldProps) {
   const id = useId()
 
   return (
-    <div className={`flex flex-col ${gapOf(roomy, snug)} ${className ?? ''}`}>
-      <Label htmlFor={id} label={label} required={required} />
+    <div className={`flex flex-col ${LABEL_GAPS[labelGap]} ${className ?? ''}`}>
+      <Label htmlFor={id} label={label} required={required} spacedStar={spacedStar} />
       <div className="relative">
         <select
           ref={selectRef}
@@ -192,7 +195,7 @@ export function SelectField({
           aria-invalid={error ? true : undefined}
           aria-describedby={describedBy(id, error, hint)}
           onChange={(event) => onChange(event.target.value)}
-          className={`${boxClass} cursor-pointer appearance-none pr-10 ${value ? '' : 'text-brand-secondary'}`}
+          className={`${boxClass} ${compactPadding ? 'pl-3' : 'pl-3.5'} cursor-pointer appearance-none pr-10 ${mutedPlaceholder && !value ? 'text-brand-secondary!' : ''}`}
         >
           <option value="" disabled>
             {placeholder}
@@ -236,8 +239,8 @@ export function EnsField({
   error,
   hint,
   className,
-  roomy,
-  snug,
+  labelGap = 7,
+  compactPadding,
   name,
   value,
   onChange,
@@ -250,7 +253,7 @@ export function EnsField({
   const id = useId()
 
   return (
-    <div className={`flex flex-col ${gapOf(roomy, snug)} ${className ?? ''}`}>
+    <div className={`flex flex-col ${LABEL_GAPS[labelGap]} ${className ?? ''}`}>
       <Label htmlFor={id} label={label} required={required} spacedStar={spacedStar} />
       <div className="flex gap-2.5">
         <div className="relative w-[79px] shrink-0">
@@ -281,7 +284,7 @@ export function EnsField({
           aria-invalid={error ? true : undefined}
           aria-describedby={describedBy(id, error, hint)}
           onChange={(event) => onChange(event.target.value)}
-          className={`${boxClass} min-w-0 flex-1`}
+          className={`${boxClass} ${compactPadding ? 'px-3' : 'px-3.5'} min-w-0 flex-1`}
         />
       </div>
       <Message id={id} error={error} hint={hint} />

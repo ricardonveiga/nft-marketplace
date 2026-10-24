@@ -180,29 +180,26 @@ NFTs, 3 páginas), e a arte do hero (o Figma usa o Emerald Ape; aqui vale o crit
   mantém o menu da conta. Os ícones de "Ofertas" e "Arquivos baixados" são os mais próximos da
   biblioteca Lucide, não o desenho exato do frame.
 
-## Carteiras (`/carteiras`)
+## Carteiras (`/carteiras`): conferido com o frame `Carteiras.png`
 
-- **Regra do desafio**: no máximo **uma principal e uma secundária**. A primeira carteira de uma
-  conta vira a principal; a segunda, a secundária; não há uma terceira (a API recusa com 409
-  `wallet_limit`, e a tela nem oferece o botão).
-- **Ações**: cadastrar, editar (apelido, endereço, redes), trocar qual é a principal e remover
-  (com diálogo de confirmação). Remover a principal promove a outra. Trocar o endereço de uma
-  carteira conectada encerra a conexão (a conexão passou a valer para outro endereço).
-- **Validação** (a mesma no formulário e na API simulada): apelido de 2 a 30 caracteres, endereço
-  `0x` + 40 caracteres hexadecimais, ao menos uma rede. Endereço repetido na mesma conta é conflito
-  (409 `wallet_duplicate`, sem diferenciar maiúsculas) e o erro aparece no campo.
-- **Formato do endereço**: só aceita o formato `0x…` para as três redes (inclusive Solana), por
-  simplicidade e para casar com os dados do mock. Um endereço real de Solana (base58) seria
-  recusado; num backend de verdade a validação dependeria da rede.
-- **Formulário** em diálogo de 500 px (mesmo padrão do modal de login), com foco preso, Esc para
-  fechar e retorno do foco ao botão. Cada abertura recomeça do estado salvo.
-- **Do pagamento**: o aviso "sem carteiras" e o link "Gerenciar carteiras" levam a
-  `/carteiras?redirect=/pagamento`; depois de salvar, aparece "Voltar ao pagamento". Assim contas
-  novas conseguem concluir uma compra.
-- **Mock**: carteiras por usuário em `localStorage['mock-wallets:<usuário>']`, semeadas com as
-  fixtures (Ana: 2; Bruno: 1; contas novas: nenhuma). A "Carteira secundária" da Ana continua
-  recusando a conexão, para o cenário de recusa do pagamento.
-- **Sem frame mobile** no Figma: a tela empilha as carteiras em uma coluna abaixo de 768 px.
+- **Layout** (medido no pixel, 1440): mesmo menu lateral do Perfil; formulário em 2 colunas de 417 px
+  (vão de 28), rótulo a 3 px do campo, "Salvar carteira" 131 × 40, depois a seção "Carteira secundária".
+- **Um formulário só, para as duas carteiras**: nome de exibição, apelido, rede, nome do perfil,
+  endereço, ENS/carteira secundária (opcional), tipo de carteira, código de indicação, e-mail e nome ENS.
+  O diálogo e os cartões antigos saíram. Os dados novos ficam na carteira (`Wallet`); o apelido continua
+  sendo o `label` usado no pagamento.
+- **Rede**: o campo é uma rede só (a primeira de `networks`); as outras que a carteira já aceitava são
+  preservadas ao salvar, para não reduzir as opções do pagamento.
+- **"Adicionar"**: na principal (só aparece enquanto ela não existe) leva o foco ao formulário; na
+  secundária mostra o formulário de cadastro, com "Cancelar". Sem principal, fica desabilitado: a
+  primeira carteira sempre vira a principal. O limite de duas carteiras e a recusa de endereço
+  duplicado continuam na API simulada.
+- **"Igual à carteira principal"**: preferência só da tela (não persiste): dispensa a secundária e
+  desabilita "Adicionar". O Figma não detalha o efeito; nada no pagamento depende dela.
+- **Além do frame (necessário ao desafio)**: com a carteira cadastrada aparecem, ao lado de "Salvar
+  carteira", o estado "Conectada/Desconectada" e as ações "Definir como principal" e "Remover" (com
+  confirmação). O frame mostra só o estado vazio.
+- **Não replicado**: o cabeçalho do frame mostra "Entrar" mesmo logado (o app mantém o menu da conta).
 
 ## Pagamento e pedido
 

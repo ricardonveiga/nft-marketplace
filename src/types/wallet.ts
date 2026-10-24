@@ -7,8 +7,23 @@ export type WalletType = (typeof WALLET_TYPES)[number]
 /** Sufixos de nome ENS aceitos (Figma: seletor ".eth"). */
 export const ENS_SUFFIXES = ['.eth'] as const
 
-export type Wallet = {
+/** Dados do perfil do colecionador guardados com a carteira (Figma: formulário de Carteiras). */
+export type WalletProfile = {
+  /** "Nome de exibição". */
+  displayName: string
+  profileName: string
+  /** ENS ou carteira secundária (opcional); vazio = não informado. */
+  secondary: string
+  walletType: WalletType
+  referralCode: string
+  email: string
+  /** Nome ENS completo, com o sufixo (ex.: "ana.eth"). */
+  ensName: string
+}
+
+export type Wallet = WalletProfile & {
   id: string
+  /** "Apelido da carteira": como ela aparece no pagamento. */
   label: string
   /** Endereço completo (0x + 40 hex). Para exibir, use shortAddress(). */
   address: string
@@ -23,9 +38,10 @@ export type WalletsResponse = {
   connectedWalletId: string | null
 }
 
-export type WalletInput = {
+export type WalletInput = WalletProfile & {
   label: string
   address: string
+  /** A primeira rede é a escolhida no formulário; as demais (se houver) são preservadas. */
   networks: NftNetwork[]
 }
 

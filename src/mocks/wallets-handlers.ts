@@ -1,5 +1,5 @@
 import { HttpResponse, delay, http } from 'msw'
-import { validateWallet, type WalletFields } from '@/lib/validation'
+import { validateWallet } from '@/lib/validation'
 import { MAX_WALLETS } from '@/lib/wallets'
 import { NETWORKS } from '@/lib/catalog-search'
 import type { ApiErrorBody } from '@/types/auth'
@@ -36,8 +36,8 @@ function writeConnectedWalletId(userId: string, walletId: string | null) {
   }
 }
 
-export function toPublicWallet({ id, label, address, networks, isPrimary }: MockWallet): Wallet {
-  return { id, label, address, networks, isPrimary }
+export function toPublicWallet({ userId: _userId, rejectsConnection: _rejects, ...wallet }: MockWallet): Wallet {
+  return wallet
 }
 
 function error(status: number, body: ApiErrorBody) {
@@ -64,8 +64,33 @@ function parseNetworks(value: unknown): NftNetwork[] {
     : []
 }
 
-function validationError(fields: WalletFields) {
-  const errors = validateWallet(fields)
+type WalletData = Omit<WalletInput, never>
+
+function asText(value: unknown) {
+  return typeof value === 'string' ? value : ''
+}
+
+/** Lê o corpo da requisição; o que faltar (ou vier fora do tipo) vira vazio e falha na validação. */
+function readInput(body: Partial<WalletInput> | null, base?: WalletData): WalletData {
+  const pick = (field: keyof WalletData) => (body && field in body ? asText(body[field]) : base ? asText(base[field]) : '')
+
+  return {
+    displayName: pick('displayName').trim(),
+    label: pick('label').trim(),
+    profileName: pick('profileName').trim(),
+    address: pick('address').trim(),
+    secondary: pick('secondary').trim(),
+    walletType: pick('walletType') as WalletData['walletType'],
+    referralCode: pick('referralCode').trim(),
+    email: pick('email').trim(),
+    ensName: pick('ensName').trim().toLowerCase(),
+    networks: body?.networks === undefined ? (base?.networks ?? []) : parseNetworks(body.networks),
+  }
+}
+
+function validationError(data: WalletData) {
+  const { networks, ...rest } = data
+  const errors = validateWallet({ ...rest, network: networks[0] ?? '' })
 
   return Object.keys(errors).length > 0 ? error(422, { code: 'validation_error', errors }) : null
 }
@@ -86,11 +111,7 @@ export const walletsHandlers = [
     }
 
     const body = (await request.json().catch(() => null)) as Partial<WalletInput> | null
-    const input = {
-      label: typeof body?.label === 'string' ? body.label : '',
-      address: typeof body?.address === 'string' ? body.address : '',
-      networks: parseNetworks(body?.networks),
-    }
+    const input = readInput(body)
     const invalid = validationError(input)
 
     if (invalid) {
@@ -117,9 +138,7 @@ export const walletsHandlers = [
     const wallet: MockWallet = {
       id: nextWalletId(),
       userId: user.id,
-      label: input.label.trim(),
-      address: input.address.trim(),
-      networks: input.networks,
+      ...input,
       isPrimary: current.length === 0,
     }
     writeWallets(user.id, [...current, wallet])
@@ -143,11 +162,7 @@ export const walletsHandlers = [
     }
 
     const body = (await request.json().catch(() => null)) as WalletUpdate | null
-    const next = {
-      label: typeof body?.label === 'string' ? body.label : target.label,
-      address: typeof body?.address === 'string' ? body.address : target.address,
-      networks: body?.networks === undefined ? target.networks : parseNetworks(body.networks),
-    }
+    const next = readInput(body, target)
     const invalid = validationError(next)
 
     if (invalid) {
@@ -170,9 +185,7 @@ export const walletsHandlers = [
         if (wallet.id === target.id) {
           return {
             ...wallet,
-            label: next.label.trim(),
-            address: next.address.trim(),
-            networks: next.networks,
+            ...next,
             isPrimary: makePrimary || wallet.isPrimary,
           }
         }
