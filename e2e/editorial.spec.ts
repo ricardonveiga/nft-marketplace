@@ -154,3 +154,17 @@ test('sem rolagem horizontal em 390, 768 e 1440 px', async ({ page }) => {
     expect(overflow, `em ${width}px`).toBe(0)
   }
 })
+
+test('blog: os quatro artigos ficam na mesma linha em 1024, 1280 e 1440 px', async ({ page }) => {
+  for (const width of [1024, 1280, 1440]) {
+    await page.setViewportSize({ width, height: 900 })
+    await page.goto('/')
+    await expect(page.getByTestId('blog-post')).toHaveCount(4)
+
+    const tops = await page.getByTestId('blog-post').evaluateAll((cards) =>
+      cards.map((card) => Math.round(card.getBoundingClientRect().top)),
+    )
+
+    expect(new Set(tops).size, `linhas em ${width}px`).toBe(1)
+  }
+})

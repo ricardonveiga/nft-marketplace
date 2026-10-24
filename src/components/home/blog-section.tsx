@@ -29,7 +29,7 @@ export function BlogSection() {
       </div>
 
       {isPending && (
-        <div role="status" aria-label="Carregando artigos" className="mt-8 grid gap-6 sm:grid-cols-2 min-[1208px]:grid-cols-4">
+        <div role="status" aria-label="Carregando artigos" className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-[repeat(4,minmax(0,268px))]">
           {Array.from({ length: 4 }, (_, index) => (
             <Skeleton key={index} className="h-[369px] rounded-lg" />
           ))}
@@ -46,7 +46,7 @@ export function BlogSection() {
       )}
 
       {data && (
-        <ul className="mt-8 grid gap-6 sm:grid-cols-2 md:mt-[41px] lg:grid-cols-[repeat(3,268px)] min-[1208px]:grid-cols-[repeat(4,268px)]">
+        <ul className="mt-8 grid gap-6 sm:grid-cols-2 md:mt-[41px] lg:grid-cols-[repeat(4,minmax(0,268px))]">
           {data.map((post) => (
             <li key={post.id} className="flex">
               <article data-testid="blog-post" className="flex w-full flex-col overflow-hidden rounded-lg bg-card">
