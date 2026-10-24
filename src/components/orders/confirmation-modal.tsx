@@ -55,7 +55,7 @@ function ThankYouIcon() {
 }
 
 function Separator() {
-  return <span aria-hidden="true" className="h-[33px] w-0.5 shrink-0 bg-primary/60" />
+  return <span aria-hidden="true" className="h-[33px] w-0.5 shrink-0 bg-primary/60 max-md:hidden" />
 }
 
 function Fact({ label, value, bold }: { label: string; value: ReactNode; bold?: boolean }) {
@@ -99,7 +99,7 @@ export function ConfirmationModal({ order, receipt }: { order: Order; receipt: R
               </Dialog.Title>
             </div>
 
-            <dl className="flex items-center justify-between gap-2 border-y border-primary px-[37px] pt-[13px] pb-[16px] max-md:flex-wrap max-md:gap-y-3">
+            <dl className="flex items-center justify-between gap-2 border-y border-primary px-[37px] pt-[13px] pb-[16px] max-md:grid max-md:grid-cols-2 max-md:gap-x-4 max-md:gap-y-3 max-md:px-6">
               <Fact
                 bold
                 label="ID da transação"
@@ -113,15 +113,15 @@ export function ConfirmationModal({ order, receipt }: { order: Order; receipt: R
               <Fact bold label="Carteira" value={order.collector.walletType} />
             </dl>
 
-            <div className="px-[44px] pt-[18px] pb-0">
+            <div className="px-[44px] pt-[18px] pb-0 max-md:px-6">
               <h2 className="text-[15px] leading-5 font-bold">Detalhes da transação</h2>
 
               <div
                 aria-hidden="true"
-                className="mt-[7px] grid grid-cols-[1fr_96px_112px] border-b border-sidebar-line pb-[10px] text-base leading-5 font-bold"
+                className="mt-[7px] grid grid-cols-[1fr_96px_112px] max-md:grid-cols-[1fr_auto] border-b border-sidebar-line pb-[10px] text-base leading-5 font-bold"
               >
                 <span>NFTs</span>
-                <span className="text-center">Edições</span>
+                <span className="text-center max-md:hidden">Edições</span>
                 <span className="text-right">Subtotal</span>
               </div>
 
@@ -130,7 +130,7 @@ export function ConfirmationModal({ order, receipt }: { order: Order; receipt: R
                   <li
                     key={item.nftId}
                     data-testid="confirmation-item"
-                    className="grid h-[70px] grid-cols-[1fr_96px_112px] items-center"
+                    className="grid h-[70px] grid-cols-[1fr_96px_112px] items-center max-md:h-auto max-md:grid-cols-1 max-md:gap-y-1"
                   >
                     <div className="flex min-w-0 items-center gap-[13px]">
                       <img
@@ -141,23 +141,26 @@ export function ConfirmationModal({ order, receipt }: { order: Order; receipt: R
                         className="size-[70px] shrink-0 rounded-md object-cover"
                       />
                       <div className="min-w-0">
-                        <p className="truncate text-base leading-5 font-bold">{item.name}</p>
-                        <p className="text-sm leading-5 text-brand-secondary">ID do token: {item.tokenId}</p>
+                        <p className="truncate text-base leading-5 font-bold max-md:whitespace-normal">{item.name}</p>
+                        <p className="text-sm leading-5 text-brand-secondary max-md:text-[13px]">ID do token: {item.tokenId}</p>
                       </div>
                     </div>
-                    <p className="text-center text-sm text-text-secondary">(x {item.quantity})</p>
-                    <p className="pr-1 text-right text-lg font-bold text-text-accent">{item.lineTotalEth} ETH</p>
+                    <p className="text-center text-sm text-text-secondary max-md:order-3 max-md:hidden">(x {item.quantity})</p>
+                    <p className="pr-1 text-right text-lg font-bold text-text-accent max-md:text-base">
+                      <span className="mr-2 text-sm font-normal text-text-secondary md:hidden">(x {item.quantity})</span>
+                      {item.lineTotalEth} ETH
+                    </p>
                   </li>
                 ))}
               </ul>
 
               <dl className="mt-[13px] flex flex-col gap-[5px]">
                 <div className="flex items-baseline justify-between text-[15px] leading-5">
-                  <dt className="pl-[169px]">Taxa de rede</dt>
+                  <dt className="pl-[169px] max-md:pl-0">Taxa de rede</dt>
                   <dd className="text-right text-[17px]">{order.networkFeeEth} ETH</dd>
                 </div>
                 <div className="flex items-baseline justify-between text-[15px] leading-5 font-bold">
-                  <dt className="pl-[169px]">Total</dt>
+                  <dt className="pl-[169px] max-md:pl-0">Total</dt>
                   <dd className="text-right text-lg text-text-accent">{order.totalEth} ETH</dd>
                 </div>
               </dl>

@@ -259,25 +259,6 @@ export function ProfileForm({ user }: { user: User }) {
           />
         </fieldset>
 
-        {errors.form && (
-          <p role="alert" className="text-sm text-destructive">
-            {errors.form}
-          </p>
-        )}
-
-        <div className="mt-[3px] flex flex-wrap items-center gap-4">
-          <Button
-            type="submit"
-            disabled={pending}
-            aria-busy={pending}
-            className="h-10 w-[131px] rounded-[3px] text-sm font-bold"
-          >
-            {pending ? 'Salvando…' : 'Salvar'}
-          </Button>
-          <p role="status" className="text-sm text-text-accent empty:hidden">
-            {saved}
-          </p>
-        </div>
       </div>
 
       <div className="flex flex-col gap-[29px]">
@@ -307,6 +288,28 @@ export function ProfileForm({ user }: { user: User }) {
           inputRef={refs.ensName}
         />
         <AvatarEditor user={user} />
+      </div>
+
+      <div className="flex flex-col gap-[29px] lg:col-start-1">
+        {errors.form && (
+          <p role="alert" className="text-sm text-destructive">
+            {errors.form}
+          </p>
+        )}
+
+        <div className="mt-[3px] flex flex-wrap items-center gap-4">
+          <Button
+            type="submit"
+            disabled={pending}
+            aria-busy={pending}
+            className="h-10 w-[131px] rounded-[3px] text-sm font-bold"
+          >
+            {pending ? 'Salvando…' : 'Salvar'}
+          </Button>
+          <p role="status" className="text-sm text-text-accent empty:hidden">
+            {saved}
+          </p>
+        </div>
       </div>
     </form>
   )

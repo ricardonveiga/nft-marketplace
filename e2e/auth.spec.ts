@@ -98,7 +98,12 @@ test('mostrar e ocultar senha', async ({ page }) => {
 
 test('retorno ao fluxo anterior: volta para o NFT de onde o usuário veio', async ({ page }) => {
   await page.goto('/nft/nft-03')
-  await page.getByRole('link', { name: 'Entrar', exact: true }).click()
+  // No mobile (Figma) a tela do NFT não tem o cabeçalho: o caminho até o login é o coração.
+  if ((page.viewportSize()?.width ?? 0) < 1024) {
+    await page.getByRole('link', { name: /^Entrar para favoritar/ }).click()
+  } else {
+    await page.getByRole('link', { name: 'Entrar', exact: true }).click()
+  }
 
   await expect(page).toHaveURL(/\/login\?redirect=%2Fnft%2Fnft-03/)
   await signIn(page, ana)

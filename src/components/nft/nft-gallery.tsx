@@ -24,7 +24,7 @@ export function NftGallery({ images, name, soldOut }: NftGalleryProps) {
                 onClick={() => setActive(index)}
                 className={`block aspect-square w-full overflow-hidden rounded-[3px] bg-card focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring lg:size-[100px] ${index === active ? '' : 'opacity-70 hover:opacity-100'}`}
               >
-                <img src={image} alt="" width={100} height={100} loading="lazy" className="size-full object-cover" />
+                <img src={image} alt="" width={100} height={100} className="size-full object-cover" />
               </button>
             </li>
           ))}

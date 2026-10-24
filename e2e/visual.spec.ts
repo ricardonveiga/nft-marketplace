@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test'
+import { paymentHeading } from './support/checkout'
 import { mockUsers } from '../src/mocks/fixtures/users'
 
 // Regressão visual de Início, detalhe, carrinho e pagamento (desktop e mobile, um conjunto de
@@ -87,7 +88,7 @@ test('Pagamento', async ({ page }) => {
     localStorage.setItem('mock-cart:user:user-ana', JSON.stringify(cart))
   }, seededCart)
   await signIn(page, '/pagamento')
-  await expect(page.getByRole('heading', { name: 'Perfil do colecionador' })).toBeVisible()
+  await expect(paymentHeading(page)).toBeVisible()
   await settle(page)
 
   await expect(page).toHaveScreenshot('pagamento.png', { fullPage: true })

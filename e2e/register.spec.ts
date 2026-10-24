@@ -133,7 +133,12 @@ test('conflito também vale sem diferenciar maiúsculas', async ({ page }) => {
 
 test('retorno ao fluxo anterior: cadastra e volta para o NFT de origem', async ({ page }) => {
   await page.goto('/nft/nft-03')
-  await page.getByRole('link', { name: 'Entrar', exact: true }).click()
+  // No mobile (Figma) a tela do NFT não tem o cabeçalho: o caminho até o login é o coração.
+  if ((page.viewportSize()?.width ?? 0) < 1024) {
+    await page.getByRole('link', { name: /^Entrar para favoritar/ }).click()
+  } else {
+    await page.getByRole('link', { name: 'Entrar', exact: true }).click()
+  }
   await expect(page).toHaveURL(/\/login\?redirect=%2Fnft%2Fnft-03/)
 
   // O destino é preservado ao alternar entre as abas do modal.
@@ -144,6 +149,9 @@ test('retorno ao fluxo anterior: cadastra e volta para o NFT de origem', async (
   await submit(page)
 
   await expect(page).toHaveURL('/nft/nft-03')
+  if ((page.viewportSize()?.width ?? 0) < 1024) {
+    await page.goto('/')
+  }
   await expect(accountMenu(page, newUser.name)).toBeVisible()
 })
 
