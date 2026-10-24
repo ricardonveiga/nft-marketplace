@@ -69,7 +69,7 @@ function CouponBox({ cart, busy, onFeedback }: CartSummaryProps) {
 
   return (
     <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-1">
-      <div className="flex h-10 rounded-[2px] border border-primary">
+      <div className="flex h-10 rounded-[2px] border border-primary max-lg:h-[50px] max-lg:rounded-full max-lg:border-border max-lg:bg-transparent">
         <input
           id={inputId}
           name="coupon"
@@ -83,12 +83,12 @@ function CouponBox({ cart, busy, onFeedback }: CartSummaryProps) {
           autoComplete="off"
           aria-invalid={error ? true : undefined}
           aria-describedby={error ? errorId : undefined}
-          className="min-w-0 flex-1 bg-transparent px-[6px] text-xs uppercase outline-none placeholder:text-brand-secondary placeholder:normal-case focus-visible:bg-surface-featured aria-[invalid=true]:text-destructive"
+          className="min-w-0 flex-1 bg-transparent px-[6px] text-xs uppercase max-lg:pl-4 max-lg:text-[13px] outline-none placeholder:text-brand-secondary placeholder:normal-case focus-visible:bg-surface-featured aria-[invalid=true]:text-destructive"
         />
         <button
           type="submit"
           disabled={busy || cart.items.length === 0}
-          className="-my-px -mr-px w-[102px] shrink-0 bg-primary text-[15px] font-bold text-primary-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:opacity-50"
+          className="-my-px -mr-px w-[102px] shrink-0 bg-primary text-[15px] font-bold text-primary-foreground max-lg:m-0 max-lg:w-[97px] max-lg:rounded-full max-lg:bg-[linear-gradient(90deg,#7c5130,#cf884b)] max-lg:text-base max-lg:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:opacity-50"
         >
           {apply.isPending ? 'Aplicando…' : 'Aplicar'}
         </button>
@@ -131,17 +131,20 @@ export function CartSummary(props: CartSummaryProps) {
   const hasPayable = cart.items.some((item) => item.status === 'ok')
 
   return (
-    <section aria-labelledby={headingId} className="flex flex-col">
-      <h2 id={headingId} className="border-b border-header-line pt-px pb-[9px] text-lg leading-5 font-bold">
+    <section
+      aria-labelledby={headingId}
+      className="flex flex-col max-lg:fixed max-lg:inset-x-0 max-lg:bottom-0 max-lg:z-40 max-lg:rounded-t-[36px] max-lg:bg-card max-lg:px-6 max-lg:pt-[29px] max-lg:pb-[37px]"
+    >
+      <h2 id={headingId} className="max-lg:sr-only border-b border-header-line pt-px pb-[9px] text-lg leading-5 font-bold">
         Resumo da carteira
       </h2>
 
-      <p className="mt-[22px] text-sm leading-5 font-bold">Código promocional</p>
-      <div className="mt-[6px]">
+      <p className="mt-[22px] text-sm leading-5 font-bold max-lg:sr-only">Código promocional</p>
+      <div className="mt-[6px] max-lg:mt-0">
         <CouponBox {...props} />
       </div>
 
-      <dl className="mt-[22px] flex flex-col gap-[13px]">
+      <dl className="mt-[22px] flex flex-col gap-[13px] max-lg:mt-[10px] max-lg:gap-3">
         <Row label="Subtotal" value={`${cart.subtotalEth} ETH`} testId="summary-subtotal" />
         <Row
           label="Desconto do lançamento"
@@ -150,8 +153,8 @@ export function CartSummary(props: CartSummaryProps) {
           small
         />
         <Row label="Taxa de rede" value={`${cart.networkFeeEth} ETH`} testId="summary-fee" />
-        <p className="text-right text-[11px] leading-[14px] text-text-accent">Taxa estimada</p>
-        <div className="mt-[4px] flex items-baseline justify-between text-[15px] leading-5 font-bold">
+        <p className="text-right text-[11px] leading-[14px] text-text-accent max-lg:-mt-[11px]">Taxa estimada</p>
+        <div className="mt-[4px] flex items-baseline max-lg:-mt-[6px] justify-between text-[15px] leading-5 font-bold">
           <dt>Total</dt>
           <dd data-testid="summary-total" className="text-lg text-text-accent">
             {cart.totalEth} ETH
@@ -166,11 +169,11 @@ export function CartSummary(props: CartSummaryProps) {
       )}
 
       {blocked || !hasPayable ? (
-        <Button type="button" disabled className="mt-[18px] h-10 w-full rounded-[3px] text-[15px] font-bold">
+        <Button type="button" disabled className="mt-[18px] h-10 w-full rounded-[3px] text-[15px] font-bold max-lg:mt-[26px] max-lg:h-[60px] max-lg:rounded-full max-lg:bg-[linear-gradient(110deg,#d28a4c,#b07440)] max-lg:text-base">
           Conectar e finalizar
         </Button>
       ) : (
-        <Button asChild className="mt-[18px] h-10 w-full rounded-[3px] text-[15px] font-bold">
+        <Button asChild className="mt-[18px] h-10 w-full rounded-[3px] text-[15px] font-bold max-lg:mt-[26px] max-lg:h-[60px] max-lg:rounded-full max-lg:bg-[linear-gradient(110deg,#d28a4c,#b07440)] max-lg:text-base">
           <Link to="/pagamento">Conectar e finalizar</Link>
         </Button>
       )}
@@ -180,7 +183,7 @@ export function CartSummary(props: CartSummaryProps) {
 
       <Link
         to="/"
-        className="mt-[12px] self-center text-[15px] leading-5 text-text-accent focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
+        className="mt-[12px] self-center text-[15px] max-lg:hidden leading-5 text-text-accent focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
       >
         Continuar explorando
       </Link>

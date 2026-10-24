@@ -1,5 +1,6 @@
 import { useIsMutating } from '@tanstack/react-query'
-import { Link, createFileRoute } from '@tanstack/react-router'
+import { Link, createFileRoute, useRouter } from '@tanstack/react-router'
+import { ChevronLeft } from 'lucide-react'
 import { useState } from 'react'
 import { CART_COLUMNS, CartItemRow } from '@/components/cart/cart-item-row'
 import { CartSkeleton } from '@/components/cart/cart-skeleton'
@@ -20,17 +21,28 @@ function CartPage() {
   const { data: cart, isPending, isError, refetch } = useCart()
   const busy = useIsMutating({ mutationKey: CART_MUTATION_KEY }) > 0
   const [feedback, setFeedback] = useState<Feedback | null>(null)
+  const router = useRouter()
 
   return (
-    <div className="mx-auto w-full max-w-[1264px] px-6 pt-[32px] pb-24 md:px-8">
-      <Breadcrumb
+    <div className="mx-auto w-full max-w-[1264px] px-7 pt-[32px] pb-[370px] md:px-8 md:pt-[32px] lg:pb-24">
+      <Breadcrumb className="max-md:hidden"
         items={[
           { label: 'Início', to: '/' },
           { label: 'Mercado', to: '/', hash: 'mercado' },
           { label: 'Carrinho' },
         ]}
       />
-      <h1 className="sr-only">Carrinho de NFTs</h1>
+      <div className="relative flex h-[35px] items-center justify-center md:block md:h-auto">
+        <button
+          type="button"
+          aria-label="Voltar"
+          onClick={() => router.history.back()}
+          className="absolute left-0 grid size-[35px] place-items-center rounded-full bg-avatar text-brand-secondary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring md:hidden"
+        >
+          <ChevronLeft className="size-5" strokeWidth={1.5} aria-hidden="true" />
+        </button>
+        <h1 className="text-xl leading-6 font-bold max-md:pl-6 max-md:text-center md:sr-only">Carrinho de NFTs</h1>
+      </div>
 
       <RealtimeNotices nftIds={cart?.items.map((item) => item.nft.id)} className="mt-4" />
 
@@ -44,7 +56,7 @@ function CartPage() {
         </p>
       )}
 
-      <div className="mt-[9px]">
+      <div className="mt-[21px] md:mt-[9px]">
         {isPending && <CartSkeleton />}
 
         {isError && (
@@ -75,7 +87,7 @@ function CartPage() {
                 <span>Edições</span>
                 <span>Total</span>
               </div>
-              <ul className="flex flex-col gap-3 lg:mt-[12px]" aria-label="Itens do carrinho">
+              <ul className="flex flex-col gap-5 lg:mt-[12px] lg:gap-3" aria-label="Itens do carrinho">
                 {cart.items.map((item) => (
                   <CartItemRow key={item.nft.id} item={item} busy={busy} onFeedback={setFeedback} />
                 ))}
@@ -86,7 +98,7 @@ function CartPage() {
         )}
       </div>
 
-      {(isPending || (cart && cart.items.length > 0)) && <RecommendedNfts compact />}
+      {(isPending || (cart && cart.items.length > 0)) && <RecommendedNfts compact className="mt-[60px] lg:mt-[95px]" />}
     </div>
   )
 }

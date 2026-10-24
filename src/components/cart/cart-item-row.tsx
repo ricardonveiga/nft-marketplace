@@ -1,6 +1,7 @@
 import { Link } from '@tanstack/react-router'
 import { Minus, Plus, Trash } from 'lucide-react'
 import { useRemoveCartItem, useSetCartItemQuantity } from '@/hooks/use-cart'
+import { useMediaQuery } from '@/hooks/use-media-query'
 import { getApiErrorMessage } from '@/lib/api-error'
 import type { CartItem } from '@/types/cart'
 
@@ -17,7 +18,7 @@ type CartItemRowProps = {
 const stepperButtonClass =
   'grid h-6 w-[19px] shrink-0 place-items-center rounded-lg bg-primary text-stepper-glyph focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:cursor-not-allowed disabled:opacity-40'
 
-export function CartItemRow({ item, busy, onFeedback }: CartItemRowProps) {
+function CartTableRow({ item, busy, onFeedback }: CartItemRowProps) {
   const { nft, quantity, maxQuantity, status } = item
   const setQuantity = useSetCartItemQuantity()
   const remove = useRemoveCartItem()
@@ -145,4 +146,136 @@ export function CartItemRow({ item, busy, onFeedback }: CartItemRowProps) {
       </button>
     </li>
   )
+}
+
+const roundButtonClass =
+  'grid size-6 shrink-0 place-items-center rounded-full bg-avatar text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:cursor-not-allowed disabled:text-stepper-glyph'
+
+/** Cartão do item no mobile (Figma): imagem de 100 px, nome, edição, valor e o seletor de quantidade. */
+function CartCard({ item, busy, onFeedback }: CartItemRowProps) {
+  const { nft, quantity, maxQuantity, status } = item
+  const setQuantity = useSetCartItemQuantity()
+  const remove = useRemoveCartItem()
+
+  function changeQuantity(next: number) {
+    setQuantity.mutate(
+      { nftId: nft.id, quantity: next },
+      {
+        onSuccess: () =>
+          onFeedback({ kind: 'success', text: `Quantidade de ${nft.name} alterada para ${next}.` }),
+        onError: (error) =>
+          onFeedback({
+            kind: 'error',
+            text: getApiErrorMessage(error, 'Não foi possível alterar a quantidade. Tente novamente.'),
+          }),
+      },
+    )
+  }
+
+  function removeItem() {
+    remove.mutate(nft.id, {
+      onSuccess: () => onFeedback({ kind: 'success', text: `${nft.name} removido do carrinho.` }),
+      onError: (error) =>
+        onFeedback({
+          kind: 'error',
+          text: getApiErrorMessage(error, 'Não foi possível remover o item. Tente novamente.'),
+        }),
+    })
+  }
+
+  return (
+    <li data-testid="cart-item" className="relative flex h-[100px] overflow-hidden rounded-xl bg-card">
+      <Link
+        to="/nft/$id"
+        params={{ id: nft.id }}
+        className="block size-[100px] shrink-0 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-ring"
+      >
+        <img
+          src={nft.imageUrl}
+          alt={`${nft.name}, da coleção ${nft.collection}`}
+          width={100}
+          height={100}
+          className="size-full rounded-l-xl object-cover"
+        />
+      </Link>
+
+      <div className="flex min-w-0 flex-1 flex-col justify-center pr-4 pl-[9px]">
+        <h3 className="truncate text-base leading-5 font-bold">
+          <Link
+            to="/nft/$id"
+            params={{ id: nft.id }}
+            className="hover:text-text-accent focus-visible:outline-2 focus-visible:outline-ring"
+          >
+            {nft.name}
+          </Link>
+        </h3>
+        <p className="text-[15px] leading-5 text-text-secondary">Edição: {nft.edition}</p>
+        <p className="mt-[14px] text-xl leading-6 font-bold text-text-accent" data-testid="cart-line-total">
+          {item.lineTotalEth} ETH
+        </p>
+        {status === 'sold_out' && (
+          <p className="absolute right-3 bottom-1 left-[109px] text-[11px] leading-4 text-destructive">
+            Este NFT esgotou. Remova-o para continuar.
+          </p>
+        )}
+        {status === 'insufficient_stock' && (
+          <p className="absolute right-3 bottom-1 left-[109px] text-[11px] leading-4 text-destructive">
+            Só restam {maxQuantity} unidades. Reduza a quantidade.
+          </p>
+        )}
+        {status === 'ok' && quantity >= maxQuantity && (
+          <p className="absolute right-3 bottom-1 left-[109px] text-[11px] leading-4 text-text-secondary">
+            Máximo de {maxQuantity} {maxQuantity === 1 ? 'unidade' : 'unidades'} por pedido.
+          </p>
+        )}
+      </div>
+
+      {status !== 'sold_out' && (
+        <div
+          role="group"
+          aria-label={`Quantidade de ${nft.name}`}
+          className="absolute top-[38px] right-4 flex items-center gap-[12px]"
+        >
+          <button
+            type="button"
+            aria-label={`Diminuir quantidade de ${nft.name}`}
+            disabled={busy || quantity <= 1}
+            onClick={() => changeQuantity(quantity - 1)}
+            className={roundButtonClass}
+          >
+            <Minus className="size-3" strokeWidth={2.5} aria-hidden="true" />
+          </button>
+          <output aria-label={`Quantidade de ${nft.name}: ${quantity}`} className="mt-[6px] min-w-[10px] text-center text-base">
+            {quantity}
+          </output>
+          <button
+            type="button"
+            aria-label={`Aumentar quantidade de ${nft.name}`}
+            disabled={busy || quantity >= maxQuantity}
+            onClick={() => changeQuantity(quantity + 1)}
+            className={roundButtonClass}
+          >
+            <Plus className="size-3" strokeWidth={2.5} aria-hidden="true" />
+          </button>
+        </div>
+      )}
+
+      <button
+        type="button"
+        aria-label={`Remover ${nft.name} do carrinho`}
+        disabled={busy}
+        onClick={removeItem}
+        className="absolute top-2 right-3 grid size-6 place-items-center text-brand-secondary hover:text-destructive focus-visible:outline-2 focus-visible:outline-ring disabled:cursor-not-allowed disabled:opacity-40"
+      >
+        <Trash className="size-4" strokeWidth={1.5} aria-hidden="true" />
+      </button>
+    </li>
+  )
+}
+
+/** Tabela no desktop (a partir de 1024 px) e cartões abaixo disso. */
+export function CartItemRow(props: CartItemRowProps) {
+  const wide = useMediaQuery('(min-width: 1024px)')
+
+  return wide ? <CartTableRow {...props} /> : <CartCard {...props} />
 }

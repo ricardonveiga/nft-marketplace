@@ -58,7 +58,7 @@ export function MobileTabBar() {
   return (
     <nav
       aria-label="Navegação inferior"
-      className="fixed inset-x-0 bottom-0 z-40 h-[95px] md:hidden print:hidden"
+      className="site-chrome fixed inset-x-0 bottom-0 z-40 h-[95px] md:hidden print:hidden"
     >
       <div
         aria-hidden="true"

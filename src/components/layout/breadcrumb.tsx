@@ -3,9 +3,9 @@ import { Link } from '@tanstack/react-router'
 type Crumb = { label: string; to?: '/' | '/carrinho'; hash?: string }
 
 /** Trilha "Início / Mercado / Pagamento" do Figma; o último item é a página atual. */
-export function Breadcrumb({ items }: { items: readonly Crumb[] }) {
+export function Breadcrumb({ items, className }: { items: readonly Crumb[]; className?: string }) {
   return (
-    <nav aria-label="Trilha de navegação">
+    <nav aria-label="Trilha de navegação" className={className}>
       <ol className="flex flex-wrap items-center gap-x-2 text-[15px] leading-4 font-bold">
         {items.map((item, index) => {
           const last = index === items.length - 1

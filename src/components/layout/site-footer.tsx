@@ -94,7 +94,7 @@ function NewsletterForm() {
 
 export function SiteFooter() {
   return (
-    <footer className="mx-auto w-full max-w-[1264px] px-4 pb-6 md:px-8 print:hidden">
+    <footer className="site-chrome mx-auto w-full max-w-[1264px] px-4 pb-6 md:px-8 print:hidden">
       <div className="overflow-hidden">
         <div className="bg-card px-8 pt-8 pb-4 lg:px-0">
           <div className={`grid gap-8 md:grid-cols-2 lg:gap-0 ${featureColumnsClass}`}>

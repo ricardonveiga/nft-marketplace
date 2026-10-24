@@ -109,7 +109,7 @@ export function SiteHeader() {
   }
 
   return (
-    <header className="sticky top-0 z-50 bg-background print:hidden">
+    <header className="site-chrome sticky top-0 z-50 bg-background print:hidden">
       {/* Desktop (Figma: 69 px de altura; itens a partir de y=24; a linha só cobre o conteúdo) */}
       <div className="mx-auto hidden w-full max-w-[1264px] px-8 pt-6 md:block">
         <div className="relative flex h-[45px] justify-between border-b border-header-line">

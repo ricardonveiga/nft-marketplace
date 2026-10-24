@@ -18,6 +18,15 @@ function cartLink(page: Page, label: string | RegExp = /^Carrinho/) {
   return page.getByRole('link', typeof label === 'string' ? { name: label, exact: true } : { name: label })
 }
 
+/** O contador fica no cabeçalho; no mobile as telas de compra (Figma) não o mostram, então confere na Início. */
+async function expectCartLink(page: Page, label: string | RegExp = /^Carrinho/) {
+  if ((page.viewportSize()?.width ?? 0) < 768) {
+    await page.goto('/')
+  }
+
+  await expect(cartLink(page, label)).toBeVisible()
+}
+
 async function openCart(page: Page) {
   await page.goto('/carrinho')
   await expect(page.getByTestId('cart-loading')).toHaveCount(0)
@@ -54,7 +63,7 @@ test('carrinho vazio mostra a mensagem e leva de volta ao catálogo', async ({ p
 
 test('adicionar pelo detalhe atualiza o contador e mostra os valores calculados pela API', async ({ page }) => {
   await addToCart(page, 'nft-01')
-  await expect(cartLink(page, 'Carrinho, 1 item')).toBeVisible()
+  await expectCartLink(page, 'Carrinho, 1 item')
 
   await openCart(page)
 
@@ -71,7 +80,7 @@ test('adicionar o mesmo NFT de novo soma as quantidades', async ({ page }) => {
   await openCart(page)
 
   await expect(row(page, EMERALD).getByTestId('cart-line-total')).toHaveText('2.38 ETH')
-  await expect(cartLink(page, 'Carrinho, 2 itens')).toBeVisible()
+  await expectCartLink(page, 'Carrinho, 2 itens')
 })
 
 test('quantidade: aumentar, diminuir e respeitar o limite do pedido', async ({ page }) => {
@@ -159,7 +168,7 @@ test('NFT esgotado não tem como entrar no carrinho pela tela', async ({ page })
 
   await expect(page.getByText('Esta edição está esgotada.')).toBeVisible()
   await expect(page.getByRole('button', { name: 'Comprar' })).toHaveCount(0)
-  await expect(cartLink(page, 'Carrinho')).toBeVisible()
+  await expectCartLink(page, 'Carrinho')
 })
 
 test('remover o item esvazia o carrinho e zera o contador', async ({ page }) => {
@@ -169,7 +178,7 @@ test('remover o item esvazia o carrinho e zera o contador', async ({ page }) => 
   await row(page, EMERALD).getByRole('button', { name: `Remover ${EMERALD} do carrinho` }).click()
 
   await expect(page.getByTestId('cart-empty')).toBeVisible()
-  await expect(cartLink(page, 'Carrinho')).toBeVisible()
+  await expectCartLink(page, 'Carrinho')
 })
 
 test('o carrinho persiste após refresh', async ({ page }) => {
@@ -230,11 +239,11 @@ test('cupom inválido, expirado e vazio mostram erro associado ao campo', async 
 
 test('itens do visitante são preservados ao entrar na conta', async ({ page }) => {
   await addToCart(page, 'nft-01')
-  await expect(cartLink(page, 'Carrinho, 1 item')).toBeVisible()
+  await expectCartLink(page, 'Carrinho, 1 item')
 
   await signIn(page, ana)
 
-  await expect(cartLink(page, 'Carrinho, 1 item')).toBeVisible()
+  await expectCartLink(page, 'Carrinho, 1 item')
   await openCart(page)
   await expect(row(page, EMERALD)).toBeVisible()
 })
@@ -242,17 +251,18 @@ test('itens do visitante são preservados ao entrar na conta', async ({ page }) 
 test('troca de usuário: o carrinho de cada conta é separado e persiste entre sessões', async ({ page }) => {
   await signIn(page, ana)
   await addToCart(page, 'nft-02')
-  await expect(cartLink(page, 'Carrinho, 1 item')).toBeVisible()
+  await expectCartLink(page, 'Carrinho, 1 item')
 
   await signOut(page, ana.name)
   // Sem conta, o carrinho é o do visitante (vazio): nada da Ana aparece.
-  await expect(cartLink(page, 'Carrinho')).toBeVisible()
+  await expectCartLink(page, 'Carrinho')
 
   await signIn(page, bruno)
   await openCart(page)
   await expect(page.getByTestId('cart-empty')).toBeVisible()
   await expect(row(page, SAGE)).toHaveCount(0)
 
+  await page.goto('/')
   await signOut(page, bruno.name)
   await signIn(page, ana)
   await openCart(page)

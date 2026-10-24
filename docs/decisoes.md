@@ -469,3 +469,10 @@ Mesma lógica do desktop; só o que o frame mobile mostra diferente.
   sociais inertes e o link de baixo ("Já tem uma conta? Entre" / "Novo na Kurio? Crie uma conta").
   Medido no pixel contra os frames. O frame do cadastro centraliza o placeholder do primeiro campo;
   não replicado (o texto digitado também ficaria centralizado, um defeito de uso).
+
+- **Carrinho (mobile, < 1024 px)**: sem cabeçalho, rodapé e barra inferior do site (as telas de compra
+  escondem o "chrome" no mobile; o contador do carrinho só aparece nas demais telas). Barra com o botão
+  de voltar e o título, cartões de 100 px (imagem, nome, "Edição", valor da linha e quantidade) e o
+  resumo como folha fixa na base (cupom em pílula, valores, botão "Conectar e finalizar" de 60 px).
+  Medido no pixel contra o frame. **Lixeira**: no frame ela se sobrepõe ao "+" do 3º item (defeito);
+  fica no canto superior direito do cartão. "Continuar explorando" não aparece no mobile (não está no frame).

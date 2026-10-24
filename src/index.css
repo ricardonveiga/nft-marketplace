@@ -199,3 +199,10 @@
     border: 1px solid #999;
   }
 }
+
+/* Telas de compra no mobile (Figma): sem cabeçalho, rodapé nem barra inferior do site. */
+@media (max-width: 767px) {
+  [data-chromeless='true'] .site-chrome {
+    display: none;
+  }
+}
