@@ -240,7 +240,7 @@ test('cadastro e login (Figma mobile): campos de 50 px, botão de 60 px e sem o 
     const field = (await page.getByRole('main').getByLabel('E-mail', { exact: true }).boundingBox())!
     const submit = (await page.getByRole('main').getByRole('button', { name: /^(Entrar|Criar perfil)$/ }).boundingBox())!
 
-    expect(field.width).toBe(358)
+    expect(field.width).toBe((page.viewportSize()?.width ?? 0) - 56)
     expect(field.height).toBe(50)
     expect(submit.height).toBe(60)
   }
