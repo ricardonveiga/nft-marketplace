@@ -58,6 +58,25 @@ tudo o que difere dele (ou que ele não define) está listado aqui.
   ativo; a posição fica em `aria-current` e no rótulo "N de 3").
 - Sem destaques (catálogo vazio ou erro) o hero mantém texto e botão, sem arte.
 
+## Login (modal): conferência com o frame Desktop (print do usuário)
+
+Conferido no pixel contra o frame (modal de 500 × 600, a 160 px do topo):
+
+- **Estrutura**: o modal fica sobre a Início (que aparece atrás, sem escurecer, `inert` e escondida de
+  leitores de tela; `src/components/auth/auth-layout.tsx`). Vale também para o cadastro. No mobile o
+  modal sobe para cima do cabeçalho fixo.
+- **Casca** (`auth-card.tsx`): cantos retos, faixa de 10 px na base, abas de 20 px (Entrar em laranja,
+  Criar conta em branco, divisor `#8a4b38` de 1 px), texto de apoio de 13 px, X laranja de 12 px.
+- **Campos**: vazados, 40 px, borda de 1 px que fica laranja no foco, raio 2; o olho da senha mostra o
+  estado atual (senha oculta = olho riscado). O botão "Entrar" tem 45 px e raio 7.
+- **Elementos que faltavam**: separador "Ou continue com" e os botões "Continuar com Google" e
+  "Continuar com Facebook". **Login social está fora do escopo**: os botões existem como no Figma, mas
+  são inertes (`aria-disabled`, `title="Em breve"`, nenhuma ação), sem aparentar sucesso.
+- **Não replicado**: os três ícones de ação (carrinho, coração, lupa) que aparecem no hover de um card
+  do fundo do frame, e o estado "senha preenchida" do print (é um estado de foco, não uma regra).
+- **Pendente de conferir**: o frame mobile do Login e o Cadastro (mesma casca; campos e textos do
+  cadastro seguem os do login até haver o frame).
+
 ## Início: conferência com os frames do Figma (prints do usuário)
 
 Desktop (1440) e mobile (414 × 896) conferidos **no pixel** contra os prints (medindo caixas de
@@ -425,7 +444,7 @@ passa a falhar na rodada inteira sem que o código tenha mudado. Casos vistos e 
 
 ## Fora do escopo (inertes e sinalizados com "Em breve")
 
-Páginas editoriais, suporte e atividade, "Esqueceu a senha?", login social, itens do menu
+Páginas editoriais, suporte e atividade, "Esqueceu a senha?", login social (os botões aparecem, inertes), itens do menu
 (Criadores, Aprenda), links do footer e newsletter (mostra "indisponível nesta demonstração").
 
 ## Pendências conhecidas

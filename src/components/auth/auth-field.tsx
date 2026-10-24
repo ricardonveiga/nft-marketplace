@@ -4,6 +4,10 @@ import { useId, useState, type ReactNode, type RefObject } from 'react'
 const inputClass =
   'h-10 w-full rounded-md bg-surface-dark px-4 text-sm text-foreground outline-none placeholder:text-brand-secondary focus-visible:ring-2 focus-visible:ring-ring aria-[invalid=true]:ring-2 aria-[invalid=true]:ring-destructive'
 
+// Modal de login e cadastro (Figma): campo vazado, com contorno de 1 px que fica laranja no foco.
+const outlineInputClass =
+  'h-10 w-full rounded-[2px] border border-border bg-transparent px-4 text-sm text-foreground outline-none placeholder:text-brand-secondary focus-visible:border-primary aria-[invalid=true]:border-destructive'
+
 export type AuthFieldProps = {
   label: string
   name: string
@@ -19,6 +23,8 @@ export type AuthFieldProps = {
   onChange: (value: string) => void
   inputRef?: RefObject<HTMLInputElement | null>
   trailing?: ReactNode
+  /** `outline`: campo do modal de login/cadastro. Padrão: campo preenchido. */
+  tone?: 'filled' | 'outline'
 }
 
 /** Campo dos formulários de autenticação: rótulo (oculto), erro e ajuda associados. */
@@ -35,6 +41,7 @@ export function AuthField({
   onChange,
   inputRef,
   trailing,
+  tone = 'filled',
 }: AuthFieldProps) {
   const id = useId()
   const errorId = `${id}-error`
@@ -60,7 +67,7 @@ export function AuthField({
           onChange={(event) => onChange(event.target.value)}
           aria-invalid={error ? true : undefined}
           aria-describedby={describedBy || undefined}
-          className={`${inputClass} ${trailing ? 'pr-12' : ''}`}
+          className={`${tone === 'outline' ? outlineInputClass : inputClass} ${trailing ? 'pr-12' : ''}`}
         />
         {trailing}
       </div>
@@ -96,9 +103,10 @@ export function PasswordField({ toggleLabel = 'senha', ...props }: PasswordField
           onClick={() => setVisible((current) => !current)}
           aria-label={`${visible ? 'Ocultar' : 'Mostrar'} ${toggleLabel}`}
           aria-pressed={visible}
-          className="absolute top-1/2 right-3 grid size-6 -translate-y-1/2 place-items-center text-text-secondary focus-visible:outline-2 focus-visible:outline-ring"
+          className={`absolute top-1/2 right-3 grid size-6 -translate-y-1/2 place-items-center focus-visible:outline-2 focus-visible:outline-ring ${props.tone === 'outline' ? 'text-brand-secondary' : 'text-text-secondary'}`}
         >
-          {visible ? (
+          {/* No modal (Figma) o ícone mostra o estado atual: senha oculta = olho riscado. */}
+          {(props.tone === 'outline' ? !visible : visible) ? (
             <EyeOff className="size-5" aria-hidden="true" />
           ) : (
             <Eye className="size-5" aria-hidden="true" />

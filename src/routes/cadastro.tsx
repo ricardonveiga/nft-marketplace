@@ -1,4 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { AuthLayout } from '@/components/auth/auth-layout'
 import { RegisterForm } from '@/components/auth/register-form'
 import { getSafeRedirect, validateAuthSearch } from '@/lib/redirect'
 
@@ -11,8 +12,8 @@ function RegisterPage() {
   const { redirect } = Route.useSearch()
 
   return (
-    <div className="mx-auto w-full max-w-[1264px] px-4 py-10 md:px-8 md:py-16">
+    <AuthLayout>
       <RegisterForm redirect={getSafeRedirect(redirect)} />
-    </div>
+    </AuthLayout>
   )
 }

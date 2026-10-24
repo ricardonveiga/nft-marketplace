@@ -101,6 +101,7 @@ export function RegisterForm({ redirect }: RegisterFormProps) {
         className="mx-auto flex w-full max-w-[340px] flex-col gap-3 px-6 pt-6 pb-10 sm:px-0"
       >
         <AuthField
+          tone="outline"
           label="Nome completo"
           name="name"
           placeholder="Seu nome completo"
@@ -111,6 +112,7 @@ export function RegisterForm({ redirect }: RegisterFormProps) {
           inputRef={refs.name}
         />
         <AuthField
+          tone="outline"
           label="E-mail"
           name="email"
           type="email"
@@ -122,6 +124,7 @@ export function RegisterForm({ redirect }: RegisterFormProps) {
           inputRef={refs.email}
         />
         <PasswordField
+          tone="outline"
           label="Senha"
           name="password"
           placeholder="***********"
@@ -133,6 +136,7 @@ export function RegisterForm({ redirect }: RegisterFormProps) {
           inputRef={refs.password}
         />
         <PasswordField
+          tone="outline"
           label="Confirmar senha"
           toggleLabel="confirmação de senha"
           name="confirmPassword"
@@ -154,7 +158,7 @@ export function RegisterForm({ redirect }: RegisterFormProps) {
           type="submit"
           disabled={register.isPending}
           aria-busy={register.isPending}
-          className="mt-3 h-[45px] w-full rounded-md text-base font-bold"
+          className="mt-3 h-[45px] w-full rounded-[7px] text-base font-bold"
         >
           {register.isPending ? 'Criando conta…' : 'Criar conta'}
         </Button>

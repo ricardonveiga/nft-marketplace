@@ -18,8 +18,12 @@ async function expectVisibleFocus(locator: Locator) {
     // Rótulos e campos às vezes mostram o foco no elemento que os envolve (`has-[:focus-visible]`).
     const wrapper = element.closest('label, [role="menuitem"]') as HTMLElement | null
     const wrapperStyle = wrapper ? getComputedStyle(wrapper) : null
+    // Contorno, anel/sombra ou, nos campos do modal (Figma), a borda que fica laranja no foco.
     const shows = (s: CSSStyleDeclaration | null) =>
-      Boolean(s) && (s!.outlineStyle !== 'none' && parseFloat(s!.outlineWidth) > 0 || s!.boxShadow !== 'none')
+      Boolean(s) &&
+      ((s!.outlineStyle !== 'none' && parseFloat(s!.outlineWidth) > 0) ||
+        s!.boxShadow !== 'none' ||
+        s!.borderTopColor === 'rgb(210, 138, 76)')
 
     return { focusVisible: element.matches(':focus-visible'), visible: shows(style) || shows(wrapperStyle) }
   })

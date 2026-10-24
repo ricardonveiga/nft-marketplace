@@ -199,3 +199,41 @@ test('token vencido no carregamento é descartado sem interromper a navegação'
   await expect(page).toHaveURL('/')
   await expect.poll(() => page.evaluate(() => localStorage.getItem('kurio.session'))).toBeNull()
 })
+
+test('modal de login (Figma): 500 × 600 a 160 px do topo, com a Início inerte atrás e login social inerte', async ({
+  page,
+}) => {
+  await page.goto('/login')
+
+  const dialogCard = page.getByRole('heading', { level: 1, name: 'Entrar' })
+  await expect(dialogCard).toBeVisible()
+  // A Início aparece atrás (conteúdo real), mas fora da árvore de acessibilidade e sem foco.
+  await expect(page.getByTestId('hero-title')).toHaveCount(1)
+  await expect(page.getByRole('heading', { level: 1 })).toHaveCount(1)
+  await expect(page.locator('[inert]')).toHaveCount(1)
+
+  const card = page.locator('div.border-primary.bg-card')
+  const box = (await card.boundingBox())!
+
+  if ((page.viewportSize()?.width ?? 0) >= 768) {
+    expect(box.width).toBe(500)
+    expect(box.height).toBe(600)
+    expect(box.y).toBe(160)
+  }
+
+  // Elementos do frame: separador, botões de login social (fora do escopo: inertes e sem sucesso falso).
+  await expect(page.getByRole('separator')).toContainText('Ou continue com')
+  for (const name of ['Continuar com Google', 'Continuar com Facebook']) {
+    const button = page.getByRole('button', { name })
+    await expect(button).toBeVisible()
+    await expect(button).toHaveAttribute('aria-disabled', 'true')
+    await expect(button).toHaveAttribute('title', 'Em breve')
+    // O Playwright trata aria-disabled como desabilitado; forçamos o clique para provar que nada acontece.
+    await button.click({ force: true })
+    await expect(page).toHaveURL(/\/login/)
+  }
+
+  // O X (orange) fecha o modal e volta ao destino.
+  await page.getByRole('button', { name: 'Fechar e voltar' }).click()
+  await expect(page).toHaveURL('/')
+})

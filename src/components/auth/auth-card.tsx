@@ -13,8 +13,8 @@ type AuthCardProps = {
 }
 
 /**
- * Casca do modal de autenticação (Figma: "Sign In Modal", 500 px): abas
- * Entrar / Criar conta, texto de apoio, botão de fechar e faixa de destaque.
+ * Casca do modal de autenticação (Figma: "Sign In Modal", 500 × 600): abas Entrar / Criar conta,
+ * texto de apoio, botão de fechar e faixa de destaque de 10 px na base.
  */
 export function AuthCard({ mode, redirect, expired, subtitle, children }: AuthCardProps) {
   const router = useRouter()
@@ -28,23 +28,23 @@ export function AuthCard({ mode, redirect, expired, subtitle, children }: AuthCa
     }
   }, [user, redirect, router])
 
-  const activeClass = 'text-base text-text-accent'
+  const activeClass = 'text-[20px] leading-5 font-medium text-text-accent'
   const idleClass =
-    'text-base text-foreground/60 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring'
+    'text-[20px] leading-5 font-medium text-foreground hover:text-text-accent focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring'
 
   return (
-    <div className="relative mx-auto w-full max-w-[500px] overflow-hidden rounded-xl border-b-[10px] border-primary bg-card shadow-[0_0_30px_rgba(10,6,4,0.45)]">
+    <div className="relative w-full border-b-[10px] border-primary bg-card md:min-h-[600px]">
       <button
         type="button"
         aria-label="Fechar e voltar"
         onClick={() => router.history.replace(redirect)}
-        className="absolute top-3 right-3 grid size-[18px] place-items-center text-foreground focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
+        className="absolute top-2 right-[9px] grid size-6 place-items-center text-primary focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-ring"
       >
-        <X className="size-[18px]" aria-hidden="true" />
+        <X className="size-6" strokeWidth={1.5} aria-hidden="true" />
       </button>
 
       <div className="flex flex-col items-center gap-10 px-6 pt-12">
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2">
           {mode === 'login' ? (
             <h1 className={activeClass}>Entrar</h1>
           ) : (
@@ -52,7 +52,7 @@ export function AuthCard({ mode, redirect, expired, subtitle, children }: AuthCa
               Entrar
             </Link>
           )}
-          <span aria-hidden="true" className="h-5 w-px bg-border-soft" />
+          <span aria-hidden="true" className="h-5 w-px bg-auth-divider" />
           {mode === 'register' ? (
             <h1 className={activeClass}>Criar conta</h1>
           ) : (
@@ -61,9 +61,7 @@ export function AuthCard({ mode, redirect, expired, subtitle, children }: AuthCa
             </Link>
           )}
         </div>
-        <p className="max-w-[404px] text-center text-sm leading-4 text-text-secondary">
-          {subtitle}
-        </p>
+        <p className="max-w-[404px] text-center text-[13px] leading-4">{subtitle}</p>
       </div>
 
       {expired && (

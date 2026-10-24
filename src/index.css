@@ -25,6 +25,7 @@
     --color-surface-featured: var(--surface-featured);
     --color-hero-base: var(--hero-base);
     --color-filter-from: var(--filter-from);
+    --color-auth-divider: var(--auth-divider);
     --color-sidebar-ring: var(--sidebar-ring);
     --color-sidebar-border: var(--sidebar-border);
     --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -112,6 +113,8 @@
     --hero-base: #1b110a;
     /* Botão de filtros do mobile: degradê do canto superior esquerdo (escuro) ao inferior direito. */
     --filter-from: #83552f;
+    /* Divisor entre as abas Entrar / Criar conta (Figma). */
+    --auth-divider: #8a4b38;
     --hero-circle-a: linear-gradient(180deg, #c48751 0%, #3b2514 100%);
     --hero-circle-b: linear-gradient(180deg, #eba564 0%, #1f1208 100%);
     /* Fundo do card "NFT em destaque" (Figma). */
