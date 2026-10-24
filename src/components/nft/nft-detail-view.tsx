@@ -1,6 +1,7 @@
 import { Mail, Star } from 'lucide-react'
 import { Tabs } from 'radix-ui'
 import { Skeleton } from '@/components/ui/skeleton'
+import { useMediaQuery } from '@/hooks/use-media-query'
 import type { NftDetail } from '@/types/nft'
 import { FavoriteButton } from './favorite-button'
 import { NftGallery } from './nft-gallery'
@@ -44,16 +45,31 @@ const tabClass =
   'relative -mb-px pb-2 text-[17px] leading-5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring data-[state=active]:font-bold data-[state=active]:text-text-accent data-[state=active]:after:absolute data-[state=active]:after:inset-x-0 data-[state=active]:after:bottom-[-1px] data-[state=active]:after:h-[3px] data-[state=active]:after:bg-primary'
 
 export function NftDetailView({ nft }: { nft: NftDetail }) {
+  const wide = useMediaQuery('(min-width: 1024px)')
   const soldOut = nft.availability === 'esgotado' || nft.maxQuantity === 0
 
   return (
     <>
-      <div className="grid gap-8 lg:grid-cols-[100px_444px_1fr] lg:gap-x-[28px]">
+      <div className="grid lg:grid-cols-[100px_444px_1fr] lg:gap-x-[28px]">
         <NftGallery key={nft.id} images={nft.gallery} name={nft.name} soldOut={soldOut} />
 
-        <div className="flex min-w-0 flex-col lg:ml-[5px]">
-          <h1 className="pt-[3px] text-[27px] leading-8 font-bold">{nft.name}</h1>
+        <div className="relative z-10 flex min-w-0 flex-col max-lg:-mx-7 max-md:-mr-[25px] max-lg:-mt-[35px] max-lg:rounded-t-[36px] max-lg:bg-card max-lg:px-6 max-lg:pt-[32px] max-lg:pb-[190px] max-md:pr-[27px] lg:ml-[5px]">
+          <div className="flex items-start justify-between gap-3">
+            <h1 className="text-xl leading-8 font-bold max-lg:pt-0 lg:pt-[3px] lg:text-[27px]">{nft.name}</h1>
+            <p
+              data-testid="detail-rating-pill"
+              className="flex h-[27px] shrink-0 items-center gap-1 rounded-full border border-primary px-[5px] text-[13px] lg:hidden"
+            >
+              <Star className="size-3 text-text-accent" fill="currentColor" strokeWidth={0} aria-hidden="true" />
+              <span>
+                {nft.ratingAverage.toFixed(1)}
+                <span className="sr-only"> de 5, </span>
+                <span className="text-text-secondary">({nft.reviewCount})</span>
+              </span>
+            </p>
+          </div>
 
+          {wide && (
           <div className="mt-[11px] flex flex-wrap items-center justify-between gap-x-4 gap-y-1">
             <p className="flex items-baseline gap-3">
               <span className="text-[22px] leading-7 font-bold text-text-accent" data-testid="detail-price">
@@ -75,13 +91,16 @@ export function NftDetailView({ nft }: { nft: NftDetail }) {
             </p>
           </div>
 
-          <div className="mt-[6px] h-px bg-header-line lg:mr-[22px]" />
+          )}
 
-          <h2 className="mt-3 text-[15px] leading-5 font-bold">Sobre este NFT:</h2>
-          <p className="mt-[9px] text-sm leading-6 text-text-secondary">{nft.about}</p>
+          <div className="mt-[6px] h-px bg-header-line max-lg:hidden lg:mr-[22px]" />
 
-          <h2 className="mt-[6px] text-sm leading-5 font-bold">Edição:</h2>
-          <ul aria-label="Edições" className="mt-[9px] flex flex-wrap gap-[6px]">
+          <h2 className="mt-3 text-[15px] leading-5 font-bold max-lg:hidden">Sobre este NFT:</h2>
+          <p className="mt-[9px] text-sm leading-6 text-text-secondary max-lg:hidden">{nft.about}</p>
+          <p className="mt-[7px] text-sm leading-6 text-text-secondary lg:hidden">{nft.summary}</p>
+
+          <h2 className="mt-[6px] text-sm leading-5 font-bold max-lg:mt-2 max-lg:text-[15px]">Edição:</h2>
+          <ul aria-label="Edições" className="mt-[9px] flex flex-wrap gap-[6px] max-lg:mt-[7px] max-lg:gap-[13px]">
             {nft.editionOptions.map((option) => {
               const selected = option === nft.edition
 
@@ -103,15 +122,16 @@ export function NftDetailView({ nft }: { nft: NftDetail }) {
               : `Edição ${nft.edition} · ${nft.availableQuantity} ${nft.availableQuantity === 1 ? 'unidade disponível' : 'unidades disponíveis'}`}
           </p>
 
-          <div className="mt-[13px]">
+          <div className="mt-[13px] max-lg:mt-0">
             <PurchasePanel
-              key={nft.id}
+              key={`${nft.id}-${wide}`}
               nft={nft}
-              favorite={<FavoriteButton nftId={nft.id} name={nft.name} />}
+              variant={wide ? 'panel' : 'bar'}
+              favorite={wide ? <FavoriteButton nftId={nft.id} name={nft.name} /> : null}
             />
           </div>
 
-          <dl className="mt-[15px] flex flex-col gap-3 text-sm leading-5 text-brand-secondary">
+          <dl className="mt-[15px] flex flex-col gap-3 text-sm leading-5 text-brand-secondary max-lg:mt-[10px] max-lg:gap-[12px] max-lg:text-[15px]">
             <div>
               <dt className="inline">ID do token: </dt>
               <dd className="inline">{nft.tokenId}</dd>
@@ -126,7 +146,7 @@ export function NftDetailView({ nft }: { nft: NftDetail }) {
             </div>
           </dl>
 
-          <p className="mt-[10px] flex items-center gap-2 text-sm leading-5 font-bold">
+          <p className="mt-[10px] flex items-center gap-2 text-sm leading-5 font-bold max-lg:hidden">
             Compartilhar este NFT:
             <ShareIcon label="LinkedIn">
               <svg viewBox="0 0 24 24" className="size-[18px]" fill="currentColor" aria-hidden="true">

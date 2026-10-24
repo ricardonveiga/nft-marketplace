@@ -1,8 +1,10 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, useRouter } from '@tanstack/react-router'
 import { isAxiosError } from 'axios'
+import { ChevronLeft } from 'lucide-react'
 import { useEffect } from 'react'
 import { RecommendedNfts } from '@/components/cart/recommended-nfts'
 import { Breadcrumb } from '@/components/layout/breadcrumb'
+import { FavoriteButton } from '@/components/nft/favorite-button'
 import { NftDetailSkeleton, NftDetailView } from '@/components/nft/nft-detail-view'
 import { RealtimeNotices } from '@/components/realtime/realtime-notices'
 import { Button } from '@/components/ui/button'
@@ -15,6 +17,7 @@ export const Route = createFileRoute('/nft/$id')({
 function NftDetailPage() {
   const { id } = Route.useParams()
   const { data: nft, isPending, isError, error, refetch } = useNft(id)
+  const router = useRouter()
   const notFound = isError && isAxiosError(error) && error.response?.status === 404
 
   useEffect(() => {
@@ -28,9 +31,9 @@ function NftDetailPage() {
   }, [nft, notFound])
 
   return (
-    <div className="mx-auto w-full max-w-[1264px] px-6 pt-[32px] pb-24 md:px-8">
-      <Breadcrumb items={[{ label: 'Início', to: '/' }, { label: 'Mercado', to: '/', hash: 'mercado' }]} />
-      <div className="mt-3 empty:hidden">
+    <div className="mx-auto w-full max-w-[1264px] px-7 pt-[23px] pb-24 max-md:pr-[25px] md:px-8 md:pt-[32px]">
+      <Breadcrumb className="max-lg:hidden" items={[{ label: 'Início', to: '/' }, { label: 'Mercado', to: '/', hash: 'mercado' }]} />
+      <div className="mt-3 empty:hidden max-lg:mt-0">
         <RealtimeNotices nftIds={[id]} />
       </div>
 
@@ -54,6 +57,18 @@ function NftDetailPage() {
           <Button onClick={() => refetch()}>Tentar novamente</Button>
         </div>
       )}
+
+      <div className="mb-2 flex items-center justify-between lg:hidden">
+        <button
+          type="button"
+          aria-label="Voltar"
+          onClick={() => router.history.back()}
+          className="grid size-[35px] place-items-center rounded-full bg-avatar text-brand-secondary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+        >
+          <ChevronLeft className="size-5" strokeWidth={1.5} aria-hidden="true" />
+        </button>
+        {nft && <FavoriteButton nftId={nft.id} name={nft.name} iconOnly />}
+      </div>
 
       {nft && <NftDetailView nft={nft} />}
 

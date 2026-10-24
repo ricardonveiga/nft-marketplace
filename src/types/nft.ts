@@ -49,6 +49,8 @@ export type NftDetail = Nft & {
   description: string
   /** "Sobre este NFT": resumo curto ao lado da imagem. */
   about: string
+  /** Versão curta de `about` (mobile). */
+  summary: string
   /** Nota média (de 0 a 5, em meios pontos) e quantidade de avaliações. */
   ratingAverage: number
   reviewCount: number

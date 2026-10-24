@@ -153,6 +153,10 @@ export function aboutOf(nft: Nft) {
   return `Um colecionável digital finalizado à mão da coleção Kurio Editions, verificado na ${nft.network}, com arte desbloqueável e acesso para colecionadores.`
 }
 
+export function summaryOf(nft: Nft) {
+  return `Um colecionável digital ${nft.edition} finalizado à mão da coleção Kurio Editions, verificado na ${nft.network}.`
+}
+
 export function attributesOf(nft: Nft) {
   return [...(attributesByCollection[nft.collection] ?? []), rarityNames[nft.rarity]]
 }

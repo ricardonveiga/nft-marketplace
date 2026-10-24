@@ -6,20 +6,33 @@ import { useSession } from '@/hooks/use-session'
 import { getSafeRedirect } from '@/lib/redirect'
 
 // Figma: botão vazado de 129 × 40 com o coração e o texto "Favoritar".
-const buttonClass =
+const pillClass =
   'inline-flex h-10 w-[129px] items-center justify-center gap-2 rounded-[3px] border border-primary text-sm text-foreground transition-colors hover:bg-surface-featured focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring'
+
+const circleClass =
+  'grid size-[35px] place-items-center rounded-full bg-avatar text-text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring'
 
 /**
  * Favoritar. Visitantes são levados ao login e voltam para o mesmo NFT;
  * usuários autenticados alternam o favorito (com reversão se a API falhar).
  */
-export function FavoriteButton({ nftId, name }: { nftId: string; name: string }) {
+export function FavoriteButton({
+  nftId,
+  name,
+  iconOnly = false,
+}: {
+  nftId: string
+  name: string
+  /** Mobile (Figma): só o coração, em um círculo de 35 px. */
+  iconOnly?: boolean
+}) {
   const { data: user } = useSession()
   const favorites = useFavorites()
   const toggle = useToggleFavorite()
   const href = useRouterState({ select: (state) => state.location.href })
   const [error, setError] = useState('')
   const redirect = getSafeRedirect(href)
+  const buttonClass = iconOnly ? circleClass : pillClass
 
   if (!user) {
     return (
@@ -30,7 +43,7 @@ export function FavoriteButton({ nftId, name }: { nftId: string; name: string })
         className={buttonClass}
       >
         <Heart className="size-5 text-text-accent" strokeWidth={1.5} aria-hidden="true" />
-        Favoritar
+        {!iconOnly && 'Favoritar'}
       </Link>
     )
   }
@@ -61,7 +74,7 @@ export function FavoriteButton({ nftId, name }: { nftId: string; name: string })
           strokeWidth={1.5}
           aria-hidden="true"
         />
-        Favoritar
+        {!iconOnly && 'Favoritar'}
       </button>
       {error && (
         <p role="alert" className="max-w-56 text-right text-xs text-destructive">

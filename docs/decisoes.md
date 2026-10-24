@@ -476,3 +476,11 @@ Mesma lógica do desktop; só o que o frame mobile mostra diferente.
   resumo como folha fixa na base (cupom em pílula, valores, botão "Conectar e finalizar" de 60 px).
   Medido no pixel contra o frame. **Lixeira**: no frame ela se sobrepõe ao "+" do 3º item (defeito);
   fica no canto superior direito do cartão. "Continuar explorando" não aparece no mobile (não está no frame).
+
+- **Detalhe do NFT (mobile, < 1024 px)**: sem o chrome do site; barra com voltar e coração, imagem
+  quadrada de cantos arredondados e uma folha por cima (nome, nota "★ 4.5(19)", resumo curto, "Edição:",
+  opções, ID do token, coleção e atributos). A compra vira uma barra fixa na base: "Qtd." com − e +, o
+  valor, **Comprar NFT** (só adiciona ao carrinho, como no desktop) e um atalho para o carrinho. Medido
+  no pixel contra o frame. As miniaturas, o preço/estrelas do topo, "Sobre este NFT:" e o
+  "Compartilhar" do desktop não aparecem no mobile (não estão no frame); por isso só a primeira imagem
+  é acessível no mobile. A nota mostra a média dos dados (o frame mostra 4.8).

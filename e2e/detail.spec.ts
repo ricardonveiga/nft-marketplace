@@ -28,9 +28,13 @@ test('acesso direto mostra as informações do NFT', async ({ page }) => {
   await expect(page.getByTestId('detail-price')).toHaveText('1.99 ETH')
   await expect(page.getByText('Preço anterior: 2.29 ETH')).toBeVisible()
   await expect(page.getByTestId('detail-availability')).toHaveText('Edição 552/800 · 248 unidades disponíveis')
-  await expect(page.getByRole('heading', { name: 'Sobre este NFT:' })).toBeVisible()
-  await expect(page.getByText(/colecionável digital finalizado/)).toBeVisible()
-  await expect(page.getByTestId('detail-rating')).toContainText('avaliações de colecionadores')
+  if ((page.viewportSize()?.width ?? 0) >= 1024) {
+    await expect(page.getByRole('heading', { name: 'Sobre este NFT:' })).toBeVisible()
+    await expect(page.getByTestId('detail-rating')).toContainText('avaliações de colecionadores')
+  } else {
+    await expect(page.getByTestId('detail-rating-pill')).toContainText(/\(\d+\)/)
+  }
+  await expect(page.locator('p:visible', { hasText: /colecionável digital/ }).first()).toBeVisible()
   await expect(page.getByRole('list', { name: 'Edições' }).getByRole('listitem').filter({ hasText: '552/800' })).toHaveAttribute('aria-current', 'true')
 
   const facts = page.getByRole('main')
@@ -48,11 +52,16 @@ test('clicar no card do catálogo abre o detalhe e dá para voltar ao mercado', 
   await expect(page).toHaveURL('/nft/nft-03')
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(NEON)
 
-  await page.getByRole('navigation', { name: 'Trilha de navegação' }).getByRole('link', { name: 'Início' }).click()
+  if ((page.viewportSize()?.width ?? 0) < 1024) {
+    await page.getByRole('button', { name: 'Voltar' }).click()
+  } else {
+    await page.getByRole('navigation', { name: 'Trilha de navegação' }).getByRole('link', { name: 'Início' }).click()
+  }
   await expect(page).toHaveURL('/')
 })
 
 test('galeria: miniaturas trocam a imagem principal', async ({ page }) => {
+  test.skip((page.viewportSize()?.width ?? 0) < 1024, 'no mobile (Figma) só a imagem principal aparece')
   await page.goto('/nft/nft-03')
   const main = page.getByTestId('gallery-main')
   const thumbs = page.getByRole('list', { name: 'Miniaturas da galeria' }).getByRole('button')
@@ -206,6 +215,7 @@ test('favoritos: alternar, persistir após refresh e separar por usuário', asyn
   await expect(favorite(page)).toHaveAttribute('aria-pressed', 'true')
 
   // Outro usuário não herda o favorito.
+  await page.goto('/')
   await page.getByRole('button', { name: `Conta de ${ana.name}` }).click()
   await page.getByRole('menuitem', { name: 'Sair' }).click()
   await page.goto('/login?redirect=/nft/nft-03')
@@ -213,6 +223,7 @@ test('favoritos: alternar, persistir após refresh e separar por usuário', asyn
   await expect(favorite(page)).toHaveAttribute('aria-pressed', 'false')
 
   // E o da Ana continua lá quando ela volta.
+  await page.goto('/')
   await page.getByRole('button', { name: `Conta de ${bruno.name}` }).click()
   await page.getByRole('menuitem', { name: 'Sair' }).click()
   await page.goto('/login?redirect=/nft/nft-03')

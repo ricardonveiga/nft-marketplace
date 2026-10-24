@@ -23,7 +23,7 @@ test('compra completa: do catálogo ao recibo confirmado, com cupom', async ({ p
   await expect(page.getByRole('status').filter({ hasText: 'Adicionado ao carrinho.' })).toBeVisible()
 
   // 3. Carrinho: o item está lá e um cupom válido gera o desconto calculado pela API.
-  await page.getByRole('link', { name: /^Carrinho/ }).first().click()
+  await page.getByRole('link', { name: /^(Carrinho|Ir para o carrinho)/ }).first().click()
   await expect(page).toHaveURL('/carrinho')
   await expect(page.getByText('Neon Vessel #552').first()).toBeVisible()
   await page.getByLabel('Cupom de desconto').fill('KURIO10')

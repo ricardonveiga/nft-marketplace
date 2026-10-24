@@ -14,7 +14,7 @@ export function NftGallery({ images, name, soldOut }: NftGalleryProps) {
   return (
     <>
       {images.length > 1 && (
-        <ul aria-label="Miniaturas da galeria" className="order-2 grid grid-cols-4 gap-3 lg:order-none lg:flex lg:flex-col lg:gap-4">
+        <ul aria-label="Miniaturas da galeria" className="hidden lg:flex lg:flex-col lg:gap-4">
           {images.map((image, index) => (
             <li key={image}>
               <button
@@ -31,7 +31,7 @@ export function NftGallery({ images, name, soldOut }: NftGalleryProps) {
         </ul>
       )}
 
-      <div className="relative flex aspect-square items-center justify-center bg-card lg:mt-0.5 lg:size-[444px]">
+      <div className="relative flex aspect-square items-center justify-center overflow-hidden rounded-t-[24px] bg-card max-lg:bg-transparent lg:mt-0.5 lg:size-[444px] lg:overflow-visible lg:rounded-none">
         <img
           src={images[active]}
           alt={`${name}, imagem ${active + 1} de ${images.length}`}
@@ -39,14 +39,14 @@ export function NftGallery({ images, name, soldOut }: NftGalleryProps) {
           height={600}
           fetchPriority="high"
           data-testid="gallery-main"
-          className={`size-[calc(100%-42px)] rounded-[20px] object-cover ${soldOut ? 'opacity-60' : ''}`}
+          className={`size-[calc(100%-42px)] rounded-[20px] object-cover max-lg:size-full max-lg:rounded-[24px] ${soldOut ? 'opacity-60' : ''}`}
         />
         <button
           type="button"
           aria-disabled="true"
           title="Em breve"
           aria-label="Ampliar imagem"
-          className="absolute top-[18px] right-[18px] grid size-[26px] cursor-not-allowed place-items-center rounded-full bg-background/80 text-foreground"
+          className="absolute top-[18px] right-[18px] grid size-[26px] cursor-not-allowed max-lg:hidden place-items-center rounded-full bg-background/80 text-foreground"
         >
           <Search className="size-4" aria-hidden="true" />
         </button>
