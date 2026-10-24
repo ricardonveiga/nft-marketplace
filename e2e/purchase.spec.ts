@@ -59,7 +59,7 @@ test('compra completa: do catálogo ao recibo confirmado, com cupom', async ({ p
   await expect(page.getByTestId('order-fee')).toHaveText('0.0045 ETH')
   await expect(page.getByTestId('order-total')).toHaveText('1.7955 ETH')
   await expect(page.getByTestId('order-network')).toHaveText('Ethereum')
-  await expect(main(page).getByText('Neon Vessel #552').first()).toBeVisible()
+  await expect(page.getByTestId('order-item')).toContainText('Neon Vessel #552')
 
   // 8. O carrinho foi esvaziado pela compra.
   await page.goto('/carrinho')

@@ -116,25 +116,15 @@ test('o recibo é um retrato: mudanças posteriores no catálogo não o alteram'
   await expect(page.getByTestId('order-total')).toHaveText('1.9945 ETH')
 
   // Já o NFT, no catálogo, reflete a mudança (o link do item leva ao detalhe atual).
-  await page.getByTestId('order-item').getByRole('link', { name: 'Neon Vessel #552' }).click()
+  await page.goto('/nft/nft-03')
   await expect(page.getByTestId('detail-price')).toHaveText('9.99 ETH')
-})
-
-test('copiar a referência da transação', async ({ page, context }) => {
-  await context.grantPermissions(['clipboard-read', 'clipboard-write'])
-  const hash = await placeSimpleOrder(page)
-
-  await page.getByRole('button', { name: 'Copiar referência' }).click()
-
-  await expect(page.getByRole('status').filter({ hasText: 'Referência copiada.' })).toBeVisible()
-  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(hash)
 })
 
 test('o link da referência leva ao explorador simulado com os dados da transação', async ({ page }) => {
   const hash = await placeSimpleOrder(page)
   const settled = await page.getByTestId('order-settled').textContent()
 
-  await page.getByRole('link', { name: 'Ver no explorador (simulado)' }).click()
+  await page.getByRole('link', { name: 'Ver no Etherscan' }).click()
 
   await expect(page).toHaveURL(`/explorador/${hash}`)
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Explorador de blocos')
@@ -152,6 +142,7 @@ test('o link da referência leva ao explorador simulado com os dados da transaç
 
 test('o explorador é público e não expõe dados do colecionador', async ({ page }) => {
   const hash = await placeSimpleOrder(page)
+  await page.goto('/')
   await page.getByRole('button', { name: `Conta de ${ana.name}` }).click()
   await page.getByRole('menuitem', { name: 'Sair' }).click()
   await expect(page.getByRole('button', { name: `Conta de ${ana.name}` })).toBeHidden()
@@ -171,24 +162,41 @@ test('referência desconhecida no explorador mostra não encontrada', async ({ p
   await expect(page.getByTestId('tx-not-found')).toContainText('Transação não encontrada')
 })
 
-test('imprimir: o botão chama a impressão e a versão impressa esconde a casca do site', async ({ page }) => {
-  await page.addInitScript(() => {
-    ;(window as unknown as { printCalls: number }).printCalls = 0
-    window.print = () => {
-      ;(window as unknown as { printCalls: number }).printCalls += 1
-    }
-  })
+test('modal de confirmação (Figma): resumo da transação, itens e saída pelo X', async ({ page }) => {
+  await placeSimpleOrder(page)
+  const modal = page.getByTestId('order-confirmed')
+
+  await expect(modal.getByText('Seus NFTs agora estão na sua carteira')).toBeVisible()
+  await expect(modal.getByTestId('confirmation-hash')).toHaveText(/^0x[0-9A-F]{4}…[0-9A-F]{4}$/)
+  await expect(modal).toContainText('MetaMask')
+  await expect(modal.getByTestId('confirmation-item')).toContainText('Neon Vessel #552')
+  await expect(modal.getByTestId('confirmation-item')).toContainText('(x 1)')
+  await expect(modal.getByTestId('confirmation-item')).toContainText('1.99 ETH')
+  await expect(modal).toContainText('Transação confirmada na Ethereum.')
+
+  await modal.getByRole('button', { name: 'Fechar' }).click()
+  await expect(page).toHaveURL('/')
+})
+
+test('modal de confirmação: Esc também fecha e leva ao início', async ({ page }) => {
+  await placeSimpleOrder(page)
+  await expect(page.getByTestId('order-confirmed')).toBeVisible()
+
+  await page.keyboard.press('Escape')
+
+  await expect(page).toHaveURL('/')
+})
+
+test('modal de confirmação (Figma): 578 px de largura, 2 colunas de resumo e botão de 186 × 48', async ({ page }) => {
+  test.skip((page.viewportSize()?.width ?? 0) < 768, 'largura fixa só a partir de 768 px')
   await placeSimpleOrder(page)
 
-  await page.getByRole('button', { name: 'Imprimir recibo' }).click()
-  expect(await page.evaluate(() => (window as unknown as { printCalls: number }).printCalls)).toBe(1)
+  const box = (await page.getByTestId('order-confirmed').boundingBox())!
+  const button = (await page.getByRole('link', { name: 'Ver no Etherscan' }).boundingBox())!
 
-  await page.emulateMedia({ media: 'print' })
-  await expect(page.getByRole('banner')).toBeHidden()
-  await expect(page.getByRole('contentinfo')).toBeHidden()
-  await expect(page.getByRole('button', { name: 'Imprimir recibo' })).toBeHidden()
-  await expect(page.getByTestId('order-total')).toBeVisible()
-  await expect(page.getByTestId('order-transaction')).toBeVisible()
+  expect(box.width).toBe(578)
+  expect(button.width).toBe(186)
+  expect(button.height).toBe(48)
 })
 
 test('pagamento recusado: sem referência de transação, com itens do retrato e saída para tentar de novo', async ({ page }) => {
@@ -204,8 +212,7 @@ test('pagamento recusado: sem referência de transação, com itens do retrato e
   await expect(page.getByTestId('order-item')).toContainText('Neon Vessel #552')
   await expect(page.getByTestId('order-total')).toHaveText('1.9945 ETH')
   await expect(page.getByTestId('order-transaction')).toHaveCount(0)
-  await expect(page.getByRole('link', { name: 'Ver no explorador (simulado)' })).toHaveCount(0)
-  await expect(page.getByRole('button', { name: 'Imprimir recibo' })).toHaveCount(0)
+  await expect(page.getByRole('link', { name: 'Ver no Etherscan' })).toHaveCount(0)
   await expect(page.getByRole('link', { name: 'Tentar novamente' })).toBeVisible()
 })
 
@@ -214,7 +221,7 @@ test('o recibo tem estrutura de títulos e imagens com texto alternativo', async
 
   await expect(page.getByRole('heading', { level: 1 })).toHaveCount(1)
   for (const name of ['Itens', 'Transação', 'Valores', 'Pagamento', 'Colecionador']) {
-    await expect(page.getByRole('heading', { level: 2, name })).toBeVisible()
+    await expect(page.getByRole('heading', { level: 2, name, exact: true })).toBeVisible()
   }
   await expect(page.getByTestId('order-item').getByRole('img')).toHaveAttribute(
     'alt',

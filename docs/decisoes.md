@@ -236,12 +236,15 @@ NFTs, 3 páginas), e a arte do hero (o Figma usa o Emerald Ape; aqui vale o crit
   carrinho; recusado mantém carrinho e rascunho.
 - **Pedido = retrato (snapshot)** dos itens, valores, carteira e dados do colecionador; mudanças
   no catálogo não o alteram. Pedidos são privados: outro usuário recebe "não encontrado".
-- **Recibo** (`/pedido/:id`, confirmado): número do pedido, datas (feito/confirmado, em UTC para ser
-  determinístico), itens (quantidade × preço unitário e total da linha), valores (subtotal,
-  desconto com o código do cupom, taxa de rede, total), carteira e rede, dados do colecionador e a
-  referência da transação. É o **retrato** do pedido: itens, preços e valores foram copiados na
-  criação, então mudanças posteriores no catálogo (preço, estoque) não o alteram; só o link de cada
-  item leva ao NFT atual.
+- **Pedido confirmado = modal do Figma** (`/pedido/:id`, 578 px, medido no pixel contra
+  `Confirmação de Pedido.png`): "Seus NFTs agora estão na sua carteira", faixa com ID da transação
+  (curto, `0xA91F…E82C`), data (UTC, "29 Jul, 2026"), total e tipo de carteira, "Detalhes da transação"
+  (itens com `ID do token`, `(x N)` e subtotal), taxa de rede, total, texto da rede e **Ver no Etherscan**
+  (abre o explorador simulado do próprio app). Fechar (X ou Esc) leva ao início. O recibo completo
+  (número do pedido, datas, carteira, rede e dados do colecionador) continua no modal, mas só para
+  leitores de tela e testes: o frame mostra apenas o resumo. **Saíram**: "Imprimir recibo" e
+  "Continuar comprando" (não estão no frame); copiar a referência deixou de ter botão visível.
+  Pendente e recusado seguem como páginas (o frame cobre só o confirmado).
 - **Referência e explorador (simulados)**: o hash tem 64 caracteres hexadecimais, é derivado do
   número do pedido e pode ser copiado. O link "Ver no explorador (simulado)" abre uma página do
   próprio app (`/explorador/:hash`, pública, como um explorador real) que mostra rede, status, bloco,

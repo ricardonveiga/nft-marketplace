@@ -1,7 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { Link, createFileRoute } from '@tanstack/react-router'
 import { isAxiosError } from 'axios'
-import { Check, Printer } from 'lucide-react'
 import { useEffect } from 'react'
 import { RequireAuth } from '@/components/auth/require-auth'
 import {
@@ -11,6 +10,7 @@ import {
   OrderTransactionSection,
   OrderValuesSection,
 } from '@/components/orders/order-sections'
+import { ConfirmationModal } from '@/components/orders/confirmation-modal'
 import { RealtimeNotices } from '@/components/realtime/realtime-notices'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -55,54 +55,30 @@ function OrderBody({ order }: { order: Order }) {
   )
 }
 
-function ConfirmedHeader({ order, user }: { order: Order; user: User }) {
+/** Recibo completo do pedido confirmado: vai dentro do modal, só para leitores de tela (o frame mostra o resumo). */
+function ConfirmedReceipt({ order, user }: { order: Order; user: User }) {
   const firstName = user.name.split(' ')[0]
 
   return (
-    <header data-testid="order-confirmed" className="flex flex-col gap-4 sm:flex-row sm:items-start sm:gap-6">
-      <div
-        aria-hidden="true"
-        className="grid size-16 shrink-0 place-items-center rounded-full bg-primary text-primary-foreground print:border print:border-black"
-      >
-        <Check className="size-8" />
-      </div>
-      <div className="flex min-w-0 flex-col gap-2">
-        <h1 className="text-heading">Pedido confirmado</h1>
-        <p className="text-text-secondary">
-          Obrigado, {firstName}! Seu pagamento foi confirmado na rede {order.network}.
-        </p>
-        <dl className="flex flex-col gap-1 text-sm">
-          <div className="flex flex-wrap gap-x-2">
-            <dt className="text-text-secondary">Número do pedido:</dt>
-            <dd data-testid="order-id">{order.id}</dd>
-          </div>
-          <div className="flex flex-wrap gap-x-2">
-            <dt className="text-text-secondary">Feito em:</dt>
-            <dd data-testid="order-created">{formatDateTime(order.createdAt)}</dd>
-          </div>
-          {order.settledAt && (
-            <div className="flex flex-wrap gap-x-2">
-              <dt className="text-text-secondary">Confirmado em:</dt>
-              <dd data-testid="order-settled">{formatDateTime(order.settledAt)}</dd>
-            </div>
-          )}
-        </dl>
-        <div className="mt-2 flex flex-wrap gap-3 print:hidden">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => window.print()}
-            className="h-10 gap-2 rounded-md px-4 text-sm font-bold"
-          >
-            <Printer className="size-4" aria-hidden="true" />
-            Imprimir recibo
-          </Button>
-          <Button asChild className="h-10 rounded-md px-4 text-sm font-bold">
-            <Link to="/">Continuar comprando</Link>
-          </Button>
-        </div>
-      </div>
-    </header>
+    <div data-testid="order-receipt" className="flex flex-col gap-6">
+      <h1>Pedido confirmado</h1>
+      <p>
+        Obrigado, {firstName}! Seu pagamento foi confirmado na rede {order.network}.
+      </p>
+      <dl>
+        <dt>Número do pedido:</dt>
+        <dd data-testid="order-id">{order.id}</dd>
+        <dt>Feito em:</dt>
+        <dd data-testid="order-created">{formatDateTime(order.createdAt)}</dd>
+        {order.settledAt && (
+          <>
+            <dt>Confirmado em:</dt>
+            <dd data-testid="order-settled">{formatDateTime(order.settledAt)}</dd>
+          </>
+        )}
+      </dl>
+      <OrderBody order={order} />
+    </div>
   )
 }
 
@@ -191,7 +167,9 @@ function OrderContent({ user }: { user: User }) {
         </div>
       )}
 
-      {order.status === 'confirmed' && <ConfirmedHeader order={order} user={user} />}
+      {order.status === 'confirmed' && (
+        <ConfirmationModal order={order} receipt={<ConfirmedReceipt order={order} user={user} />} />
+      )}
 
       {order.status === 'declined' && (
         <div role="alert" data-testid="order-declined" className="flex flex-col items-start gap-3">
@@ -209,7 +187,7 @@ function OrderContent({ user }: { user: User }) {
         </div>
       )}
 
-      <OrderBody order={order} />
+      {order.status !== 'confirmed' && <OrderBody order={order} />}
     </div>
   )
 }

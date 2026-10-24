@@ -220,6 +220,7 @@ test('o pedido de um usuário não aparece para outro', async ({ page }) => {
   await confirmButton(page).click()
   await expect(page.getByTestId('order-confirmed')).toBeVisible({ timeout: 10_000 })
 
+  await page.goto('/')
   await page.getByRole('button', { name: `Conta de ${ana.name}` }).click()
   await page.getByRole('menuitem', { name: 'Sair' }).click()
   await signIn(page, bruno, '/pedido/KUR-000001')

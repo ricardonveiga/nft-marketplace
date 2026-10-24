@@ -201,6 +201,7 @@ test('order.updated: o pedido pendente é confirmado pelo socket, sem polling', 
   expect(orderReads.count).toBeLessThanOrEqual(1)
   await expect(page.getByTestId('realtime-notices')).toContainText('Pagamento do pedido KUR-000001 confirmado.')
   // O carrinho foi esvaziado e o contador do header zerou.
+  await page.goto('/')
   await expect(page.getByRole('link', { name: 'Carrinho', exact: true })).toBeVisible()
 })
 
