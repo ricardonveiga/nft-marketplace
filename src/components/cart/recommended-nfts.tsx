@@ -46,7 +46,7 @@ export function RecommendedNfts() {
           >
             {visible.map((nft) => (
               <li key={nft.id} className="w-[200px] shrink-0 snap-start lg:w-auto">
-                <NftCard nft={nft} compact />
+                <NftCard nft={nft} compact priority={!wide} />
               </li>
             ))}
           </ul>
