@@ -153,4 +153,5 @@ e2e             testes Playwright e baselines visuais
 
 Resumidas em [`ARCHITECTURE.md`](./ARCHITECTURE.md#limitações-e-pendências): transporte só
 WebSocket no mock, validação de endereço de carteira no formato `0x…`, Performance mobile do
-Lighthouse abaixo da meta, e telas ainda sem conferência final contra o Figma.
+Lighthouse abaixo da meta. A fidelidade ao Figma foi conferida e ajustada tela a tela (desktop e
+mobile, nos frames que existem); os desvios intencionais estão em [`docs/decisoes.md`](./docs/decisoes.md#pendências-conhecidas).

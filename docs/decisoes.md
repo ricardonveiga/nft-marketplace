@@ -449,14 +449,21 @@ Lista atual (a visão completa, com as limitações do ambiente, está em
 [`ARCHITECTURE.md`](../ARCHITECTURE.md#limitações-e-pendências)). O MCP do Figma segue sem cota;
 a conferência vem de prints enviados pelo usuário.
 
-- **Conferido com prints e ajustado:** hero da Início (desktop e mobile), card "NFT em destaque",
-  Pagamento mobile e o menu lateral "Meu perfil" (Perfil e Carteiras).
-- **Pagamento desktop:** campos vindos de uma descrição em texto. Ordem, espaçamento vertical,
-  agrupamento e alinhamento com o resumo ainda **não foram comparados**; aguardam o print do frame.
-- **Em aberto:** cor da moldura da arte do hero (hoje creme fixo `#fcf2da`, medido em print).
-- **Sem conferir com o frame (estrutura inferida):** Promoções e Diário da Cunhagem, Carrinho,
-  Detalhe do NFT, Recibo/confirmação, Login mobile, Cadastro, e as telas Carteiras e Perfil além
-  do menu lateral.
+- **Conferido contra o frame e ajustado (desktop):** Início (com Promoções e Diário da Cunhagem), Login,
+  Cadastro, Pagamento, Perfil do colecionador, Carteiras, Carrinho, Detalhe do NFT e Confirmação de
+  Pedido. **Mobile:** Início, Login, Cadastro, Carrinho, Detalhe do NFT e Pagamento. A conferência foi
+  medida no pixel (cor, espaçamento, tipografia, tamanho e conteúdo) e a bateria de testes visuais e de
+  layout passa (464 passed, 32 skipped, 0 failed na rodada completa final).
+- **Sem frame mobile:** Perfil, Carteiras e Confirmação seguem com o layout responsivo (sem rolagem
+  horizontal; navegação e formulários verificados), sem referência de Figma para o mobile.
+- **Desvios intencionais** (decididos, não replicados; detalhes nas seções de cada tela): placeholder
+  centralizado do primeiro campo do Cadastro mobile; lixeira do Carrinho mobile que no frame se
+  sobrepõe ao "+"; "Entrar" no cabeçalho dos frames mesmo logado (o app mantém o menu da conta);
+  quantidades 6 e 9 do Carrinho (acima do limite de 5 por pedido); pílula de "carteiras compatíveis"
+  como opção de rádio no Pagamento desktop; nota "4.8" e nome "Kurio Apes" do Detalhe (o app mostra os
+  dados); "Imprimir recibo" e "Continuar comprando" (fora do frame da Confirmação).
+- **Em aberto:** cor da moldura da arte do hero (hoje creme fixo `#fcf2da`, medido em print; falta
+  confirmar com o Figma).
 - **Fora do Figma:** Performance mobile do Lighthouse abaixo da meta (ver `ARCHITECTURE.md`).
 
 ## Mobile (frames de 414 × 896)

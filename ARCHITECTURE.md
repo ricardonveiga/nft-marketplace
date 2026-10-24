@@ -199,17 +199,24 @@ WebSocket; sem namespaces, salas, broadcast nem acks; o servidor simulado vive n
 
 - **Performance mobile do Lighthouse abaixo da meta:** 78 (meta 90) em Início e Detalhe; desktop
   99. Causas e tentativas em [`docs/lighthouse.md`](./docs/lighthouse.md).
-- **Fidelidade ao Figma, por tela.** O MCP do Figma ficou sem cota; parte da conferência foi feita
-  por prints:
-  - *Conferidos por print e ajustados:* hero da Início (desktop e mobile; sem círculos e sem texto
-    sobre a imagem no desktop, círculos só no mobile), card "NFT em destaque" (sem texto sobre a
-    foto), Pagamento mobile, menu lateral "Meu perfil".
-  - *Parcial:* Pagamento desktop. Os campos vieram de uma descrição em texto; ordem, espaçamentos,
-    agrupamento e alinhamento com o resumo **não foram comparados**. Aguarda o print do frame.
-  - *Em aberto:* cor da moldura da arte do hero (hoje creme fixo `#fcf2da`, medido em print; falta
-    confirmar com o Figma).
-  - *Sem conferir com o frame, estrutura inferida:* Promoções e Diário da Cunhagem, Carrinho,
-    Detalhe do NFT, Recibo, Login mobile, Cadastro, Carteiras e Perfil (além do menu lateral).
+- **Fidelidade ao Figma, por tela.** O MCP do Figma ficou sem cota; a conferência foi feita com os
+  prints (PNG, 1x) dos frames, medidos no pixel contra a nossa renderização (cor em hex, espaçamento,
+  tipografia, tamanho e conteúdo), e a bateria de testes visuais e de layout passa
+  (464 passed, 32 skipped, 0 failed na última rodada completa).
+  - *Desktop, conferidas e ajustadas contra o frame:* Início (com Promoções e Diário da Cunhagem),
+    Login, Cadastro, Pagamento, Perfil do colecionador, Carteiras, Carrinho, Detalhe do NFT e
+    Confirmação de Pedido (o recibo confirmado).
+  - *Mobile, conferidas e ajustadas contra o frame:* Início, Login, Cadastro, Carrinho, Detalhe do NFT
+    e Pagamento ("Pagamento com carteira"). Perfil, Carteiras e Confirmação **não têm frame mobile**:
+    seguem com o layout responsivo (sem rolagem horizontal, navegação e formulários verificados), sem
+    referência de Figma para o mobile.
+  - *Desvios intencionais (não são pendência de conferência):* defeitos do próprio frame que não foram
+    replicados, como o placeholder centralizado do primeiro campo do Cadastro mobile e a lixeira do
+    Carrinho mobile que se sobrepõe ao "+"; telas do mobile sem o cabeçalho do site, como nos frames;
+    dados que vêm da API simulada em vez do texto do frame (nota média, nome da coleção). A lista
+    completa, por tela, está em [`docs/decisoes.md`](./docs/decisoes.md).
+  - *Em aberto de verdade:* cor da moldura da arte do hero (hoje creme fixo `#fcf2da`, medido em print;
+    falta confirmar com o Figma).
 - **Regressão visual:** a tela é fotografada inteira com tolerância de 1% (`maxDiffPixelRatio`);
   mudanças pequenas e localizadas podem passar sem atualizar a baseline.
 - **Fora do escopo, inertes e sinalizados com "Em breve":** páginas editoriais, suporte, atividade,
