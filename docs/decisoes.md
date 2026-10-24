@@ -58,6 +58,20 @@ tudo o que difere dele (ou que ele não define) está listado aqui.
   ativo; a posição fica em `aria-current` e no rótulo "N de 3").
 - Sem destaques (catálogo vazio ou erro) o hero mantém texto e botão, sem arte.
 
+## Cadastro (modal): conferência com o frame Desktop (print do usuário)
+
+Mesma casca do Login (Início atrás, `inert`), conferida no pixel contra o frame:
+
+- **Medidas**: modal de 500 × 656 a 158 px do topo, com cantos de 10 px (no frame do Login os cantos são
+  retos e o modal fica a 160 px; as duas diferenças são do próprio Figma e foram mantidas).
+- **Conteúdo**: abas com "Entrar" em branco e "Criar conta" em laranja; texto "Crie seu perfil de
+  colecionador e conecte uma carteira quando quiser."; campos **Nome de usuário**, **Digite seu e-mail**,
+  **Senha** (com o olho) e **Confirmar senha** (sem o olho, como no frame); botão "Criar conta";
+  "Ou continue com" e os botões Google/Facebook (inertes, ver Login), 4 px mais abaixo e com 16 px entre eles.
+- **Mudanças de comportamento**: o campo de nome passou a se chamar "Nome de usuário" (continua sendo o
+  nome da conta, o mesmo `name` da API); a dica "Mínimo de 8 caracteres..." saiu (a regra aparece na
+  mensagem de erro); a confirmação de senha deixou de ter o botão de mostrar/ocultar.
+
 ## Login (modal): conferência com o frame Desktop (print do usuário)
 
 Conferido no pixel contra o frame (modal de 500 × 600, a 160 px do topo):
@@ -74,8 +88,7 @@ Conferido no pixel contra o frame (modal de 500 × 600, a 160 px do topo):
   são inertes (`aria-disabled`, `title="Em breve"`, nenhuma ação), sem aparentar sucesso.
 - **Não replicado**: os três ícones de ação (carrinho, coração, lupa) que aparecem no hover de um card
   do fundo do frame, e o estado "senha preenchida" do print (é um estado de foco, não uma regra).
-- **Pendente de conferir**: o frame mobile do Login e o Cadastro (mesma casca; campos e textos do
-  cadastro seguem os do login até haver o frame).
+- **Pendente de conferir**: os frames mobile do Login e do Cadastro.
 
 ## Início: conferência com os frames do Figma (prints do usuário)
 

@@ -10,6 +10,7 @@ import {
 import type { ApiErrorBody } from '@/types/auth'
 import { AuthCard } from './auth-card'
 import { AuthField, PasswordField } from './auth-field'
+import { SocialLogin } from './social-login'
 
 type RegisterFormProps = {
   /** Caminho interno para onde voltar depois de criar a conta. */
@@ -93,19 +94,20 @@ export function RegisterForm({ redirect }: RegisterFormProps) {
     <AuthCard
       mode="register"
       redirect={redirect}
-      subtitle="Crie sua conta para colecionar, comprar e acompanhar seus NFTs."
+      minHeight={656}
+      subtitle="Crie seu perfil de colecionador e conecte uma carteira quando quiser."
     >
       <form
         onSubmit={handleSubmit}
         noValidate
-        className="mx-auto flex w-full max-w-[340px] flex-col gap-3 px-6 pt-6 pb-10 sm:px-0"
+        className="mx-auto flex w-full max-w-[340px] flex-col gap-3 px-6 pt-6 sm:px-0"
       >
         <AuthField
           tone="outline"
-          label="Nome completo"
+          label="Nome de usuário"
           name="name"
-          placeholder="Seu nome completo"
-          autoComplete="name"
+          placeholder="Nome de usuário"
+          autoComplete="username"
           value={values.name}
           error={errors.name}
           onChange={(value) => setField('name', value)}
@@ -116,7 +118,7 @@ export function RegisterForm({ redirect }: RegisterFormProps) {
           label="E-mail"
           name="email"
           type="email"
-          placeholder="contato@email.com"
+          placeholder="Digite seu e-mail"
           autoComplete="email"
           value={values.email}
           error={errors.email}
@@ -127,20 +129,20 @@ export function RegisterForm({ redirect }: RegisterFormProps) {
           tone="outline"
           label="Senha"
           name="password"
-          placeholder="***********"
+          placeholder="Senha"
           autoComplete="new-password"
-          hint="Mínimo de 8 caracteres, com letras e números."
           value={values.password}
           error={errors.password}
           onChange={(value) => setField('password', value)}
           inputRef={refs.password}
         />
-        <PasswordField
+        {/* No Figma a confirmação não tem o olho: só a senha principal pode ser mostrada. */}
+        <AuthField
           tone="outline"
           label="Confirmar senha"
-          toggleLabel="confirmação de senha"
           name="confirmPassword"
-          placeholder="***********"
+          type="password"
+          placeholder="Confirmar senha"
           autoComplete="new-password"
           value={values.confirmPassword}
           error={errors.confirmPassword}
@@ -163,6 +165,8 @@ export function RegisterForm({ redirect }: RegisterFormProps) {
           {register.isPending ? 'Criando conta…' : 'Criar conta'}
         </Button>
       </form>
+
+      <SocialLogin roomy />
     </AuthCard>
   )
 }

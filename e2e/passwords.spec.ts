@@ -30,7 +30,7 @@ async function signIn(page: Page, email: string, password: string) {
 
 test('cadastro guarda só o hash da senha e o login continua funcionando', async ({ page }) => {
   await page.goto('/cadastro')
-  await field(page, 'Nome completo').fill(carla.name)
+  await field(page, 'Nome de usuário').fill(carla.name)
   await field(page, 'E-mail').fill(carla.email)
   await field(page, 'Senha').fill(carla.password)
   await field(page, 'Confirmar senha').fill(carla.password)

@@ -9,14 +9,16 @@ type AuthCardProps = {
   redirect: string
   expired?: boolean
   subtitle: string
+  /** Altura mínima do modal no desktop (px): 600 no login, 654 no cadastro (Figma). */
+  minHeight?: number
   children: ReactNode
 }
 
 /**
- * Casca do modal de autenticação (Figma: "Sign In Modal", 500 × 600): abas Entrar / Criar conta,
- * texto de apoio, botão de fechar e faixa de destaque de 10 px na base.
+ * Casca do modal de autenticação (Figma: "Sign In Modal", 500 × 600; cadastro 500 × 656 com cantos de
+ * 10 px): abas Entrar / Criar conta, texto de apoio, botão de fechar e faixa de destaque de 10 px na base.
  */
-export function AuthCard({ mode, redirect, expired, subtitle, children }: AuthCardProps) {
+export function AuthCard({ mode, redirect, expired, subtitle, minHeight = 600, children }: AuthCardProps) {
   const router = useRouter()
   const { data: user } = useSession()
   const search = redirect === '/' ? {} : { redirect }
@@ -33,7 +35,10 @@ export function AuthCard({ mode, redirect, expired, subtitle, children }: AuthCa
     'text-[20px] leading-5 font-medium text-foreground hover:text-text-accent focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring'
 
   return (
-    <div className="relative w-full border-b-[10px] border-primary bg-card md:min-h-[600px]">
+    <div
+      style={{ minHeight }}
+      className={`relative w-full border-b-[10px] border-primary bg-card max-md:!min-h-0 ${mode === 'register' ? 'overflow-hidden rounded-[10px]' : ''}`}
+    >
       <button
         type="button"
         aria-label="Fechar e voltar"

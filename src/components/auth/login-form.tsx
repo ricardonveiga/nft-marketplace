@@ -1,5 +1,5 @@
 import { isAxiosError } from 'axios'
-import { useRef, useState, type FormEvent, type ReactNode } from 'react'
+import { useRef, useState, type FormEvent } from 'react'
 import { Button } from '@/components/ui/button'
 import { useLogin } from '@/hooks/use-session'
 import {
@@ -10,27 +10,12 @@ import {
 import type { ApiErrorBody } from '@/types/auth'
 import { AuthCard } from './auth-card'
 import { AuthField, PasswordField } from './auth-field'
-import { FacebookMark, GoogleMark } from './social-icons'
+import { SocialLogin } from './social-login'
 
 type LoginFormProps = {
   /** Caminho interno para onde voltar depois de entrar. */
   redirect: string
   expired?: boolean
-}
-
-function SocialButton({ icon, children }: { icon: ReactNode; children: string }) {
-  return (
-    <button
-      type="button"
-      aria-disabled="true"
-      title="Em breve"
-      onClick={(event) => event.preventDefault()}
-      className="flex h-10 w-full cursor-not-allowed items-center justify-center gap-[10px] rounded-[2px] border border-border text-[13px] font-medium text-text-secondary"
-    >
-      {icon}
-      {children}
-    </button>
-  )
 }
 
 export function LoginForm({ redirect, expired }: LoginFormProps) {
@@ -151,18 +136,7 @@ export function LoginForm({ redirect, expired }: LoginFormProps) {
         </Button>
       </form>
 
-      {/* Login social está fora do escopo: os botões aparecem como no Figma, mas ficam inertes. */}
-      <div className="pb-8">
-        <div role="separator" className="mt-[23px] flex items-center gap-3 text-[13px] leading-4">
-          <span aria-hidden="true" className="h-px flex-1 bg-border" />
-          Ou continue com
-          <span aria-hidden="true" className="h-px flex-1 bg-border" />
-        </div>
-        <div className="mx-auto mt-[13px] flex w-full max-w-[340px] flex-col gap-3 px-6 sm:px-0">
-          <SocialButton icon={<GoogleMark />}>Continuar com Google</SocialButton>
-          <SocialButton icon={<FacebookMark />}>Continuar com Facebook</SocialButton>
-        </div>
-      </div>
+      <SocialLogin />
     </AuthCard>
   )
 }

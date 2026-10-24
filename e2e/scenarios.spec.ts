@@ -266,7 +266,7 @@ test.describe('erro geral (500)', () => {
     await expect(page).toHaveURL(/\/login/)
 
     await page.goto('/cadastro')
-    await main(page).getByLabel('Nome completo', { exact: true }).fill('Maria Teste')
+    await main(page).getByLabel('Nome de usuário', { exact: true }).fill('Maria Teste')
     await main(page).getByLabel('E-mail', { exact: true }).fill('maria.teste@kurio.test')
     await main(page).getByLabel('Senha', { exact: true }).fill('Senha-segura-1')
     await main(page).getByLabel('Confirmar senha', { exact: true }).fill('Senha-segura-1')

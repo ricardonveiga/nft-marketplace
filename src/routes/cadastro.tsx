@@ -12,7 +12,7 @@ function RegisterPage() {
   const { redirect } = Route.useSearch()
 
   return (
-    <AuthLayout>
+    <AuthLayout top={158}>
       <RegisterForm redirect={getSafeRedirect(redirect)} />
     </AuthLayout>
   )

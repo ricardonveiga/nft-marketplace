@@ -22,7 +22,7 @@ async function signIn(page: Page, user: { email: string; password: string }, red
 
 async function registerCarla(page: Page) {
   await page.goto('/cadastro?redirect=%2Fcarteiras')
-  await main(page).getByLabel('Nome completo', { exact: true }).fill('Carla Mendes')
+  await main(page).getByLabel('Nome de usuário', { exact: true }).fill('Carla Mendes')
   await main(page).getByLabel('E-mail', { exact: true }).fill('carla@exemplo.com')
   await main(page).getByLabel('Senha', { exact: true }).fill('senha1234')
   await main(page).getByLabel('Confirmar senha', { exact: true }).fill('senha1234')

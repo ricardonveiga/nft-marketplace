@@ -71,7 +71,7 @@ test('cadastro: sem rolagem horizontal em 390, 768 e 1440 px (também com os err
   for (const width of WIDTHS) {
     await page.setViewportSize({ width, height: 900 })
     await page.goto('/cadastro')
-    await expect(main(page).getByLabel('Nome completo', { exact: true })).toBeVisible()
+    await expect(main(page).getByLabel('Nome de usuário', { exact: true })).toBeVisible()
     await expectNoHorizontalScroll(page, width)
 
     await main(page).getByRole('button', { name: 'Criar conta', exact: true }).click()

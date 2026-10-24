@@ -13,7 +13,7 @@ async function fillRegister(
   page: Page,
   values: { name: string; email: string; password: string; confirm?: string },
 ) {
-  await field(page, 'Nome completo').fill(values.name)
+  await field(page, 'Nome de usuário').fill(values.name)
   await field(page, 'E-mail').fill(values.email)
   await field(page, 'Senha').fill(values.password)
   await field(page, 'Confirmar senha').fill(values.confirm ?? values.password)
@@ -61,7 +61,7 @@ test('validação: campos vazios mostram os erros associados e focam o primeiro'
   await page.goto('/cadastro')
   await submit(page)
 
-  const name = field(page, 'Nome completo')
+  const name = field(page, 'Nome de usuário')
   await expect(name).toBeFocused()
   await expect(name).toHaveAttribute('aria-invalid', 'true')
   await expect(page.getByText('Informe seu nome.')).toBeVisible()
@@ -104,10 +104,10 @@ test('erro desaparece do campo quando o usuário volta a digitar', async ({ page
   await submit(page)
   await expect(page.getByText('Informe seu nome.')).toBeVisible()
 
-  await field(page, 'Nome completo').fill('Carla')
+  await field(page, 'Nome de usuário').fill('Carla')
 
   await expect(page.getByText('Informe seu nome.')).toBeHidden()
-  await expect(field(page, 'Nome completo')).not.toHaveAttribute('aria-invalid', 'true')
+  await expect(field(page, 'Nome de usuário')).not.toHaveAttribute('aria-invalid', 'true')
 })
 
 test('conflito: e-mail já cadastrado vai para o campo e não abre sessão', async ({ page }) => {
@@ -177,7 +177,7 @@ test('quem já está autenticado e abre o cadastro é levado ao destino', async 
   await expect(page).toHaveURL('/nft/nft-04')
 })
 
-test('mostrar e ocultar a senha e a confirmação são botões independentes', async ({ page }) => {
+test('só a senha tem o olho de mostrar e ocultar; a confirmação não (como no Figma)', async ({ page }) => {
   await page.goto('/cadastro')
   await field(page, 'Senha').fill('segredo123')
   await field(page, 'Confirmar senha').fill('segredo123')
@@ -185,7 +185,46 @@ test('mostrar e ocultar a senha e a confirmação são botões independentes', a
   await page.getByRole('button', { name: 'Mostrar senha' }).click()
   await expect(field(page, 'Senha')).toHaveAttribute('type', 'text')
   await expect(field(page, 'Confirmar senha')).toHaveAttribute('type', 'password')
+  await expect(page.getByRole('button', { name: /confirmação/ })).toHaveCount(0)
 
-  await page.getByRole('button', { name: 'Mostrar confirmação de senha' }).click()
-  await expect(field(page, 'Confirmar senha')).toHaveAttribute('type', 'text')
+  await page.getByRole('button', { name: 'Ocultar senha' }).click()
+  await expect(field(page, 'Senha')).toHaveAttribute('type', 'password')
+})
+
+test('cadastro (Figma): textos, campos e login social inerte', async ({ page }) => {
+  await page.goto('/cadastro')
+
+  await expect(page.getByRole('heading', { level: 1, name: 'Criar conta' })).toBeVisible()
+  await expect(page.getByRole('main').getByRole('link', { name: 'Entrar', exact: true })).toBeVisible()
+  await expect(
+    page.getByText('Crie seu perfil de colecionador e conecte uma carteira quando quiser.'),
+  ).toBeVisible()
+
+  for (const [label, placeholder] of [
+    ['Nome de usuário', 'Nome de usuário'],
+    ['E-mail', 'Digite seu e-mail'],
+    ['Senha', 'Senha'],
+    ['Confirmar senha', 'Confirmar senha'],
+  ]) {
+    await expect(field(page, label)).toHaveAttribute('placeholder', placeholder)
+  }
+
+  // Sem a dica de senha (o Figma não a mostra); a regra aparece no erro de validação.
+  await expect(page.getByText('Mínimo de 8 caracteres')).toHaveCount(0)
+
+  await expect(page.getByRole('separator')).toContainText('Ou continue com')
+  for (const name of ['Continuar com Google', 'Continuar com Facebook']) {
+    const button = page.getByRole('button', { name })
+    await expect(button).toHaveAttribute('aria-disabled', 'true')
+    await button.click({ force: true })
+    await expect(page).toHaveURL(/\/cadastro/)
+  }
+
+  if ((page.viewportSize()?.width ?? 0) >= 768) {
+    const box = (await page.locator('div.border-primary.bg-card').boundingBox())!
+
+    expect(box.width).toBe(500)
+    expect(box.height).toBe(656)
+    expect(box.y).toBe(158)
+  }
 })

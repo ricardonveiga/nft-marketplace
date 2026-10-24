@@ -147,7 +147,7 @@ test('carteira que recusa a conexão mostra o erro e continua desconectada', asy
 
 test('usuário sem carteiras cadastradas é avisado e não consegue seguir', async ({ page }) => {
   await page.goto('/cadastro')
-  await main(page).getByLabel('Nome completo', { exact: true }).fill('Carla Mendes')
+  await main(page).getByLabel('Nome de usuário', { exact: true }).fill('Carla Mendes')
   await main(page).getByLabel('E-mail', { exact: true }).fill('carla@exemplo.com')
   await main(page).getByLabel('Senha', { exact: true }).fill('senha1234')
   await main(page).getByLabel('Confirmar senha', { exact: true }).fill('senha1234')

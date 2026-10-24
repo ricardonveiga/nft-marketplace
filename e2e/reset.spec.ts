@@ -30,7 +30,7 @@ test('resetAll restaura catálogo, contas, carrinho, favoritos, perfil, cenário
 
   // Mexe em tudo: conta nova...
   await page.goto('/cadastro')
-  await main(page).getByLabel('Nome completo', { exact: true }).fill(carla.name)
+  await main(page).getByLabel('Nome de usuário', { exact: true }).fill(carla.name)
   await main(page).getByLabel('E-mail', { exact: true }).fill(carla.email)
   await main(page).getByLabel('Senha', { exact: true }).fill(carla.password)
   await main(page).getByLabel('Confirmar senha', { exact: true }).fill(carla.password)
