@@ -484,3 +484,13 @@ Mesma lógica do desktop; só o que o frame mobile mostra diferente.
   no pixel contra o frame. As miniaturas, o preço/estrelas do topo, "Sobre este NFT:" e o
   "Compartilhar" do desktop não aparecem no mobile (não estão no frame); por isso só a primeira imagem
   é acessível no mobile. A nota mostra a média dos dados (o frame mostra 4.8).
+
+- **Pagamento (mobile, < 1024 px)**: vira o "Pagamento com carteira" do frame, sem o formulário do desktop:
+  lista das carteiras cadastradas (cartão de 93 px, com ENS ou endereço e a rede), "Carteira e rede"
+  (WalletConnect, MetaMask e Coinbase Wallet, que escolhem o **tipo de carteira**), "Total:" e o botão
+  "Confirmar compra". Como o frame não tem campos, **os dados do colecionador vêm da carteira escolhida**
+  (nome de exibição, perfil, e-mail, código de indicação, ENS e a secundária, salvos em "Carteiras") e o
+  nome de usuário vem da conta. A carteira escolhida é **conectada automaticamente** (uma vez; uma recusa
+  aparece como erro) e "Trocar carteira" a desconecta para escolher outra. O "⋮" de cada cartão abre
+  "Carteiras" para editá-la. O pedido, a idempotência e a revalidação do total são os mesmos do desktop.
+  Não aparecem no mobile: o resumo de itens, subtotal, taxa e a observação (não estão no frame).

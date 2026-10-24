@@ -7,7 +7,9 @@ import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { storeCart, useCart } from '@/hooks/use-cart'
 import { useCreateOrder } from '@/hooks/use-orders'
-import { useWallets } from '@/hooks/use-wallets'
+import { useMediaQuery } from '@/hooks/use-media-query'
+import { useConnectWallet, useDisconnectWallet, useWallets } from '@/hooks/use-wallets'
+import { getApiErrorMessage } from '@/lib/api-error'
 import {
   clearIdempotencyKey,
   getIdempotencyKey,
@@ -19,9 +21,10 @@ import { validateCollector } from '@/lib/validation'
 import type { User } from '@/types/auth'
 import type { NftNetwork } from '@/types/nft'
 import type { CollectorData, CreateOrderRequest, OrderErrorBody } from '@/types/order'
-import { ENS_SUFFIXES } from '@/types/wallet'
+import { ENS_SUFFIXES, type Wallet, type WalletType } from '@/types/wallet'
 import { CheckoutAside } from './checkout-aside'
 import { CheckoutForm, type CheckoutErrors } from './checkout-form'
+import { CheckoutMobile } from './checkout-mobile'
 
 type Quote = { version: number; totalEth: string }
 type Notice = { kind: 'error' | 'warning'; text: string }
@@ -41,6 +44,23 @@ function initialValues(user: User, draft: Partial<CheckoutFormValues> | undefine
     ensSuffix: ENS_SUFFIXES[0],
     notes: '',
     ...draft,
+  }
+}
+
+/** No mobile (Figma) não há formulário: os dados do colecionador vêm da carteira escolhida. */
+function valuesFromWallet(user: User, wallet: Wallet): CheckoutFormValues {
+  return {
+    name: wallet.displayName,
+    username: user.username,
+    profileName: wallet.profileName,
+    email: wallet.email,
+    walletType: wallet.walletType,
+    walletAddress: wallet.address,
+    secondary: wallet.secondary,
+    referralCode: wallet.referralCode,
+    ensName: wallet.ensName.endsWith(ENS_SUFFIXES[0]) ? wallet.ensName.slice(0, -ENS_SUFFIXES[0].length) : wallet.ensName,
+    ensSuffix: ENS_SUFFIXES[0],
+    notes: '',
   }
 }
 
@@ -65,6 +85,11 @@ export function CheckoutPage({ user }: { user: User }) {
   const cartQuery = useCart()
   const walletsQuery = useWallets()
   const create = useCreateOrder()
+  const wide = useMediaQuery('(min-width: 1024px)')
+  const connectWallet = useConnectWallet()
+  const disconnectWallet = useDisconnectWallet()
+  const [connection, setConnection] = useState<{ kind: 'success' | 'error'; text: string } | null>(null)
+  const attempted = useRef(new Set<string>())
 
   const [initial] = useState(() => loadDraft(user.id))
   const [values, setValues] = useState<CheckoutFormValues>(() => initialValues(user, initial.values))
@@ -84,6 +109,36 @@ export function CheckoutPage({ user }: { user: User }) {
   const wallets = walletsQuery.data
   const selectedWallet = wallets?.wallets.find((wallet) => wallet.id === walletId)
   const connected = Boolean(selectedWallet) && wallets?.connectedWalletId === selectedWallet?.id
+
+  // Mobile: os dados do colecionador seguem a carteira escolhida.
+  useEffect(() => {
+    if (!wide && selectedWallet) {
+      setValues((current) => ({ ...current, ...valuesFromWallet(user, selectedWallet) }))
+    }
+    // Só quando a carteira (ou o tamanho da tela) muda: o tipo escolhido depois deve permanecer.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [wide, selectedWallet?.id])
+
+  function connectTo(wallet: Wallet) {
+    attempted.current.add(wallet.id)
+    setConnection(null)
+    connectWallet.mutate(wallet.id, {
+      onSuccess: () => setConnection({ kind: 'success', text: `${wallet.label} conectada.` }),
+      onError: (failure) =>
+        setConnection({
+          kind: 'error',
+          text: getApiErrorMessage(failure, 'Não foi possível conectar a carteira. Tente novamente.'),
+        }),
+    })
+  }
+
+  // Mobile: a carteira escolhida é conectada sozinha, uma vez (não há botão "Conectar" no frame).
+  useEffect(() => {
+    if (!wide && selectedWallet && !connected && !attempted.current.has(selectedWallet.id) && !connectWallet.isPending) {
+      connectTo(selectedWallet)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [wide, selectedWallet?.id, connected])
 
   useEffect(() => {
     saveDraft(user.id, { values, walletId, network, otherWallet })
@@ -385,6 +440,38 @@ export function CheckoutPage({ user }: { user: User }) {
         )}
       </div>
 
+      {!wide && (
+        <CheckoutMobile
+          wallets={wallets?.wallets ?? []}
+          walletId={walletId}
+          connectedWalletId={wallets?.connectedWalletId ?? null}
+          walletType={values.walletType}
+          totalEth={cart.totalEth}
+          error={errors.wallet}
+          message={connection}
+          disabled={create.isPending || stale || blocked}
+          pending={create.isPending}
+          busy={connectWallet.isPending || disconnectWallet.isPending}
+          onWallet={(id) => {
+            const wallet = wallets?.wallets.find((candidate) => candidate.id === id)
+
+            chooseWallet(id)
+
+            if (wallet && wallets?.connectedWalletId !== id) {
+              connectTo(wallet)
+            }
+          }}
+          onWalletType={(type: WalletType) => setValue('walletType', type)}
+          onSwitch={() =>
+            disconnectWallet.mutate(undefined, {
+              onSuccess: () => setConnection({ kind: 'success', text: 'Carteira desconectada.' }),
+            })
+          }
+          onConfirm={confirm}
+        />
+      )}
+
+      {wide && (
       <div className="mt-[30px] grid items-start gap-y-10 lg:grid-cols-[764px_405px] lg:gap-x-[31px]">
         <CheckoutForm
           values={values}
@@ -411,6 +498,7 @@ export function CheckoutPage({ user }: { user: User }) {
           onConfirm={confirm}
         />
       </div>
+      )}
     </>
   )
 }

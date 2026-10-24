@@ -54,7 +54,13 @@ export function PurchasePanel({
             </Link>
           </p>
         </div>
-        <div className="flex justify-end">{favorite}</div>
+        {variant === 'bar' ? (
+          <p className="text-xl leading-7 font-bold text-text-accent" data-testid="detail-price">
+            {nft.priceEth} ETH
+          </p>
+        ) : (
+          <div className="flex justify-end">{favorite}</div>
+        )}
       </div>
     )
   }

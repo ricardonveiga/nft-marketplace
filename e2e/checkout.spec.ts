@@ -3,7 +3,9 @@ import { mockUsers } from '../src/mocks/fixtures/users'
 import {
   confirmButton,
   connectWallet,
+  isCompact,
   fillCollector,
+  paymentHeading,
   main,
   ordersOf,
   readyToPay,
@@ -35,7 +37,7 @@ async function startCheckout(page: Page) {
   await signIn(page, ana)
   await addToCart(page, 'nft-03')
   await page.goto('/pagamento')
-  await expect(page.getByRole('heading', { name: 'Perfil do colecionador' })).toBeVisible()
+  await expect(paymentHeading(page)).toBeVisible()
 }
 
 test('visitante vai do carrinho ao login e volta ao pagamento', async ({ page }) => {
@@ -49,7 +51,7 @@ test('visitante vai do carrinho ao login e volta ao pagamento', async ({ page })
   await main(page).getByRole('button', { name: 'Entrar', exact: true }).click()
 
   await expect(page).toHaveURL('/pagamento')
-  await expect(page.getByRole('heading', { name: 'Perfil do colecionador' })).toBeVisible()
+  await expect(paymentHeading(page)).toBeVisible()
   await expect(page.getByTestId('summary-total')).toHaveText('1.9945 ETH')
 })
 
@@ -61,6 +63,7 @@ test('pagamento com carrinho vazio avisa e leva ao catálogo', async ({ page }) 
 })
 
 test('o formulário vem preenchido com os dados da conta e mostra o resumo da API', async ({ page }) => {
+  test.skip(isCompact(page), 'o formulário do desktop não existe no mobile (Figma)')
   await startCheckout(page)
 
   await expect(page.getByRole('navigation', { name: 'Trilha de navegação' })).toContainText(
@@ -80,6 +83,7 @@ test('o formulário vem preenchido com os dados da conta e mostra o resumo da AP
 })
 
 test('validação: obrigatórios vazios e carteira desconectada mostram erros e focam o primeiro', async ({ page }) => {
+  test.skip(isCompact(page), 'o formulário do desktop não existe no mobile (Figma)')
   await startCheckout(page)
 
   await main(page).getByLabel('Nome de exibição').fill('')
@@ -95,6 +99,7 @@ test('validação: obrigatórios vazios e carteira desconectada mostram erros e 
 })
 
 test('validação: formatos inválidos dos campos', async ({ page }) => {
+  test.skip(isCompact(page), 'o formulário do desktop não existe no mobile (Figma)')
   await startCheckout(page)
 
   await main(page).getByLabel('Nome de usuário').fill('a')
@@ -109,6 +114,7 @@ test('validação: formatos inválidos dos campos', async ({ page }) => {
 })
 
 test('carteira: conectar e desconectar', async ({ page }) => {
+  test.skip(isCompact(page), 'o formulário do desktop não existe no mobile (Figma)')
   await startCheckout(page)
 
   await expect(walletStatus(page, 'wallet-ana-1')).toHaveText('Desconectada')
@@ -143,6 +149,7 @@ test('usuário sem carteiras cadastradas é avisado', async ({ page }) => {
 })
 
 test('o rascunho sobrevive ao refresh (a conexão da carteira vem do servidor)', async ({ page }) => {
+  test.skip(isCompact(page), 'o formulário do desktop não existe no mobile (Figma)')
   await startCheckout(page)
   await readyToPay(page, { referralCode: 'RASCUNHO1', ensName: 'rascunho' })
   await main(page).getByLabel('Observação do colecionador (opcional)').fill('Anotação do rascunho.')
@@ -175,6 +182,7 @@ test('pagamento confirmado: pedido pendente vira confirmado, carrinho esvazia e 
 })
 
 test('o recibo guarda o perfil do colecionador, inclusive os campos opcionais', async ({ page }) => {
+  test.skip(isCompact(page), 'o formulário do desktop não existe no mobile (Figma)')
   await startCheckout(page)
   await readyToPay(page, { referralCode: 'KURIO2026', ensName: 'ana-souza', walletType: 'Coinbase Wallet' })
   await main(page).getByLabel('Observação do colecionador (opcional)').fill('Entregar na carteira principal.')
@@ -205,11 +213,12 @@ test('clique repetido em confirmar cria um único pedido', async ({ page }) => {
 })
 
 test('carteira desconectada antes de confirmar não cria o pedido', async ({ page }) => {
+  test.skip(isCompact(page), 'o formulário do desktop não existe no mobile (Figma)')
   await startCheckout(page)
   await fillCollector(page)
   await confirmButton(page).click()
 
-  await expect(page.getByRole('heading', { name: 'Perfil do colecionador' })).toBeVisible()
+  await expect(paymentHeading(page)).toBeVisible()
   await expect(page).toHaveURL('/pagamento')
   expect(await ordersOf(page, 'user-ana')).toHaveLength(0)
 })
@@ -247,4 +256,22 @@ test('pagamento (Figma): campos de 370 × 40 e botão de 405 × 45 no desktop', 
   expect(second.x - (field.x + field.width)).toBe(24)
   expect(button.width).toBe(405)
   expect(button.height).toBe(45)
+})
+
+test('pagamento mobile (Figma): carteiras em cartões de 93 px, tipos de 65 px e botão de 60 px', async ({ page }) => {
+  test.skip(!isCompact(page), 'só no mobile')
+  await startCheckout(page)
+
+  const card = (await page.locator('#checkout-wallet li').first().boundingBox())!
+  const type = (await page.getByText('MetaMask', { exact: true }).locator('xpath=ancestor::label').boundingBox())!
+  const button = (await confirmButton(page).boundingBox())!
+
+  expect(card.height).toBe(93)
+  expect(type.height).toBe(65)
+  expect(button.height).toBe(60)
+  // A carteira escolhida é conectada sozinha e os dados do colecionador vêm dela.
+  await expect(walletStatus(page, 'wallet-ana-1')).toHaveText('Conectada')
+  await confirmButton(page).click()
+  await expect(page.getByTestId('order-confirmed')).toBeVisible({ timeout: 10_000 })
+  expect((await ordersOf(page, 'user-ana'))).toHaveLength(1)
 })

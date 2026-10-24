@@ -11,15 +11,16 @@ function PaymentPage() {
   return (
     <RequireAuth>
       {(user) => (
-        <div className="mx-auto w-full max-w-[1264px] px-6 pt-[33px] pb-24 md:px-8">
+        <div className="mx-auto w-full max-w-[1264px] px-7 pt-[32px] pb-24 md:px-8 md:pt-[33px]">
           <Breadcrumb
+            className="max-lg:hidden"
             items={[
               { label: 'Início', to: '/' },
               { label: 'Mercado', to: '/', hash: 'mercado' },
               { label: 'Pagamento' },
             ]}
           />
-          <h1 className="sr-only">Pagamento</h1>
+          <h1 className="sr-only max-lg:hidden">Pagamento</h1>
           <CheckoutPage user={user} />
         </div>
       )}

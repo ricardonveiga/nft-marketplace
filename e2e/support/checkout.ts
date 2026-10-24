@@ -3,6 +3,18 @@ import { expect, type Page } from '@playwright/test'
 // Passos do pagamento (Figma: formulário único "Perfil do colecionador" + "Seus NFTs"). O que a
 // conta já sabe vem preenchido; falta o tipo de carteira, o código de indicação e o nome ENS.
 
+/** Abaixo de 1024 px o pagamento é o "Pagamento com carteira" (Figma mobile), sem formulário. */
+export function isCompact(page: Page) {
+  return (page.viewportSize()?.width ?? 0) < 1024
+}
+
+/** Título que indica que o pagamento terminou de carregar. */
+export function paymentHeading(page: Page) {
+  return page.getByRole('heading', {
+    name: isCompact(page) ? 'Pagamento com carteira' : 'Perfil do colecionador',
+  })
+}
+
 export function main(page: Page) {
   return page.getByRole('main')
 }
@@ -21,6 +33,13 @@ export const COLLECTOR_DEFAULTS = {
 export async function fillCollector(page: Page, values: Partial<typeof COLLECTOR_DEFAULTS> = {}) {
   const { walletType, referralCode, ensName } = { ...COLLECTOR_DEFAULTS, ...values }
 
+  if (isCompact(page)) {
+    // No mobile os dados vêm da carteira; só o tipo é escolhido na tela.
+    await page.getByText(walletType, { exact: true }).click()
+
+    return
+  }
+
   await main(page).getByLabel('Tipo de carteira').selectOption(walletType)
   await main(page).getByLabel('Código de indicação').fill(referralCode)
   await main(page).getByLabel(/^Nome ENS/).fill(ensName)
@@ -28,7 +47,11 @@ export async function fillCollector(page: Page, values: Partial<typeof COLLECTOR
 
 /** Conecta a carteira escolhida (a principal da Ana, por padrão) e espera o status. */
 export async function connectWallet(page: Page, walletId = 'wallet-ana-1') {
-  await page.getByRole('button', { name: 'Conectar carteira' }).click()
+  // No mobile a carteira escolhida é conectada sozinha.
+  if (!isCompact(page)) {
+    await page.getByRole('button', { name: 'Conectar carteira' }).click()
+  }
+
   await expect(walletStatus(page, walletId)).toHaveText('Conectada')
 }
 

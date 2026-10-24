@@ -1,6 +1,6 @@
 import { expect, test, type Locator, type Page } from '@playwright/test'
 import { mockUsers } from '../src/mocks/fixtures/users'
-import { fillCollector } from './support/checkout'
+import { fillCollector, isCompact } from './support/checkout'
 
 const [ana, bruno] = mockUsers
 
@@ -366,7 +366,9 @@ test('conta nova cadastra a carteira pelo pagamento e conclui a compra', async (
   await expect(page.getByRole('radio', { name: /Minha carteira/ })).toBeChecked()
 
   await fillCollector(page)
-  await page.getByRole('button', { name: 'Conectar carteira' }).click()
+  if (!isCompact(page)) {
+    await page.getByRole('button', { name: 'Conectar carteira' }).click()
+  }
   await expect(page.getByTestId(/wallet-status-wallet-/)).toHaveText('Conectada')
   await page.getByRole('button', { name: 'Confirmar compra' }).click()
 

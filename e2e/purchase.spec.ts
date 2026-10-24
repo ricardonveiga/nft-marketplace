@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 import { mockUsers } from '../src/mocks/fixtures/users'
-import { readyToPay } from './support/checkout'
+import { isCompact, readyToPay } from './support/checkout'
 
 const [ana] = mockUsers
 
@@ -38,9 +38,12 @@ test('compra completa: do catálogo ao recibo confirmado, com cupom', async ({ p
   await main(page).getByRole('button', { name: 'Entrar', exact: true }).click()
   await expect(page).toHaveURL('/pagamento')
 
-  await expect(page.getByTestId('summary-subtotal')).toHaveText('1.99 ETH')
-  await expect(page.getByTestId('summary-discount')).toHaveText('(-) 0.199')
-  await expect(page.getByTestId('summary-fee')).toHaveText('0.0045 ETH')
+  if (!isCompact(page)) {
+    // No mobile (Figma) o pagamento mostra só o total.
+    await expect(page.getByTestId('summary-subtotal')).toHaveText('1.99 ETH')
+    await expect(page.getByTestId('summary-discount')).toHaveText('(-) 0.199')
+    await expect(page.getByTestId('summary-fee')).toHaveText('0.0045 ETH')
+  }
   await expect(page.getByTestId('summary-total')).toHaveText('1.7955 ETH')
 
   // 5. Dados do colecionador, carteira conectada e revisão.
