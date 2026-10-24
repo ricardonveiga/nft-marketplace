@@ -1,12 +1,22 @@
 # Kurio — Marketplace de NFTs
 
-Marketplace de NFTs em React + TypeScript (desafio frontend). Descoberta (catálogo, busca, filtros),
-compra (carrinho, pagamento, recibo) e conta do colecionador (login, cadastro, perfil, carteiras),
-em desktop e mobile. Não há backend: APIs, autenticação, carteiras, pagamentos e eventos em tempo
-real são **simulados na camada de rede com MSW**.
+Solução para o desafio técnico de **Frontend Developer** da **Jungle Gaming**.
 
-- **Aplicação publicada:** https://nft-marketplace-beta-black.vercel.app
-- **Repositório:** https://github.com/ricardonveiga/nft-marketplace
+| | |
+| --- | --- |
+| **Aplicação publicada** | https://nft-marketplace-beta-black.vercel.app |
+| **Repositório** | https://github.com/ricardonveiga/nft-marketplace |
+
+**Stack:** React, TypeScript, TanStack Router, TanStack Query, Axios, Socket.IO, Tailwind CSS,
+shadcn/ui, MSW, Playwright e Lighthouse (build com Vite).
+
+## Sobre o projeto
+
+Marketplace de NFTs com descoberta (catálogo, busca e filtros), compra (carrinho, pagamento e
+recibo) e conta do colecionador (login, cadastro, perfil e carteiras), em desktop e mobile. Não há
+backend: APIs, autenticação, carteiras, pagamentos e eventos em tempo real são **simulados na camada
+de rede com MSW**. As telas seguem os frames do Figma, com os desvios intencionais registrados.
+
 - **Arquitetura, contratos, sessão e cache:** [`ARCHITECTURE.md`](./ARCHITECTURE.md)
 - **Decisões por tela e desvios do Figma:** [`docs/decisoes.md`](./docs/decisoes.md)
 - **Auditoria Lighthouse:** [`docs/lighthouse.md`](./docs/lighthouse.md) e `reports/lighthouse/`
@@ -15,7 +25,6 @@ real são **simulados na camada de rede com MSW**.
 
 React, TypeScript, TanStack Router, TanStack Query, Axios, Socket.IO (`socket.io-client`),
 Tailwind CSS, shadcn/ui (Radix), MSW (+ `@mswjs/socket.io-binding`), Playwright e Lighthouse.
-Build com Vite.
 
 ## Setup
 
@@ -38,8 +47,8 @@ Os testes E2E usam o Chromium do Playwright. Na primeira vez: `npx playwright in
 | `VITE_API_TIMEOUT_MS` | `15000` | Tempo limite das requisições do Axios. Os testes usam 3000 para o cenário de timeout não custar 15 s. |
 
 Só para a auditoria (`npm run audit:lighthouse`): `LH_RUNS` (medições por página, padrão 3),
-`LH_OUT` (pasta de saída) e `LH_PROFILE` (`mobile` ou `desktop`). Experimentos locais; a auditoria
-oficial usa os padrões.
+`LH_OUT` (pasta de saída) e `LH_PROFILE` (`mobile` ou `desktop`). Uso opcional; a auditoria
+publicada usa os valores padrão.
 
 ## Comandos
 
@@ -51,7 +60,7 @@ oficial usa os padrões.
 | `npm run typecheck` | Geração de rotas + `tsc -b` |
 | `npm run lint` | `oxlint` |
 | `npm run test:e2e` | Testes Playwright (desktop 1440 e mobile 390, Chromium). Sobe o próprio servidor na porta 5199 |
-| `npm run test:visual` | Só a regressão visual (Início, detalhe, carrinho e pagamento) |
+| `npm run test:visual` | Só a regressão visual (Início, detalhe, carrinho, pagamento, perfil e carteiras) |
 | `npm run test:visual:update` | Regenera as baselines visuais (depois de mudança visual intencional) |
 | `npm run audit:lighthouse` | Build, preview e 3 medições por página e perfil; escreve em `reports/lighthouse/` |
 
@@ -68,6 +77,11 @@ trace (`trace: retain-on-failure`) em `test-results/`; abra com `npx playwright 
 Também é possível criar uma conta em `/cadastro` (fica em `localStorage['mock-users']`, com a senha só como hash SHA-256). Cupons do
 carrinho: `KURIO10` (10%), `GENESIS15` (15%) e `EXPIRADO20` (expirado, para ver o erro).
 A carteira "Carteira secundária" da Ana sempre recusa a conexão, para exercitar a recusa.
+
+**Para concluir uma compra** (desktop): em `/pagamento`, complete os campos obrigatórios que a conta não
+traz (tipo de carteira, código de indicação com 4 a 12 letras ou números, como `KURIO10`, e nome ENS),
+conecte a carteira e use "Confirmar compra". No mobile o pagamento é a escolha da carteira cadastrada
+(os dados do colecionador vêm dela e a conexão é automática).
 
 ## Cenários do mock: selecionar e resetar
 
@@ -115,14 +129,14 @@ Cada passo é o que os testes automatizados fazem (`e2e/`).
 
 - **Sessão expirada:** entre como Ana, coloque `session-expired` no cenário e navegue ou abra o
   pagamento. Você vai ao login com um aviso; ao entrar volta à página em que estava.
-- **Pagamento recusado:** `payment-declined`, adicione um NFT, vá a `/pagamento`, conecte a carteira,
-  revise e confirme. O pedido fica "recusado", o carrinho e os dados continuam, e há "Tentar novamente".
-- **Clique repetido:** na revisão do pagamento, clique várias vezes em "Confirmar compra". Só um
+- **Pagamento recusado:** `payment-declined`, adicione um NFT, vá a `/pagamento`, conecte a carteira
+  e confirme. O pedido fica "recusado", o carrinho e os dados continuam, e há "Tentar novamente".
+- **Clique repetido:** no pagamento, clique várias vezes em "Confirmar compra". Só um
   pedido é criado (trava no cliente e idempotência na API).
 - **Timeout após criar o pedido:** `order-timeout` e confirme o pagamento. A resposta não chega,
   a tela avisa; confirme de novo e o mesmo pedido é recuperado (mesma `Idempotency-Key`, sem duplicar).
 - **Cupom inválido ou expirado:** no carrinho, aplique `XXXX` (inválido) ou `EXPIRADO20`.
-- **Preço ou disponibilidade mudando (Socket.IO):** com um NFT no carrinho ou na revisão do pagamento,
+- **Preço ou disponibilidade mudando (Socket.IO):** com um NFT no carrinho ou no pagamento,
   rode `__mockControl.updateNft('nft-03', { priceEth: '2.10' })` (ou `{ availableQuantity: 0 }`).
   A tela avisa, atualiza o resumo e o pagamento exige aceitar os novos valores.
 - **Eventos duplicados ou antigos, queda de conexão:** `__mockControl.replay(evento)`,

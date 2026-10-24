@@ -1,9 +1,23 @@
-# Regras do projeto
-- Enunciado completo em CHALLENGE.md. Sempre consultar antes de decidir.
-- Stack obrigatória: React, TypeScript, TanStack Router, TanStack Query, Axios, Socket.IO, Tailwind, shadcn/ui, MSW, Playwright.
-- Nunca colocar dado fictício em componente ou hook. Mock só no MSW.
-- Toda chamada REST passa pela instância Axios em src/lib/api.ts.
-- Valores em ETH como string decimal; nunca usar float para dinheiro.
-- Commits pequenos e frequentes, em português.
-- Ao terminar cada tarefa, explique em português simples o que foi feito e por quê, em até 8 linhas.
-- Prioridade: itens eliminatórios > fluxo de compra funcional > fidelidade visual > testes > Lighthouse.
+# Convenções do projeto
+
+O enunciado do desafio está em `CHALLENGE.md`; as decisões de arquitetura e de cada tela, em
+`ARCHITECTURE.md` e `docs/decisoes.md`.
+
+## Stack
+
+React, TypeScript, TanStack Router, TanStack Query, Axios, Socket.IO, Tailwind, shadcn/ui, MSW e
+Playwright.
+
+## Arquitetura
+
+- Dados fictícios ficam só na camada de mocks (`src/mocks`, MSW); nunca em componentes ou hooks.
+- Toda chamada REST passa pela instância Axios de `src/lib/api.ts`.
+- Valores em ETH são strings decimais; dinheiro nunca usa `float`.
+
+## Commits
+
+Pequenos e frequentes, com mensagem em português (`feat:`, `fix:`, `test:`, `docs:`).
+
+## Prioridades do desafio
+
+Itens eliminatórios, depois o fluxo de compra, a fidelidade visual, os testes e, por fim, o Lighthouse.
