@@ -20,13 +20,13 @@ export function FeaturedNftCard() {
     <section
       aria-labelledby={titleId}
       data-testid="featured-nft"
-      className="flex w-full flex-col gap-4 overflow-hidden rounded-lg bg-surface-dark pt-6"
+      className="flex w-full flex-col gap-3 overflow-hidden bg-surface-featured pt-6"
     >
       <div className="flex flex-col gap-4 px-5">
-        <h2 id={titleId} className="text-heading leading-8 text-text-accent">
+        <h2 id={titleId} className="text-heading leading-8 text-text-accent uppercase">
           NFT em destaque
         </h2>
-        <p className="text-center text-base leading-4 font-bold tracking-[0.2em] text-foreground uppercase">
+        <p className="-mt-0.5 text-center text-[22px] leading-[22px] font-bold text-foreground uppercase">
           Oferta limitada
         </p>
       </div>
@@ -35,14 +35,14 @@ export function FeaturedNftCard() {
         <Link
           to="/nft/$id"
           params={{ id: nft.id }}
-          className="block aspect-[310/368] focus-visible:outline-2 focus-visible:outline-offset-[-4px] focus-visible:outline-ring"
+          className="block aspect-[310/366] focus-visible:outline-2 focus-visible:outline-offset-[-4px] focus-visible:outline-ring"
         >
           <img
             src={nft.imageUrl}
             alt={`${nft.name}, da coleção ${nft.collection}`}
             width={600}
             height={600}
-            className="size-full rounded-[20px] object-cover"
+            className="size-full rounded-t-[20px] rounded-b-[15px] object-cover"
           />
           {/* No Figma a foto não tem texto sobreposto: nome e preço ficam só para leitores de tela. */}
           <span className="sr-only">
@@ -55,7 +55,7 @@ export function FeaturedNftCard() {
           aria-label="Carregando NFT em destaque"
           data-testid="featured-nft-loading"
         >
-          <Skeleton className="aspect-[310/368] w-full rounded-[20px]" />
+          <Skeleton className="aspect-[310/366] w-full rounded-t-[20px] rounded-b-[15px]" />
         </div>
       )}
     </section>

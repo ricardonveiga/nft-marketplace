@@ -18,7 +18,7 @@ export function NftCard({ nft, priority = false }: { nft: Nft; priority?: boolea
       to="/nft/$id"
       params={{ id: nft.id }}
       data-testid="nft-card"
-      className="group flex w-full flex-col gap-2 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring md:gap-3"
+      className="group flex w-full flex-col gap-[7px] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring md:gap-3"
     >
       <div className="relative flex h-[200px] items-center justify-center overflow-hidden rounded-[20px] bg-[linear-gradient(139.5deg,var(--card)_12%,var(--surface-raised)_106.6%)] md:aspect-[258/300] md:h-auto md:rounded-none md:bg-none md:bg-card">
         <img
@@ -44,11 +44,13 @@ export function NftCard({ nft, priority = false }: { nft: Nft; priority?: boolea
         )}
       </div>
 
-      <div className="flex flex-col gap-0 pl-2 md:gap-1.5 md:pl-0">
+      <div
+        className={`flex flex-1 flex-col justify-between gap-0 pl-2 md:gap-[7px] md:pl-0 ${nft.previousPriceEth ? 'md:min-h-[45px]' : ''}`}
+      >
         <h3 className="text-[15px] font-normal md:text-base md:leading-4">
           {nft.name}
         </h3>
-        <p className="flex items-center gap-3 text-base leading-4 font-bold text-text-accent md:text-lg">
+        <p className="flex items-center gap-3 text-base leading-4 font-bold text-text-accent max-md:-mt-0.5 md:-translate-y-px md:text-lg">
           {nft.priceEth} ETH
           {nft.previousPriceEth && (
             <span className="font-normal text-brand-secondary">

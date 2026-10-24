@@ -8,7 +8,7 @@ type CatalogPaginationProps = {
 }
 
 const cellClass =
-  'grid size-[35px] place-items-center rounded-sm border border-border text-lg leading-4 hover:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring'
+  'grid size-[35px] place-items-center rounded-[6px] border border-border text-lg leading-4 hover:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring'
 
 /** Páginas visíveis: todas até 7; acima disso, primeira, última e vizinhas da atual. */
 function visiblePages(page: number, totalPages: number): Array<number | 'gap'> {
@@ -42,7 +42,7 @@ function PageLink({ to, children, label, current }: {
       aria-current={current ? 'page' : undefined}
       className={
         current
-          ? 'grid size-[35px] place-items-center rounded-sm bg-primary text-lg leading-4 font-bold text-primary-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring'
+          ? 'grid size-[35px] place-items-center rounded-[6px] bg-primary text-lg leading-4 font-bold text-primary-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring'
           : cellClass
       }
     >
@@ -57,7 +57,7 @@ export function CatalogPagination({ page, totalPages }: CatalogPaginationProps) 
   }
 
   return (
-    <nav aria-label="Paginação" className="flex justify-end">
+    <nav aria-label="Paginação" className="flex justify-end md:mt-[60px]">
       <ul className="flex items-center gap-2">
         {page > 1 && (
           <li>

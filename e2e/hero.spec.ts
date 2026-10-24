@@ -47,7 +47,7 @@ test('o hero é o título da página, com texto e botão EXPLORAR', async ({ pag
 
   await expect(page.getByRole('heading', { level: 1 })).toHaveCount(1)
   await expect(page.getByText('Bem-vindo à Kurio')).toBeVisible()
-  await expect(page.getByRole('link', { name: 'EXPLORAR' })).toBeVisible()
+  await expect(page.getByRole('link', { name: 'EXPLORAR', exact: true })).toBeVisible()
 
   if (isDesktop(page)) {
     await expect(page.getByTestId('hero-title')).toContainText('Seja dono do futuro')
@@ -126,7 +126,7 @@ test('EXPLORAR leva o foco e a tela ao catálogo', async ({ page }) => {
   await page.goto('/')
   await expect(page.getByTestId('nft-grid')).toBeVisible()
 
-  await page.getByRole('link', { name: 'EXPLORAR' }).click()
+  await page.getByRole('link', { name: 'EXPLORAR', exact: true }).click()
 
   await expect(page.locator('#mercado')).toBeFocused()
   await expect(page.locator('#mercado')).toBeInViewport()
@@ -169,7 +169,7 @@ test('falha ao carregar os destaques não derruba o hero', async ({ page }) => {
   await page.goto('/')
 
   await expect(page.getByTestId('hero-title')).toBeVisible()
-  await expect(page.getByRole('link', { name: 'EXPLORAR' })).toBeVisible()
+  await expect(page.getByRole('link', { name: 'EXPLORAR', exact: true })).toBeVisible()
   await expect(slide(page)).toHaveCount(0)
 })
 
@@ -186,16 +186,23 @@ test('sem rolagem horizontal em 390, 768 e 1440 px', async ({ page }) => {
   }
 })
 
-test('a moldura da arte do hero tem sempre o mesmo fundo creme, seja qual for o destaque', async ({ page }) => {
+test('a arte do hero ocupa a moldura inteira, sem fundo próprio (como no Figma)', async ({ page }) => {
   await page.goto('/')
   await expect(slide(page)).toBeVisible()
 
-  const dots = page.getByRole('group', { name: 'Escolher destaque' }).getByRole('button')
+  const link = slide(page).getByRole('link')
+  await expect(link).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)')
 
-  for (const index of [0, 1, 2]) {
-    await dots.nth(index).click()
-    await expect(slide(page)).toHaveAttribute('aria-label', `${index + 1} de 3`)
-    await expect(slide(page).getByRole('link')).toHaveCSS('background-color', 'rgb(252, 242, 218)')
+  const frame = (await link.boundingBox())!
+  const art = (await slide(page).getByRole('img').first().boundingBox())!
+
+  expect(art.width).toBe(frame.width)
+  expect(art.height).toBe(frame.height)
+
+  // Desktop: 450 × 450 (Figma), encostada no lado direito do conteúdo.
+  if ((page.viewportSize()?.width ?? 0) >= 768) {
+    expect(frame.width).toBe(450)
+    expect(frame.height).toBe(450)
   }
 })
 

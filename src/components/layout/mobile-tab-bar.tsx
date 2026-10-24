@@ -21,7 +21,7 @@ function SoonItem({ label, children }: { label: string; children: ReactNode }) {
       aria-disabled="true"
       aria-label={`${label} (em breve)`}
       title="Em breve"
-      className={`${itemClass} cursor-not-allowed opacity-70`}
+      className={`${itemClass} cursor-not-allowed`}
     >
       {children}
     </button>
@@ -84,7 +84,7 @@ export function MobileTabBar() {
         <img src={scanIcon} alt="" className="relative h-6 w-[26.82px]" />
       </button>
 
-      <ul className="relative flex justify-between pt-[35px]">
+      <ul className="relative flex justify-between pt-[30px]">
         <li className="flex gap-8 pl-[26px]">
           <Link to="/" aria-label="Início" className={itemClass}>
             <img src={homeIcon} alt="" />

@@ -14,7 +14,10 @@ test('desktop: header com menu, busca, carrinho e entrar', async ({ page }) => {
   await expect(nav.getByText('Criadores')).toBeVisible()
   await expect(nav.getByText('Aprenda')).toBeVisible()
 
-  await expect(page.getByRole('searchbox', { name: 'Buscar NFTs' })).toBeVisible()
+  // No Figma a busca do desktop é só o ícone; ao clicar, o campo aparece.
+  await expect(page.getByRole('searchbox', { name: 'Buscar NFTs' })).toHaveCount(0)
+  await page.getByRole('button', { name: 'Abrir busca' }).click()
+  await expect(page.getByRole('searchbox', { name: 'Buscar NFTs' })).toBeFocused()
   await expect(page.getByRole('link', { name: 'Carrinho' })).toBeVisible()
   await expect(page.getByRole('link', { name: 'Entrar' })).toBeVisible()
   await expect(page.getByRole('navigation', { name: 'Navegação inferior' })).toBeHidden()

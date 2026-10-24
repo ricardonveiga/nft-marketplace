@@ -53,8 +53,8 @@ const socialLinks = [
 ]
 
 const columnsClass = 'lg:grid-cols-[1fr_1fr_1fr_228px]'
-const featureColumnsClass = 'lg:grid-cols-[1fr_1fr_1fr_357px]'
-const separatedClass = 'lg:border-l lg:border-primary'
+const featureColumnsClass = 'lg:grid-cols-[296px_266px_266px_372px]'
+const separatedClass = 'lg:border-l lg:border-primary lg:pl-4'
 
 function NewsletterForm() {
   const [notice, setNotice] = useState('')
@@ -95,13 +95,13 @@ function NewsletterForm() {
 export function SiteFooter() {
   return (
     <footer className="mx-auto w-full max-w-[1264px] px-4 pb-6 md:px-8 print:hidden">
-      <div className="overflow-hidden rounded-md">
-        <div className="bg-card p-8">
+      <div className="overflow-hidden">
+        <div className="bg-card px-8 pt-8 pb-4 lg:px-0">
           <div className={`grid gap-8 md:grid-cols-2 lg:gap-0 ${featureColumnsClass}`}>
             {features.map(({ letter, title, text }, index) => (
               <section
                 key={title}
-                className={`flex flex-col gap-3 px-4 ${index > 0 ? separatedClass : ''}`}
+                className={`flex flex-col gap-3 pr-4 ${index > 0 ? separatedClass : 'pl-4 lg:pl-12'}`}
               >
                 <div
                   aria-hidden="true"
@@ -115,13 +115,13 @@ export function SiteFooter() {
                 </p>
               </section>
             ))}
-            <div className={`px-4 ${separatedClass}`}>
+            <div className={`pr-4 lg:pr-[31px] ${separatedClass}`}>
               <NewsletterForm />
             </div>
           </div>
         </div>
 
-        <div className="bg-surface-dark p-8">
+        <div className="bg-surface-dark px-8 py-[22px]">
           <div className={`grid items-center gap-6 md:grid-cols-2 ${columnsClass}`}>
             <p className="text-sm font-bold tracking-[1.4px]">KURIO</p>
             <p className="text-sm leading-[22px]">
@@ -139,7 +139,7 @@ export function SiteFooter() {
           </div>
         </div>
 
-        <div className="bg-card p-8">
+        <div className="bg-card px-8 pt-8 pb-[30px]">
           <div
             className={`grid gap-8 sm:grid-cols-2 lg:gap-x-10 xl:gap-x-[124px] ${columnsClass}`}
           >
@@ -190,7 +190,7 @@ export function SiteFooter() {
           </div>
         </div>
 
-        <p className="bg-background px-4 text-center text-sm leading-[30px]">
+        <p className="bg-background px-4 pt-[6px] text-center text-sm leading-[30px]">
           © 2026 Kurio. Propriedade digital para todos.
         </p>
       </div>

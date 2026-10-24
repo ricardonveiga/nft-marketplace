@@ -12,9 +12,11 @@ type FilterGroupProps = {
   selected: readonly string[]
   onToggle: (name: string) => void
   boldCount?: boolean
+  /** Sem recuo à direita (a lista de Rede, no Figma, vai até a borda do bloco). */
+  flushRight?: boolean
 }
 
-function FilterGroup({ title, options, selected, onToggle, boldCount }: FilterGroupProps) {
+function FilterGroup({ title, options, selected, onToggle, boldCount, flushRight }: FilterGroupProps) {
   const titleId = useId()
 
   return (
@@ -22,7 +24,7 @@ function FilterGroup({ title, options, selected, onToggle, boldCount }: FilterGr
       <h3 id={titleId} className="text-lg leading-4">
         {title}
       </h3>
-      <ul className="flex flex-col px-3">
+      <ul className={`flex flex-col pl-3 ${flushRight ? 'pr-0' : 'pr-3'}`}>
         {options.map(({ name, count }) => {
           const checked = selected.includes(name)
 
@@ -86,7 +88,7 @@ function PriceFilter({ bounds, minPrice, maxPrice, onApply }: PriceFilterProps) 
           disabled={disabled}
           onValueChange={(value) => setRange([value[0], value[1]])}
         />
-        <p className="text-[15px]">
+        <p className="-mt-px text-[15px]">
           Preço: {formatEthBr(centiToEth(range[0]))} -{' '}
           {formatEthBr(centiToEth(range[1]))} ETH
         </p>
@@ -99,7 +101,7 @@ function PriceFilter({ bounds, minPrice, maxPrice, onApply }: PriceFilterProps) 
               maxPrice: range[1] < boundMax ? centiToEth(range[1]) : undefined,
             })
           }
-          className="self-start rounded-md bg-primary px-3 py-2 text-base leading-5 font-bold text-primary-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:opacity-50"
+          className="-mt-0.5 w-[92px] self-start rounded-md bg-primary py-2 text-base leading-5 font-bold text-primary-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:opacity-50"
         >
           Aplicar
         </button>
@@ -148,6 +150,7 @@ export function FiltersPanel() {
           />
           <FilterGroup
             title="Rede"
+            flushRight
             options={data.facets.networks}
             selected={search.network ?? []}
             onToggle={(name) =>

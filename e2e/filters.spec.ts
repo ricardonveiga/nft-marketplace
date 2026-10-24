@@ -30,6 +30,18 @@ async function facetCounts(group: Locator) {
   return labels.map((label) => Number(/\((\d+)\)/.exec(label)?.[1]))
 }
 
+/**
+ * Marca um filtro clicando no rótulo (como a pessoa faz). O campo de verdade é invisível e fica
+ * em outro ponto da tela, que pode ficar sob o botão fixo da gaveta no mobile.
+ */
+async function checkFilter(filters: Locator, name: RegExp) {
+  const checkbox = filters.getByRole('checkbox', { name })
+
+  // O "has" é relativo ao rótulo: usa um localizador da página, não o encadeado a partir dos filtros.
+  await filters.locator('label').filter({ has: filters.page().getByRole('checkbox', { name }) }).click()
+  await expect(checkbox).toBeChecked()
+}
+
 async function waitForGrid(page: Page) {
   await expect(page.getByTestId('nft-grid')).toBeVisible()
 }
@@ -52,7 +64,7 @@ test('filtro de coleção vai para a URL, atualiza a lista e as contagens', asyn
   await waitForGrid(page)
 
   const filters = await openFilters(page)
-  await filters.getByRole('checkbox', { name: /Fotografia/ }).check({ force: true })
+  await checkFilter(filters, /Fotografia/)
 
   await expect(page).toHaveURL(/category=Fotografia/)
   await expect(page.getByTestId('nft-card')).toHaveCount(4)
@@ -67,8 +79,8 @@ test('filtros se combinam (coleção + rede)', async ({ page }) => {
   await waitForGrid(page)
 
   const filters = await openFilters(page)
-  await filters.getByRole('checkbox', { name: /Fotografia/ }).check({ force: true })
-  await filters.getByRole('checkbox', { name: /Ethereum/ }).check({ force: true })
+  await checkFilter(filters, /Fotografia/)
+  await checkFilter(filters, /Ethereum/)
 
   await expect(page).toHaveURL(/category=Fotografia/)
   await expect(page).toHaveURL(/network=Ethereum/)
@@ -95,7 +107,7 @@ test('filtro de rede também reinicia a paginação', async ({ page }) => {
   await waitForGrid(page)
 
   const filters = await openFilters(page)
-  await filters.getByRole('checkbox', { name: /Solana/ }).check({ force: true })
+  await checkFilter(filters, /Solana/)
 
   await expect(page).toHaveURL(/network=Solana/)
   await expect(page).not.toHaveURL(/page=/)
@@ -180,6 +192,13 @@ test('preço na URL continua string decimal (sem virar float)', async ({ page })
 test('busca do header vai para a URL e filtra o catálogo', async ({ page }) => {
   await page.goto('/')
   await waitForGrid(page)
+
+  // No desktop a busca do cabeçalho é um ícone que abre o campo; no mobile o campo já está à vista.
+  const open = page.getByRole('button', { name: 'Abrir busca' })
+
+  if (await open.isVisible()) {
+    await open.click()
+  }
 
   const search = page.getByRole('searchbox')
   await search.fill('ivory')

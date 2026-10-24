@@ -46,23 +46,52 @@ tudo o que difere dele (ou que ele não define) está listado aqui.
   DOM, só para leitores de tela (`sr-only`), para o link do destaque ter nome acessível e o valor
   atualizado por `nft.updated` seguir verificável. A miniatura de 58 px sobreposta (mobile) é o
   próximo destaque, decorativa.
-- **Fundo da moldura da arte**: fixo, creme `#fcf2da` (token `hero-art`, medido no print do hero,
-  igual ao fundo das artes Golden e Sage), seja qual for o NFT em destaque. A troca dinâmica do
-  destaque continua igual; só o fundo ao redor da imagem não varia com o fundo embutido em cada
-  arte. No desktop a arte (quadrada) fica inteira (`object-contain`) na moldura de 446 × 450, então
-  a cor fixa aparece nas bordas finas e enquanto a imagem carrega; no mobile (138 × 138) a moldura
-  é do tamanho da arte. As artes Emerald e Neon têm fundo próprio (verde-acinzentado), então a
-  moldura não fica imperceptível com elas. Valor medido em print; sem o MCP não foi possível
-  conferir o hex exato no Figma.
+- **Moldura da arte** (conferida com o frame Desktop/Início): sem fundo próprio; a arte ocupa a
+  moldura inteira (450 × 450 no desktop, raio 24; 138 × 138 no mobile, raio 20). O creme fixo que
+  existiu antes (`hero-art`) foi removido: o frame mostra só a foto, com o fundo embutido na arte.
 - **EXPLORAR** rola até o catálogo e leva o foco para a seção (sem mexer na URL nem nos filtros).
-- **Dimensões**: 1200 × 450 no desktop e 366 × 190 no mobile (medidas do Figma). O fundo é
-  `surface-dark`. **Desktop: fundo liso, sem círculos** (Figma Desktop/Início). **Mobile: as duas
-  elipses translúcidas** (Figma: Ellipse 49/50 do frame mobile), escondidas a partir de 768 px
-  (`md:hidden`). Entre 2 versões anteriores os círculos tinham ido para os dois tamanhos e depois
-  sumido dos dois; agora estão separados por breakpoint e um teste confere (`hero-circle`). Não há
-  gradiente de fundo: as elipses (`primary` a 10%) são o efeito do mobile; o único gradiente que
-  existia era o do texto sobre a imagem, já removido.
+- **Dimensões**: 1200 × 450 no desktop e 366 × 190 no mobile (medidas do Figma). **Desktop: fundo
+  liso, sem círculos e sem card.** **Mobile:** card de raio 32 sobre base `#1b110a` com dois círculos
+  de 248 px (Ellipse 49/50), cada um com gradiente vertical e opacidade (0,63 e 0,384); os valores
+  foram **ajustados por mínimos quadrados sobre o frame** (erro médio ≈ 4/255), pois o arquivo não
+  estava legível. Os pontos do carrossel são três círculos da mesma cor (o frame não distingue o
+  ativo; a posição fica em `aria-current` e no rótulo "N de 3").
 - Sem destaques (catálogo vazio ou erro) o hero mantém texto e botão, sem arte.
+
+## Início: conferência com os frames do Figma (prints do usuário)
+
+Desktop (1440) e mobile (414 × 896) conferidos **no pixel** contra os prints (medindo caixas de
+texto, bordas e cores). O que mudou em relação ao que existia:
+
+- **Cores**: fundo da página `#040202` (era `#140d0a`); texto dos botões laranja `#040202`; fundo do
+  card "NFT em destaque" `#180f09`; linha do cabeçalho `#372414` só nos 1200 px do conteúdo.
+- **Cabeçalho desktop**: 69 px (itens a partir de y = 24), menu ativo com sublinhado de 3 px sobre a
+  linha, busca só com o ícone (clique abre o campo; `Esc` fecha se vazio), carrinho de 31 px com o
+  contador e botão "Entrar" de 100 × 35 (o componente `Button` perdia 2 px por causa de uma borda
+  transparente com `bg-clip-padding`; o padrão agora é borda da própria cor).
+- **Catálogo**: barra lateral idêntica (slider com polegar de 21 px e trilha de 4 px, lista de Rede
+  sem recuo à direita), abas regulares com sublinhado, "Ordenar por" sem folga antes da seta, linhas
+  de cards a 71 px e preço fixado na base do card (a linha com preço antigo fica 6 px mais alta).
+- **Card em destaque**: título em caixa alta, "OFERTA LIMITADA" em 22 px, cantos retos, imagem de
+  310 × 366.
+- **Promoções**: dois cards de 586 × 250 (arte de 287 px, texto à direita, botão "Explorar" que leva
+  ao catálogo); o cupom que existia nos cards saiu, porque o Figma não o mostra (o cupom segue
+  valendo no carrinho). A descrição do segundo card é cortada em três linhas, como no Figma.
+- **Diário da Cunhagem**: quatro artigos de 268 px (data, "Leitura de N min", título, resumo e
+  "Ler mais", inerte como "Em breve"). Os textos vêm do frame.
+- **Rodapé**: faixa de 250 px com colunas de 296/266/266/372 px e divisores de 1 px; barra de contato
+  de 88 px; sem cantos arredondados.
+- **Mobile**: cabeçalho com 40 px de respiro no topo (o frame tem a área do aparelho; foi mantida
+  para a posição bater), busca com ícone fino e texto em peso 600, botão de filtros em degradê
+  escuro → claro com ícone de dois controles, abas de 14 px e barra inferior com os ícones 5 px
+  mais altos e o coração na cor cheia.
+
+**Não replicado de propósito** (ruído do arquivo, não regra de interface): posição da arte dentro de
+cada card (varia de 20 a 31 px entre cards do mesmo frame; mantivemos a arte centralizada), a
+terceira linha sem nome/preço do desktop, o coração só no primeiro card do mobile, os ícones de ação
+(carrinho, coração e lupa) que aparecem no hover de um card do frame de Login (ainda não
+implementados), os 4 números de página e as contagens dos filtros (dados do Figma; o mock tem 27
+NFTs, 3 páginas), e a arte do hero (o Figma usa o Emerald Ape; aqui vale o critério do mais caro).
 
 ## Carrinho
 

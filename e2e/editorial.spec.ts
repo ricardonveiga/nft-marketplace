@@ -1,7 +1,8 @@
 import { expect, test, type Page } from '@playwright/test'
 
-// Promoções e "Diário da Cunhagem" da Início: conteúdo editorial vindo do MSW. Nada aqui pode
-// aparentar uma ação que não existe, então os cards não são links.
+// Promoções e "Diário da Cunhagem" da Início: conteúdo editorial vindo do MSW, com os textos do
+// Figma. Nada aqui pode aparentar uma ação que não existe: os artigos não são links ("Ler mais"
+// fica inerte, como "Em breve") e o "Explorar" das promoções leva ao catálogo, como o do hero.
 
 function promotions(page: Page) {
   return page.getByTestId('promotions')
@@ -11,58 +12,103 @@ function blog(page: Page) {
   return page.getByTestId('blog')
 }
 
-test('promoções: título, cards e cupons como texto', async ({ page }) => {
+test('promoções: dois cards com título, texto e botão Explorar', async ({ page }) => {
   await page.goto('/')
 
-  await expect(promotions(page).getByRole('heading', { level: 2, name: 'Promoções' })).toBeVisible()
-  await expect(page.getByTestId('promotion')).toHaveCount(3)
-  await expect(page.getByTestId('promotion').first().getByRole('heading', { level: 3 })).toHaveText('10% no seu pedido')
-  await expect(page.getByTestId('promotion-coupon')).toHaveText(['KURIO10', 'GENESIS15'])
+  const cards = page.getByTestId('promotion')
+  await expect(cards).toHaveCount(2)
+
+  await expect(cards.nth(0).getByRole('heading', { level: 3 })).toHaveText(
+    'Lançamentos gênesis de edição limitada',
+  )
+  await expect(cards.nth(0)).toContainText('Colecione edições escassas diretamente dos criadores')
+  await expect(cards.nth(1).getByRole('heading', { level: 3 })).toHaveText('Arte digital selecionada e muito mais')
+  await expect(cards.nth(1)).toContainText('Explore novos artistas, coleções verificadas e obras digitais')
+
+  for (const card of await cards.all()) {
+    await expect(card.getByRole('link', { name: 'Explorar' })).toBeVisible()
+    await expect(card.locator('img')).toHaveAttribute('alt', '')
+  }
 })
 
-test('o cupom de uma promoção funciona de verdade no carrinho', async ({ page }) => {
+test('promoções: o Explorar leva o foco e a tela ao catálogo, sem mexer na URL', async ({ page }) => {
   await page.goto('/')
-  const code = (await page.getByTestId('promotion-coupon').first().textContent()) ?? ''
+  await expect(page.getByTestId('promotion')).toHaveCount(2)
 
-  await page.goto('/nft/nft-01')
-  await page.getByRole('button', { name: 'Adicionar ao carrinho' }).click()
-  await expect(page.getByRole('status').filter({ hasText: 'Adicionado ao carrinho.' })).toBeVisible()
-  await page.goto('/carrinho')
+  await page.getByTestId('promotion').first().getByRole('link', { name: 'Explorar' }).click()
 
-  await page.getByLabel('Cupom de desconto').fill(code)
-  await page.getByRole('button', { name: 'Aplicar' }).click()
-  await expect(page.getByTestId('summary-discount')).toBeVisible()
-  await expect(page.getByText('10% de desconto no pedido')).toBeVisible()
+  await expect(page.locator('#mercado')).toBeFocused()
+  await expect(page.locator('#mercado')).toBeInViewport()
+  await expect(page).toHaveURL('/')
 })
 
-test('blog: título, três artigos com data, tempo de leitura e imagem decorativa', async ({ page }) => {
+test('promoções (Figma): cards de 586 × 250 no desktop, com a arte de 287 px à esquerda', async ({ page }) => {
+  test.skip((page.viewportSize()?.width ?? 0) < 1264, 'duas colunas só a partir de 1264 px')
+  await page.goto('/')
+  await expect(page.getByTestId('promotion')).toHaveCount(2)
+
+  const [first, second] = await Promise.all(
+    [0, 1].map((index) => page.getByTestId('promotion').nth(index).boundingBox()),
+  )
+
+  expect(first!.width).toBe(586)
+  expect(first!.height).toBe(250)
+  expect(second!.x - (first!.x + first!.width)).toBe(28)
+  expect((await page.getByTestId('promotion').first().locator('img').boundingBox())!.width).toBe(287)
+})
+
+test('blog: título, subtítulo e quatro artigos com data, tempo de leitura e imagem decorativa', async ({ page }) => {
   await page.goto('/')
 
   await expect(blog(page).getByRole('heading', { level: 2, name: 'Diário da Cunhagem' })).toBeVisible()
+  await expect(
+    blog(page).getByText('Histórias, guias e insights para colecionadores sobre o universo da propriedade digital.'),
+  ).toBeVisible()
+
   const posts = page.getByTestId('blog-post')
-  await expect(posts).toHaveCount(3)
-  await expect(posts.first().getByRole('heading', { level: 3 })).toContainText('Sua primeira cunhagem')
-  await expect(posts.first().locator('time')).toHaveText('15 de outubro de 2026')
-  await expect(posts.first()).toContainText('5 min de leitura')
+  await expect(posts).toHaveCount(4)
+  await expect(posts.nth(0).getByRole('heading', { level: 3 })).toHaveText('Como funciona a propriedade de NFTs')
+  await expect(posts.nth(0).locator('time')).toHaveText('12 de setembro')
+  await expect(posts.nth(0)).toContainText('Leitura de 6 min')
+  await expect(posts.nth(0)).toContainText('Aprenda a colecionar, negociar e verificar ativos digitais.')
+  await expect(posts.nth(1).getByRole('heading', { level: 3 })).toHaveText('10 artistas digitais para acompanhar')
+  await expect(posts.nth(2).getByRole('heading', { level: 3 })).toHaveText('Raridade, atributos e procedência')
+  await expect(posts.nth(3).getByRole('heading', { level: 3 })).toHaveText('Como proteger sua carteira')
   await expect(posts.first().locator('img')).toHaveAttribute('alt', '')
 })
 
-test('os links não aparentam funcionar: sem links e com "Em breve" nos artigos', async ({ page }) => {
+test('os artigos não aparentam funcionar: sem links e com "Ler mais" inerte ("Em breve")', async ({ page }) => {
   await page.goto('/')
-  await expect(page.getByTestId('blog-post')).toHaveCount(3)
+  await expect(page.getByTestId('blog-post')).toHaveCount(4)
 
-  await expect(promotions(page).getByRole('link')).toHaveCount(0)
   await expect(blog(page).getByRole('link')).toHaveCount(0)
 
-  const soon = blog(page).getByText('Ler artigo (em breve)')
-  await expect(soon).toHaveCount(3)
-  await expect(soon.first()).toHaveAttribute('aria-disabled', 'true')
-  await expect(soon.first()).toHaveAttribute('title', 'Em breve')
+  const more = blog(page).getByText('Ler mais')
+  await expect(more).toHaveCount(4)
+  await expect(more.first()).toHaveAttribute('aria-disabled', 'true')
+  await expect(more.first()).toHaveAttribute('title', 'Em breve')
+})
+
+test('blog (Figma): cards de 268 px com 24 px entre eles e imagem de 195 px no desktop', async ({ page }) => {
+  test.skip((page.viewportSize()?.width ?? 0) < 1264, 'quatro colunas só a partir de 1208 px')
+  await page.goto('/')
+  await expect(page.getByTestId('blog-post')).toHaveCount(4)
+
+  const boxes = await Promise.all(
+    [0, 1, 2, 3].map((index) => page.getByTestId('blog-post').nth(index).boundingBox()),
+  )
+
+  for (const box of boxes) {
+    expect(box!.width).toBe(268)
+    expect(box!.height).toBe(369)
+  }
+  expect(boxes[1]!.x - (boxes[0]!.x + boxes[0]!.width)).toBe(24)
+  expect((await page.getByTestId('blog-post').first().locator('img').boundingBox())!.height).toBe(195)
 })
 
 test('as seções ficam depois do catálogo', async ({ page }) => {
   await page.goto('/')
-  await expect(page.getByTestId('blog-post')).toHaveCount(3)
+  await expect(page.getByTestId('blog-post')).toHaveCount(4)
 
   const catalog = await page.getByRole('region', { name: 'Catálogo de NFTs' }).boundingBox()
   const promo = await promotions(page).boundingBox()
@@ -92,15 +138,15 @@ test('erro: cada seção mostra o aviso com "Tentar novamente" e se recupera', a
   await promotions(page).getByRole('button', { name: 'Tentar novamente' }).click()
   await blog(page).getByRole('button', { name: 'Tentar novamente' }).click()
 
-  await expect(page.getByTestId('promotion')).toHaveCount(3)
-  await expect(page.getByTestId('blog-post')).toHaveCount(3)
+  await expect(page.getByTestId('promotion')).toHaveCount(2)
+  await expect(page.getByTestId('blog-post')).toHaveCount(4)
 })
 
 test('sem rolagem horizontal em 390, 768 e 1440 px', async ({ page }) => {
   for (const width of [390, 768, 1440]) {
     await page.setViewportSize({ width, height: 900 })
     await page.goto('/')
-    await expect(page.getByTestId('blog-post')).toHaveCount(3)
+    await expect(page.getByTestId('blog-post')).toHaveCount(4)
 
     const overflow = await page.evaluate(
       () => document.documentElement.scrollWidth - document.documentElement.clientWidth,

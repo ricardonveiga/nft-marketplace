@@ -21,10 +21,10 @@ export function CatalogToolbar() {
   const activeTab = search.tab ?? DEFAULT_TAB
 
   return (
-    <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-3">
+    <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-3">
       <nav
         aria-label="Abas do catálogo"
-        className="-mx-1 flex max-w-full gap-5 overflow-x-auto px-1"
+        className="-mx-1 flex max-w-full gap-[5px] overflow-x-auto px-1 md:gap-[22px]"
       >
         {tabs.map(({ value, label }) => {
           const active = value === activeTab
@@ -39,7 +39,7 @@ export function CatalogToolbar() {
                 })
               }
               aria-current={active ? 'page' : undefined}
-              className={`border-b-2 pb-1 text-[15px] leading-4 font-medium whitespace-nowrap focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring ${active ? 'border-primary text-text-accent' : 'border-transparent text-foreground hover:text-text-accent'}`}
+              className={`relative h-5 pt-0 text-sm leading-4 whitespace-nowrap md:h-[23px] md:pt-[3px] md:text-[15px] ${value === 'em-alta' ? 'max-md:ml-[11px]' : ''} focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring ${active ? 'font-medium text-text-accent after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-full md:after:w-[calc(100%-16px)] after:bg-primary' : 'font-normal text-foreground hover:text-text-accent'}`}
             >
               {label}
             </Link>
@@ -47,7 +47,7 @@ export function CatalogToolbar() {
         })}
       </nav>
 
-      <div className="flex items-center gap-4">
+      <div className="flex items-start gap-4">
         <button
           type="button"
           onClick={openFilters}

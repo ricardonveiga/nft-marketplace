@@ -1,20 +1,10 @@
 import { Link } from '@tanstack/react-router'
 import { ArrowRight } from 'lucide-react'
-import { useState, type MouseEvent } from 'react'
+import { useState } from 'react'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useHighlights } from '@/hooks/use-nfts'
+import { exploreCatalog } from '@/lib/explore-catalog'
 import type { Nft } from '@/types/nft'
-
-function exploreCatalog(event: MouseEvent<HTMLAnchorElement>) {
-  event.preventDefault()
-
-  const catalog = document.getElementById('mercado')
-  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-
-  catalog?.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth' })
-  // Leva o foco junto: quem navega por teclado ou leitor de tela continua de onde rolou.
-  catalog?.focus({ preventScroll: true })
-}
 
 function HeroArt({ nft, preview, position, total }: { nft: Nft; preview?: Nft; position: number; total: number }) {
   return (
@@ -23,12 +13,12 @@ function HeroArt({ nft, preview, position, total }: { nft: Nft; preview?: Nft; p
       aria-roledescription="slide"
       aria-label={`${position} de ${total}`}
       data-testid="hero-slide"
-      className="relative size-[138px] shrink-0 md:absolute md:inset-y-0 md:right-1 md:size-auto md:w-[446px]"
+      className="absolute top-[10px] right-4 size-[138px] md:inset-y-0 md:top-0 md:right-0 md:size-auto md:w-[450px]"
     >
       <Link
         to="/nft/$id"
         params={{ id: nft.id }}
-        className="group relative block size-full overflow-hidden rounded-2xl bg-hero-art focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring md:rounded-3xl"
+        className="group relative block size-full overflow-hidden rounded-[20px] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring md:rounded-[24px]"
       >
         <img
           src={nft.imageUrl}
@@ -36,7 +26,7 @@ function HeroArt({ nft, preview, position, total }: { nft: Nft; preview?: Nft; p
           width={600}
           height={600}
           fetchPriority="high"
-          className="size-full object-cover md:object-contain"
+          className="size-full object-cover"
         />
         {/* No Figma a arte não tem texto sobreposto: nome e preço ficam só para leitores de tela. */}
         <span className="sr-only">
@@ -52,7 +42,7 @@ function HeroArt({ nft, preview, position, total }: { nft: Nft; preview?: Nft; p
           aria-hidden="true"
           width={58}
           height={58}
-          className="absolute -bottom-2 -left-4 size-[58px] rounded-xl border-2 border-surface-dark object-cover md:hidden"
+          className="absolute top-[100px] left-[14px] size-[58px] rounded-2xl object-cover md:hidden"
         />
       )}
     </div>
@@ -78,19 +68,29 @@ export function Hero() {
     <section
       aria-roledescription="carousel"
       aria-label="Destaques"
-      className="relative h-[190px] overflow-hidden rounded-[20px] bg-surface-dark md:h-[450px] md:rounded-xl"
+      className="relative h-[190px] overflow-hidden rounded-[32px] bg-hero-base md:h-[450px] md:overflow-visible md:rounded-none md:bg-transparent"
     >
-      {/* Só no mobile (Figma: Ellipse 49/50 do frame mobile). O desktop tem fundo liso. */}
-      <div aria-hidden="true" data-testid="hero-circle" className="pointer-events-none absolute -top-8 -left-20 size-[248px] rounded-full bg-primary/10 md:hidden" />
-      <div aria-hidden="true" data-testid="hero-circle" className="pointer-events-none absolute -top-2.5 left-[73px] size-[248px] rounded-full bg-primary/10 md:hidden" />
+      {/* Só no mobile (Figma: Ellipse 49/50 do frame mobile, 248 px). O desktop tem fundo liso. */}
+      <div
+        aria-hidden="true"
+        data-testid="hero-circle"
+        style={{ background: 'var(--hero-circle-a)' }}
+        className="pointer-events-none absolute -top-8 -left-20 size-[248px] rounded-full opacity-[.63] md:hidden"
+      />
+      <div
+        aria-hidden="true"
+        data-testid="hero-circle"
+        style={{ background: 'var(--hero-circle-b)' }}
+        className="pointer-events-none absolute -top-2.5 left-[73px] size-[248px] rounded-full opacity-[.384] md:hidden"
+      />
 
-      <div className="relative flex h-full items-center justify-between gap-2 px-4 md:gap-4 md:px-10">
-        <div className="flex max-w-[188px] flex-col gap-3 md:max-w-[600px] md:gap-6">
-          <div className="flex flex-col gap-1.5 md:gap-4">
-            <p className="text-sm leading-4 md:text-base">Bem-vindo à Kurio</p>
+      <div className="relative flex h-full items-start px-4 md:gap-4 md:px-10">
+        <div className="flex max-w-[188px] flex-col pt-1.5 md:max-w-[600px] md:pt-[43px]">
+          <div className="flex flex-col">
+            <p className="text-xs leading-4 md:text-base">Bem-vindo à Kurio</p>
             <h1
               data-testid="hero-title"
-              className="text-[20px] leading-[29px] uppercase md:text-display md:leading-[70px]"
+              className="mt-[5px] text-lg leading-[29px] uppercase md:mt-[9px] md:text-display md:leading-[70px]"
             >
               <span className="hidden md:inline">
                 Seja dono do futuro
@@ -101,7 +101,7 @@ export function Hero() {
             </h1>
           </div>
 
-          <p className="text-[13px] leading-[18px] text-text-secondary md:max-w-[557px] md:text-sm md:leading-6">
+          <p className="mt-1.5 text-xs leading-[18.5px] text-text-secondary md:mt-[3px] md:max-w-[557px] md:text-sm md:leading-6">
             <span className="hidden md:inline">
               Descubra NFTs selecionados de criadores emergentes e consagrados. Colecione arte
               digital rara, apoie artistas e tenha uma parte da cultura da internet.
@@ -112,10 +112,10 @@ export function Hero() {
           <a
             href="#mercado"
             onClick={exploreCatalog}
-            className="inline-flex w-fit items-center gap-2 text-sm font-bold text-text-accent focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring md:h-10 md:rounded-md md:bg-primary md:px-6 md:text-base md:text-primary-foreground"
+            className="-mt-px inline-flex w-fit items-center gap-2 text-xs leading-4 font-bold text-text-accent focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring md:mt-8 md:h-10 md:w-[140px] md:justify-center md:rounded-md md:bg-primary md:text-base md:text-primary-foreground"
           >
             EXPLORAR
-            <ArrowRight className="size-4 md:hidden" aria-hidden="true" />
+            <ArrowRight className="size-[14px] md:hidden" aria-hidden="true" />
           </a>
         </div>
 
@@ -124,9 +124,9 @@ export function Hero() {
             role="status"
             aria-label="Carregando destaques"
             data-testid="hero-loading"
-            className="size-[138px] shrink-0 md:absolute md:inset-y-0 md:right-1 md:size-auto md:w-[446px]"
+            className="absolute top-[10px] right-4 size-[138px] md:inset-y-0 md:top-0 md:right-0 md:size-auto md:w-[450px]"
           >
-            <Skeleton className="size-full rounded-2xl md:rounded-3xl" />
+            <Skeleton className="size-full rounded-[20px] md:rounded-[24px]" />
           </div>
         )}
 
@@ -145,7 +145,7 @@ export function Hero() {
         <div
           role="group"
           aria-label="Escolher destaque"
-          className="absolute inset-x-0 bottom-1 flex justify-center md:bottom-3"
+          className="absolute inset-x-0 top-[168px] flex justify-center md:inset-x-auto md:left-[596px] md:top-[391px]"
         >
           {slides.map((slide, index) => (
             <button
@@ -154,10 +154,10 @@ export function Hero() {
               aria-label={`Ver destaque ${index + 1} de ${slides.length}`}
               aria-current={index === active ? 'true' : undefined}
               onClick={() => setRequested(index)}
-              className="grid size-6 place-items-center rounded-full focus-visible:outline-2 focus-visible:outline-ring"
+              className="grid h-6 w-[13px] place-items-center rounded-full focus-visible:outline-2 focus-visible:outline-ring md:w-4"
             >
               <span
-                className={`size-[7px] rounded-full ${index === active ? 'bg-primary' : 'bg-primary/40'}`}
+                className="size-1.5 rounded-full bg-primary md:size-2"
               />
             </button>
           ))}

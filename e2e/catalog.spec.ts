@@ -57,8 +57,8 @@ test('desktop: 3 colunas com cards de 258 px e espaçamento do Figma', async ({ 
   expect(a.y).toBe(b.y)
   expect(d.x).toBe(a.x)
   expect(d.y).toBeGreaterThan(a.y + a.height)
-  // Figma: 72 px entre as linhas.
-  expect(d.y - (a.y + a.height)).toBe(72)
+  // Figma: 71 px entre as linhas.
+  expect(d.y - (a.y + a.height)).toBe(71)
 
   const artwork = page.getByTestId('nft-card').first().getByRole('img')
   expect((await artwork.boundingBox())?.width).toBe(250)

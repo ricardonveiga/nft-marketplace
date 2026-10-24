@@ -13,7 +13,7 @@ export function CatalogSortSelect({ className }: { className?: string }) {
   const { search, update } = useCatalogSearch()
 
   return (
-    <label className={`items-center gap-1 text-[15px] whitespace-nowrap ${className ?? 'flex'}`}>
+    <label className={`h-[23px] items-start text-[15px] leading-[19px] whitespace-nowrap ${className ?? 'flex'}`}>
       <span>Ordenar por:</span>
       <span className="relative">
         <select
@@ -23,7 +23,7 @@ export function CatalogSortSelect({ className }: { className?: string }) {
 
             update({ sort: sort === DEFAULT_SORT ? undefined : sort })
           }}
-          className="cursor-pointer appearance-none bg-transparent py-1 pr-6 text-[15px] outline-none focus-visible:outline-2 focus-visible:outline-ring"
+          className="cursor-pointer appearance-none bg-transparent py-0 pr-0 text-[15px] leading-[19px] outline-none focus-visible:outline-2 focus-visible:outline-ring"
         >
           {sortOptions.map(({ value, label }) => (
             <option key={value} value={value} className="bg-card">
@@ -33,7 +33,7 @@ export function CatalogSortSelect({ className }: { className?: string }) {
         </select>
         <ChevronDown
           aria-hidden="true"
-          className="pointer-events-none absolute top-1/2 right-0 size-4 -translate-y-1/2"
+          className="pointer-events-none absolute top-[2px] right-[5px] size-4"
         />
       </span>
     </label>

@@ -16,9 +16,9 @@ import {
 } from '@/hooks/use-catalog-search'
 import { hasActiveFilters, validateCatalogSearch } from '@/lib/catalog-search'
 
-// 2 colunas escalonadas no mobile; 3 colunas (258 px, gap 34 × 72) no desktop.
+// 2 colunas escalonadas no mobile; 3 colunas (258 px, gap 34 × 71) no desktop.
 const gridClass =
-  'grid grid-cols-2 gap-x-4 gap-y-6 pb-8 [&>*:nth-child(even)]:translate-y-8 md:grid-cols-3 md:gap-x-[34px] md:gap-y-[72px] md:pb-0 md:[&>*:nth-child(even)]:translate-y-0'
+  'grid grid-cols-2 gap-x-4 gap-y-6 pb-8 [&>*:nth-child(even)]:translate-y-8 md:grid-cols-3 md:gap-x-[34px] md:gap-y-[71px] md:pb-0 md:[&>*:nth-child(even)]:translate-y-0'
 
 export const Route = createFileRoute('/')({
   validateSearch: validateCatalogSearch,
@@ -38,14 +38,14 @@ function HomePage() {
   }, [data, isPlaceholderData, update])
 
   return (
-    <div className="mx-auto w-full max-w-[1264px] px-6 py-8 md:px-8 md:py-12">
+    <div className="mx-auto w-full max-w-[1264px] px-6 pt-0 pb-8 md:px-8 md:pt-8 md:pb-24">
       <Hero />
 
       <section
         id="mercado"
         tabIndex={-1}
         aria-label="Catálogo de NFTs"
-        className="mt-4 scroll-mt-24 outline-none md:mt-[120px] xl:grid xl:grid-cols-[310px_1fr] xl:gap-12"
+        className="mt-4 scroll-mt-24 outline-none md:mt-24 xl:grid xl:grid-cols-[310px_1fr] xl:gap-12"
       >
         <div className="hidden flex-col gap-6 xl:flex">
           <aside aria-label="Filtros">
@@ -54,7 +54,7 @@ function HomePage() {
           <FeaturedNftCard />
         </div>
 
-        <div className="flex flex-col gap-8">
+        <div className="flex flex-col gap-4 md:gap-[27px]">
           <CatalogToolbar />
 
           {data && !isPlaceholderData && (
