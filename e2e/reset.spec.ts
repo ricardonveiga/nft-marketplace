@@ -52,10 +52,9 @@ test('resetAll restaura catálogo, contas, carrinho, favoritos, perfil, cenário
   await expect(page.getByRole('button', { name: 'Remover cupom KURIO10' })).toBeVisible()
   await page.goto('/perfil')
   // Só preenche depois de o formulário receber os dados da conta (senão o campo é reiniciado).
-  await expect(main(page).getByLabel('Nome completo', { exact: true })).toHaveValue(ana.name)
-  await main(page).getByLabel('Telefone (opcional)', { exact: true }).fill('11 91234-5678')
-  await expect(page.getByRole('button', { name: 'Salvar alterações' })).toBeEnabled()
-  await page.getByRole('button', { name: 'Salvar alterações' }).click()
+  await expect(main(page).getByLabel(/^Nome de exibição/)).toHaveValue(ana.name)
+  await main(page).getByLabel(/^Nome de usuário/).fill('ana_alterada')
+  await main(page).getByRole('button', { name: 'Salvar', exact: true }).click()
   await expect(page.getByRole('status').filter({ hasText: 'Dados atualizados.' })).toBeVisible()
 
   // ...preço do catálogo e um cenário de falha ativo.
@@ -98,7 +97,7 @@ test('resetAll restaura catálogo, contas, carrinho, favoritos, perfil, cenário
   await signIn(page, carla.email, carla.password)
   await expect(page.getByText('E-mail ou senha incorretos.')).toBeVisible()
 
-  // A Ana volta ao zero: sem favorito, sem item no carrinho e sem telefone.
+  // A Ana volta ao zero: sem favorito, sem item no carrinho e com o usuário original.
   await signIn(page, ana.email, ana.password!)
   await expect(page.getByRole('button', { name: `Conta de ${ana.name}` })).toBeVisible()
   await page.goto('/nft/nft-03')
@@ -106,5 +105,5 @@ test('resetAll restaura catálogo, contas, carrinho, favoritos, perfil, cenário
   await page.goto('/carrinho')
   await expect(page.getByText('Seu carrinho está vazio.')).toBeVisible()
   await page.goto('/perfil')
-  await expect(main(page).getByLabel('Telefone (opcional)', { exact: true })).toHaveValue('')
+  await expect(main(page).getByLabel(/^Nome de usuário/)).toHaveValue('ana')
 })

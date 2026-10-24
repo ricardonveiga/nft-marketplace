@@ -2,8 +2,12 @@ export type User = {
   id: string
   name: string
   email: string
-  /** Telefone com DDD, só dígitos; opcional no perfil. */
-  phone: string | null
+  /** Nome de usuário público (letras, números, ponto ou sublinhado). */
+  username: string
+  /** Nome ENS completo, com o sufixo (ex.: "ana-souza.eth"). */
+  ensName: string
+  /** Apelido da carteira principal, mostrado no perfil. */
+  walletNickname: string
   /** Foto do perfil como data URL (WebP/JPEG/PNG reduzido); null = sem foto. */
   avatarUrl: string | null
 }
@@ -11,7 +15,9 @@ export type User = {
 export type ProfileUpdateRequest = {
   name: string
   email: string
-  phone: string
+  username: string
+  ensName: string
+  walletNickname: string
 }
 
 export type PasswordChangeRequest = {
@@ -44,7 +50,9 @@ export type ApiErrorBody = {
       | 'name'
       | 'email'
       | 'password'
-      | 'phone'
+      | 'username'
+      | 'ensName'
+      | 'walletNickname'
       | 'avatar'
       | 'currentPassword'
       | 'newPassword'

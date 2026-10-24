@@ -6,12 +6,20 @@ import { useId, useState, type ReactNode, type RefObject } from 'react'
 const boxClass =
   'h-10 w-full rounded-[2px] border border-border bg-transparent px-3.5 text-sm text-foreground outline-none placeholder:text-brand-secondary focus-visible:border-primary aria-[invalid=true]:border-destructive disabled:cursor-not-allowed disabled:opacity-70 read-only:cursor-default'
 
+function gapOf(roomy?: boolean, snug?: boolean) {
+  return roomy ? 'gap-[17px]' : snug ? 'gap-[11px]' : 'gap-[7px]'
+}
+
 type BaseProps = {
   label: string
   required?: boolean
   error?: string
   hint?: string
   className?: string
+  /** Rótulo mais afastado do campo (telas de perfil e carteiras). */
+  roomy?: boolean
+  /** Distância intermediária (campos de senha do perfil). */
+  snug?: boolean
 }
 
 function Label({
@@ -19,17 +27,22 @@ function Label({
   label,
   required,
   hidden,
+  spacedStar,
 }: {
   htmlFor: string
   label: string
   required?: boolean
   hidden?: boolean
+  spacedStar?: boolean
 }) {
   return (
     <label htmlFor={htmlFor} className={hidden ? 'sr-only' : 'block h-[17px] text-[15px] leading-[17px] text-foreground'}>
       {label}
       {required && (
-        <span aria-hidden="true" className="ml-px text-lg leading-[17px] font-bold text-text-accent">
+        <span
+          aria-hidden="true"
+          className={`${spacedStar ? 'ml-[5px]' : 'ml-px'} text-lg leading-[17px] font-bold text-text-accent`}
+        >
           *
         </span>
       )}
@@ -80,6 +93,8 @@ export function TextField({
   error,
   hint,
   className,
+  roomy,
+  snug,
   name,
   value,
   onChange,
@@ -95,7 +110,7 @@ export function TextField({
   const [visible, setVisible] = useState(false)
 
   return (
-    <div className={`flex flex-col gap-[7px] ${className ?? ''}`}>
+    <div className={`flex flex-col ${gapOf(roomy, snug)} ${className ?? ''}`}>
       <Label htmlFor={id} label={label} required={required} hidden={hideLabel} />
       <div className="relative">
         <input
@@ -122,9 +137,9 @@ export function TextField({
             className="absolute top-1/2 right-3 grid size-6 -translate-y-1/2 place-items-center text-brand-secondary focus-visible:outline-2 focus-visible:outline-ring"
           >
             {visible ? (
-              <Eye className="size-5" aria-hidden="true" />
+              <Eye className="size-[18px]" strokeWidth={1.5} aria-hidden="true" />
             ) : (
-              <EyeOff className="size-5" aria-hidden="true" />
+              <EyeOff className="size-[18px]" strokeWidth={1.5} aria-hidden="true" />
             )}
           </button>
         )}
@@ -151,6 +166,8 @@ export function SelectField({
   error,
   hint,
   className,
+  roomy,
+  snug,
   name,
   value,
   onChange,
@@ -162,7 +179,7 @@ export function SelectField({
   const id = useId()
 
   return (
-    <div className={`flex flex-col gap-[7px] ${className ?? ''}`}>
+    <div className={`flex flex-col ${gapOf(roomy, snug)} ${className ?? ''}`}>
       <Label htmlFor={id} label={label} required={required} />
       <div className="relative">
         <select
@@ -208,6 +225,8 @@ type EnsFieldProps = BaseProps & {
   suffixOptions: readonly string[]
   onSuffixChange: (value: string) => void
   inputRef?: RefObject<HTMLInputElement | null>
+  /** Espaço antes do asterisco (o Figma do perfil escreve "Nome ENS *"). */
+  spacedStar?: boolean
 }
 
 /** "Nome ENS": seletor do sufixo (.eth) e o nome, lado a lado (Figma). */
@@ -217,6 +236,8 @@ export function EnsField({
   error,
   hint,
   className,
+  roomy,
+  snug,
   name,
   value,
   onChange,
@@ -224,12 +245,13 @@ export function EnsField({
   suffixOptions,
   onSuffixChange,
   inputRef,
+  spacedStar,
 }: EnsFieldProps) {
   const id = useId()
 
   return (
-    <div className={`flex flex-col gap-[7px] ${className ?? ''}`}>
-      <Label htmlFor={id} label={label} required={required} />
+    <div className={`flex flex-col ${gapOf(roomy, snug)} ${className ?? ''}`}>
+      <Label htmlFor={id} label={label} required={required} spacedStar={spacedStar} />
       <div className="flex gap-2.5">
         <div className="relative w-[79px] shrink-0">
           <select

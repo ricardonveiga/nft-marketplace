@@ -1,10 +1,11 @@
 import { HttpResponse, http } from 'msw'
 import {
   isEmail,
-  normalizePhone,
+  validateEnsName,
   validateName,
   validatePassword,
-  validatePhone,
+  validateUsername,
+  validateWalletNickname,
 } from '@/lib/validation'
 import type { ApiErrorBody, PasswordChangeRequest, ProfileUpdateRequest } from '@/types/auth'
 import { authenticate } from './auth-handlers'
@@ -25,7 +26,15 @@ function currentUser(userId: string) {
   const user = listUsers().find((candidate) => candidate.id === userId)
 
   return user
-    ? { id: user.id, name: user.name, email: user.email, phone: user.phone, avatarUrl: user.avatarUrl }
+    ? {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        username: user.username,
+        ensName: user.ensName,
+        walletNickname: user.walletNickname,
+        avatarUrl: user.avatarUrl,
+      }
     : null
 }
 
@@ -40,22 +49,26 @@ export const profileHandlers = [
     const body = (await request.json().catch(() => null)) as Partial<ProfileUpdateRequest> | null
     const name = typeof body?.name === 'string' ? body.name.trim() : ''
     const email = typeof body?.email === 'string' ? body.email.trim() : ''
-    const phone = typeof body?.phone === 'string' ? body.phone.trim() : ''
+    const username = typeof body?.username === 'string' ? body.username.trim() : ''
+    const ensName = typeof body?.ensName === 'string' ? body.ensName.trim() : ''
+    const walletNickname = typeof body?.walletNickname === 'string' ? body.walletNickname.trim() : ''
 
     const errors: NonNullable<ApiErrorBody['errors']> = {}
-    const nameError = validateName(name)
-    const phoneError = phone ? validatePhone(phone) : undefined
+    const found = {
+      name: validateName(name),
+      username: validateUsername(username),
+      ensName: validateEnsName(ensName),
+      walletNickname: validateWalletNickname(walletNickname),
+    }
 
-    if (nameError) {
-      errors.name = nameError
+    for (const [field, message] of Object.entries(found)) {
+      if (message) {
+        errors[field as keyof typeof found] = message
+      }
     }
 
     if (!isEmail(email)) {
       errors.email = 'Informe um e-mail válido.'
-    }
-
-    if (phoneError) {
-      errors.phone = phoneError
     }
 
     if (Object.keys(errors).length > 0) {
@@ -72,7 +85,7 @@ export const profileHandlers = [
       })
     }
 
-    writeProfile(user.id, { name, email, phone: phone ? normalizePhone(phone) : null })
+    writeProfile(user.id, { name, email, username, ensName: ensName.toLowerCase(), walletNickname })
 
     return HttpResponse.json({ user: currentUser(user.id) })
   }),

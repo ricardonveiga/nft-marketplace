@@ -1,4 +1,4 @@
-// Alterações de perfil por usuário (nome, e-mail, telefone, foto e senha), no localStorage:
+// Alterações de perfil por usuário (nome, e-mail, usuário, ENS, apelido, foto e senha), no localStorage:
 // sobrevivem ao refresh e valem tanto para usuários das fixtures quanto para os cadastrados.
 // resetProfiles() volta ao cenário conhecido.
 const PREFIX = 'mock-profile:'
@@ -6,7 +6,9 @@ const PREFIX = 'mock-profile:'
 export type ProfileOverride = Partial<{
   name: string
   email: string
-  phone: string | null
+  username: string
+  ensName: string
+  walletNickname: string
   avatarUrl: string | null
   /** Hash SHA-256 da senha nova (nunca a senha em claro). */
   passwordHash: string

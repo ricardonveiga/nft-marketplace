@@ -166,8 +166,8 @@ test.describe('403: falta de permissão', () => {
     await expect(main(page).getByRole('heading', { name: 'Perfil do colecionador' })).toBeVisible()
     await switchTo(page, 'forbidden')
 
-    await main(page).getByLabel('Nome completo', { exact: true }).fill('Ana Souza Lima')
-    await main(page).getByRole('button', { name: 'Salvar alterações' }).click()
+    await main(page).getByLabel(/^Nome de exibição/).fill('Ana Souza Lima')
+    await main(page).getByRole('button', { name: 'Salvar', exact: true }).click()
     await expect(main(page).getByRole('alert').filter({ hasText: 'Você não tem permissão para alterar este perfil.' })).toBeVisible()
 
     await page.goto('/')
@@ -235,7 +235,7 @@ test.describe('erro geral (500)', () => {
     await switchTo(page, 'error')
 
     // Navegação interna: a sessão está em cache, só a lista de carteiras é pedida.
-    await main(page).getByRole('link', { name: 'carteiras', exact: true }).click()
+    await main(page).getByRole('navigation', { name: 'Meu perfil' }).getByRole('link', { name: 'Carteiras' }).click()
     await expect(main(page).getByRole('alert')).toContainText('Não foi possível carregar suas carteiras.')
 
     await switchTo(page, null)
@@ -248,8 +248,8 @@ test.describe('erro geral (500)', () => {
     await expect(main(page).getByRole('heading', { name: 'Perfil do colecionador' })).toBeVisible()
     await switchTo(page, 'error')
 
-    await main(page).getByLabel('Nome completo', { exact: true }).fill('Ana Souza Lima')
-    await main(page).getByRole('button', { name: 'Salvar alterações' }).click()
+    await main(page).getByLabel(/^Nome de exibição/).fill('Ana Souza Lima')
+    await main(page).getByRole('button', { name: 'Salvar', exact: true }).click()
     await expect(
       main(page).getByRole('alert').filter({ hasText: 'Não foi possível salvar os dados. Tente novamente.' }),
     ).toBeVisible()

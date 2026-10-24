@@ -13,8 +13,8 @@ import { addUser, findUserByEmail, listUsers, passwordMatches, type StoredUser }
 
 const SESSION_TTL_MS = 8 * 60 * 60 * 1000
 
-function toPublicUser({ id, name, email, phone, avatarUrl }: StoredUser): User {
-  return { id, name, email, phone, avatarUrl }
+function toPublicUser({ id, name, email, username, ensName, walletNickname, avatarUrl }: StoredUser): User {
+  return { id, name, email, username, ensName, walletNickname, avatarUrl }
 }
 
 // Token sem estado ("kurio.<usuário>.<expira em ms>"): sobrevive ao refresh dos mocks.
@@ -120,8 +120,9 @@ export const authHandlers = [
     }
 
     const user = addUser({ name, email, passwordHash: await hashPassword(password) })
+    const stored = listUsers().find((candidate) => candidate.id === user.id)!
     const response: LoginResponse = {
-      user: toPublicUser({ ...user, phone: null, avatarUrl: null }),
+      user: toPublicUser(stored),
       token: createToken(user.id),
     }
 

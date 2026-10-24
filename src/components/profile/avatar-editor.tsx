@@ -1,5 +1,5 @@
 import { useRef, useState, type ChangeEvent } from 'react'
-import { Button } from '@/components/ui/button'
+import { Image as ImageIcon } from 'lucide-react'
 import { useRemoveAvatar, useSetAvatar } from '@/hooks/use-profile'
 import { getApiErrorMessage } from '@/lib/api-error'
 import { AvatarError, prepareAvatar } from '@/lib/image'
@@ -68,28 +68,31 @@ export function AvatarEditor({ user }: { user: User }) {
   }
 
   return (
-    <div className="flex flex-col items-center gap-4 text-center">
-      {user.avatarUrl ? (
-        <img
-          src={user.avatarUrl}
-          alt={`Foto de perfil de ${user.name}`}
-          data-testid="profile-avatar"
-          width={128}
-          height={128}
-          className="size-32 rounded-full object-cover"
-        />
-      ) : (
-        <div
-          data-testid="profile-avatar-fallback"
-          role="img"
-          aria-label={`Sem foto de perfil. Iniciais de ${user.name}`}
-          className="grid size-32 place-items-center rounded-full bg-primary text-heading font-bold text-primary-foreground"
-        >
-          {initialsOf(user.name)}
-        </div>
-      )}
+    <div className="-mt-[6px] flex flex-col gap-[9px]">
+      <span className="text-[15px] leading-[17px]">Avatar</span>
 
-      <div className="flex flex-wrap justify-center gap-2">
+      <div className="flex items-center">
+        {user.avatarUrl ? (
+          <img
+            src={user.avatarUrl}
+            alt={`Foto de perfil de ${user.name}`}
+            data-testid="profile-avatar"
+            width={50}
+            height={50}
+            className="size-[50px] rounded-full border border-border object-cover"
+          />
+        ) : (
+          <div
+            data-testid="profile-avatar-fallback"
+            role="img"
+            aria-label={`Sem foto de perfil. Iniciais de ${user.name}`}
+            title={initialsOf(user.name)}
+            className="grid size-[50px] place-items-center rounded-full border border-border bg-avatar text-primary"
+          >
+            <ImageIcon className="size-[22px]" strokeWidth={1.5} aria-hidden="true" />
+          </div>
+        )}
+
         <input
           ref={inputRef}
           id="avatar-input"
@@ -97,31 +100,28 @@ export function AvatarEditor({ user }: { user: User }) {
           accept="image/png,image/jpeg,image/webp"
           onChange={handleChange}
           disabled={busy}
+          title="PNG, JPEG ou WebP, até 2 MB."
           className="peer sr-only"
         />
         <label
           htmlFor="avatar-input"
-          className="inline-flex h-9 cursor-pointer items-center rounded-md bg-primary px-4 text-sm font-bold text-primary-foreground peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-ring peer-disabled:cursor-not-allowed peer-disabled:opacity-50"
+          title="PNG, JPEG ou WebP, até 2 MB."
+          className="ml-6 inline-flex h-10 w-[98px] cursor-pointer items-center rounded-[3px] bg-primary pr-3 pl-[25px] text-sm font-bold text-primary-foreground peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-ring peer-disabled:cursor-not-allowed peer-disabled:opacity-50"
         >
-          {busy ? 'Salvando…' : 'Alterar foto'}
+          {busy ? 'Salvando…' : 'Alterar'}
         </label>
 
-        {user.avatarUrl && (
-          <Button
-            type="button"
-            variant="outline"
-            disabled={busy}
-            onClick={handleRemove}
-            className="h-9 rounded-md px-4 text-sm font-bold"
-          >
-            Remover foto
-          </Button>
-        )}
+        <button
+          type="button"
+          disabled={busy || !user.avatarUrl}
+          onClick={handleRemove}
+          className="ml-[21px] text-sm focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
+        >
+          Remover
+        </button>
       </div>
 
-      <p className="text-xs text-text-secondary">PNG, JPEG ou WebP, até 2 MB.</p>
-
-      <p role="status" className="min-h-5 text-sm text-text-accent">
+      <p role="status" className="text-sm text-text-accent empty:hidden">
         {feedback?.kind === 'success' ? feedback.text : ''}
       </p>
       {feedback?.kind === 'error' && (

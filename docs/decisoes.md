@@ -160,33 +160,25 @@ NFTs, 3 páginas), e a arte do hero (o Figma usa o Emerald Ape; aqui vale o crit
   real é relido. Cenário de teste: `localStorage['mock-scenario'] = 'favorites-error'`.
 - **Dados extras de mock**: descrição e criador por coleção, gerados nas fixtures.
 
-## Perfil do colecionador (`/perfil`)
+## Perfil do colecionador (`/perfil`): conferido com o frame `Perfil do Colecionador.png`
 
-- **Dados**: nome, e-mail e telefone (opcional, só dígitos; exibido como `(11) 91234-5678`).
-  O perfil é parte do usuário da sessão: ao salvar, o cache da sessão se atualiza e o header
-  reflete na hora. A "consulta" do perfil é a própria consulta da sessão (`/api/auth/session`);
-  a API de perfil tem só as operações de escrita (`PATCH /api/profile`, `PUT`/`DELETE
-  /api/profile/avatar`, `POST /api/profile/password`).
-- **Validação** igual no formulário e na API: nome (2+ caracteres), e-mail válido, telefone com
-  DDD quando informado. "Salvar alterações" só habilita quando algo muda. E-mail de outra conta
-  é conflito (409) e o erro aparece no campo. Trocar o e-mail vale para o próximo login.
-- **Telefone no pagamento**: vem preenchido com o do perfil.
-- **Rascunho do pagamento é por usuário**: fica em `sessionStorage` com o `userId` do dono, é apagado
-  no logout e nunca é mostrado a outra conta (corrige um vazamento de nome, e-mail e telefone na
-  troca de usuário na mesma aba). Detalhes em "Política de sessão" do `ARCHITECTURE.md`.
-- **Foto**: aceita PNG, JPEG ou WebP até 2 MB. O navegador recorta o quadrado central e reduz para
-  256 × 256 em WebP (~15 KB) antes de enviar; o que fica guardado é esse data URL, nunca o arquivo
-  original (`lib/image.ts`). Tipo inválido, arquivo grande e imagem corrompida têm mensagem
-  própria. Sem foto, aparecem as iniciais. A foto também aparece no menu da conta (header e barra
-  inferior do mobile). O campo de arquivo é um `<input type="file">` real, rotulado por
-  "Alterar foto" (acessível por teclado).
-- **Senha**: exige a senha atual (errada = erro no campo), a nova segue a mesma regra do cadastro
-  (8+ caracteres, letras e números), tem que ser diferente da atual e ter confirmação. Ao
-  concluir, os campos são limpos e a nova senha vale no próximo login. Cada campo tem o seu botão
-  de mostrar/ocultar.
-- **Mock**: alterações de perfil por usuário em `localStorage['mock-profile:<usuário>']`, por
-  cima das fixtures e dos usuários cadastrados (`resetProfiles()` volta ao cenário conhecido).
-- Sem frame mobile no Figma: abaixo de 1024 px os blocos empilham em uma coluna.
+- **Layout** (medido no pixel, 1440): menu lateral de 310 px (y101–508) e formulário em 2 colunas de
+  417 px com vão de 28; campos de 40 px; rótulo 17 px acima do campo; "Salvar" 131 × 40.
+- **Campos** (todos com asterisco são obrigatórios): nome de exibição, nome de usuário, e-mail,
+  nome ENS (".eth" + nome), apelido da carteira. O **telefone saiu** (não existe no frame) e a coluna
+  de foto/identificação à parte também; o avatar é o bloco "Avatar" com "Alterar" e "Remover".
+- **Um só "Salvar"**: grava os dados se mudaram e troca a senha se algum campo de senha foi
+  preenchido (aí os três são exigidos, a senha atual é conferida no servidor). Sem mudança, avisa
+  "Nenhuma alteração para salvar." O botão não fica desabilitado como antes: o Figma o mostra sempre ativo.
+- **Dados novos na conta** (`User`): `username`, `ensName`, `walletNickname`. Ana e Bruno têm valores
+  nas fixtures; contas novas recebem padrões derivados do e-mail (só na camada de mocks) e podem trocar.
+- **Avatar**: sem foto aparece o círculo com o ícone de imagem (as iniciais ficam no `title`);
+  "Remover" fica inerte enquanto não há foto. A foto continua sendo salva na hora, ao escolher o arquivo.
+- **Menu lateral** (também usado em Carteiras): ícones, barra laranja de 6 px no item ativo, divisor
+  antes de "Sair". Itens fora do escopo seguem inertes ("Em breve").
+- **Não replicado**: o cabeçalho do frame mostra o botão "Entrar" mesmo com a pessoa logada; o app
+  mantém o menu da conta. Os ícones de "Ofertas" e "Arquivos baixados" são os mais próximos da
+  biblioteca Lucide, não o desenho exato do frame.
 
 ## Carteiras (`/carteiras`)
 

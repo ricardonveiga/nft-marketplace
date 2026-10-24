@@ -92,3 +92,12 @@ test('Pagamento', async ({ page }) => {
 
   await expect(page).toHaveScreenshot('pagamento.png', { fullPage: true })
 })
+
+test('Perfil do colecionador', async ({ page }) => {
+  await signIn(page, '/perfil')
+  await expect(page.getByRole('heading', { name: 'Perfil do colecionador' })).toBeVisible()
+  await expect(page.getByLabel(/^Nome de exibição/)).toHaveValue('Ana Souza')
+  await settle(page)
+
+  await expect(page).toHaveScreenshot('perfil.png', { fullPage: true })
+})

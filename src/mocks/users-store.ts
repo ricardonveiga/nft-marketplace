@@ -1,9 +1,11 @@
+import type { User } from '@/types/auth'
 import { mockUsers, type MockUser } from './fixtures/users'
 import { hashPassword } from './password'
 import { readProfile } from './profiles-store'
 
 /** Usuário com o perfil já aplicado por cima (nome, e-mail, telefone, foto e senha editados). */
-export type StoredUser = MockUser & { phone: string | null; avatarUrl: string | null }
+export type StoredUser = MockUser &
+  Pick<User, 'username' | 'ensName' | 'walletNickname'> & { avatarUrl: string | null }
 
 // Usuários criados pelo cadastro. Ficam no localStorage para sobreviver ao refresh
 // e voltam ao cenário conhecido (só os usuários das fixtures) com resetRegisteredUsers().
@@ -19,6 +21,17 @@ function readRegistered(): MockUser[] {
   }
 }
 
+/** Contas novas ainda não escolheram usuário, ENS nem apelido: parte do e-mail, já válida. */
+function defaultsOf(user: MockUser) {
+  const username = (user.email.split('@')[0].replace(/[^A-Za-z0-9_.]/g, '') || 'colecionador').slice(0, 30)
+
+  return {
+    username: user.username ?? username,
+    ensName: user.ensName ?? `${username.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'colecionador'}.eth`,
+    walletNickname: user.walletNickname ?? 'Minha carteira',
+  }
+}
+
 export function listUsers(): StoredUser[] {
   return [...mockUsers, ...readRegistered()].map((user) => {
     const profile = readProfile(user.id)
@@ -30,7 +43,9 @@ export function listUsers(): StoredUser[] {
       // Uma senha trocada no perfil vale no lugar da de demonstração (que sai de cena).
       password: profile.passwordHash ? undefined : user.password,
       passwordHash: profile.passwordHash ?? user.passwordHash,
-      phone: profile.phone ?? null,
+      username: profile.username ?? defaultsOf(user).username,
+      ensName: profile.ensName ?? defaultsOf(user).ensName,
+      walletNickname: profile.walletNickname ?? defaultsOf(user).walletNickname,
       avatarUrl: profile.avatarUrl ?? null,
     }
   })

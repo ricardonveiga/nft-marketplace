@@ -174,25 +174,6 @@ export function validateWalletType(value: string): string | undefined {
   return (WALLET_TYPES as readonly string[]).includes(value) ? undefined : 'Selecione o tipo de carteira.'
 }
 
-/** Telefone brasileiro com DDD: 10 ou 11 dígitos (aceita máscara, espaços e +55). */
-export function normalizePhone(value: string) {
-  const digits = value.replace(/\D/g, '')
-
-  return digits.startsWith('55') && digits.length > 11 ? digits.slice(2) : digits
-}
-
-export function validatePhone(value: string): string | undefined {
-  if (!value.trim()) {
-    return 'Informe seu telefone.'
-  }
-
-  const digits = normalizePhone(value)
-
-  return digits.length === 10 || digits.length === 11
-    ? undefined
-    : 'Informe um telefone válido com DDD.'
-}
-
 /** Validação do colecionador no pagamento: a mesma no formulário e na API simulada. */
 export function validateCollector(values: CollectorFields): FieldErrors<CollectorFields> {
   const errors: FieldErrors<CollectorFields> = {}
@@ -275,25 +256,39 @@ export function validateWallet(values: WalletFields): FieldErrors<WalletFields> 
 
 export type ProfileFields = {
   name: string
+  username: string
   email: string
-  phone: string
+  /** Nome ENS completo, com o sufixo (ex.: "ana.eth"); vazio = não informado. */
+  ensName: string
+  walletNickname: string
 }
 
-/** Perfil: como no checkout, mas o telefone é opcional. */
+export function validateWalletNickname(value: string): string | undefined {
+  const trimmed = value.trim()
+
+  if (!trimmed) {
+    return 'Informe o apelido da carteira.'
+  }
+
+  return trimmed.length < 2 || trimmed.length > 30
+    ? 'O apelido deve ter de 2 a 30 caracteres.'
+    : undefined
+}
+
+/** Perfil do colecionador: todos os campos com asterisco do Figma são obrigatórios. */
 export function validateProfile(values: ProfileFields): FieldErrors<ProfileFields> {
   const errors: FieldErrors<ProfileFields> = {}
   const email = values.email.trim()
 
   errors.name = validateName(values.name)
+  errors.username = validateUsername(values.username)
+  errors.ensName = validateEnsName(values.ensName)
+  errors.walletNickname = validateWalletNickname(values.walletNickname)
 
   if (!email) {
     errors.email = 'Informe seu e-mail.'
   } else if (!isEmail(email)) {
     errors.email = 'Informe um e-mail válido.'
-  }
-
-  if (values.phone.trim()) {
-    errors.phone = validatePhone(values.phone)
   }
 
   for (const key of Object.keys(errors) as Array<keyof ProfileFields>) {
