@@ -1,5 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 import { mockUsers } from '../src/mocks/fixtures/users'
+import { readyToPay } from './support/checkout'
 
 const [ana, bruno] = mockUsers
 
@@ -165,11 +166,7 @@ test('pagamento: mudança de preço durante a revisão exige nova confirmação'
   await signIn(page, ana)
   await addToCart(page, 'nft-03')
   await page.goto('/pagamento')
-  await main(page).getByLabel('Telefone').fill('(11) 91234-5678')
-  await page.getByRole('button', { name: 'Conectar carteira' }).click()
-  await expect(page.getByTestId('wallet-status-wallet-ana-1')).toHaveText('Conectada')
-  await page.getByRole('button', { name: 'Revisar pedido' }).click()
-  await page.getByLabel('Li e aceito os termos de compra de NFTs.').check()
+  await readyToPay(page)
   await waitForSocket(page)
 
   await control(page).updateNft('nft-03', { priceEth: '2.10' })
@@ -180,8 +177,6 @@ test('pagamento: mudança de preço durante a revisão exige nova confirmação'
   await expect(page.getByRole('button', { name: 'Confirmar compra' })).toBeDisabled()
 
   await page.getByRole('button', { name: 'Aceitar novos valores' }).click()
-  await expect(page.getByLabel('Li e aceito os termos de compra de NFTs.')).not.toBeChecked()
-  await page.getByLabel('Li e aceito os termos de compra de NFTs.').check()
   await page.getByRole('button', { name: 'Confirmar compra' }).click()
 
   await expect(page.getByTestId('order-total')).toHaveText('2.1045 ETH', { timeout: 10_000 })
@@ -191,11 +186,7 @@ async function reviewAndConfirm(page: Page) {
   await signIn(page, ana)
   await addToCart(page, 'nft-03')
   await page.goto('/pagamento')
-  await main(page).getByLabel('Telefone').fill('(11) 91234-5678')
-  await page.getByRole('button', { name: 'Conectar carteira' }).click()
-  await expect(page.getByTestId('wallet-status-wallet-ana-1')).toHaveText('Conectada')
-  await page.getByRole('button', { name: 'Revisar pedido' }).click()
-  await page.getByLabel('Li e aceito os termos de compra de NFTs.').check()
+  await readyToPay(page)
   await waitForSocket(page)
 }
 

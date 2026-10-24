@@ -1,5 +1,12 @@
 import type { NftNetwork } from './nft'
 
+/** Tipo de carteira (Figma: "Tipo de carteira"). */
+export const WALLET_TYPES = ['MetaMask', 'WalletConnect', 'Coinbase Wallet'] as const
+export type WalletType = (typeof WALLET_TYPES)[number]
+
+/** Sufixos de nome ENS aceitos (Figma: seletor ".eth"). */
+export const ENS_SUFFIXES = ['.eth'] as const
+
 export type Wallet = {
   id: string
   label: string

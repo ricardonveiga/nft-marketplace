@@ -1,5 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 import { mockUsers } from '../src/mocks/fixtures/users'
+import { readyToPay } from './support/checkout'
 
 const [ana] = mockUsers
 
@@ -38,17 +39,12 @@ test('compra completa: do catálogo ao recibo confirmado, com cupom', async ({ p
   await expect(page).toHaveURL('/pagamento')
 
   await expect(page.getByTestId('summary-subtotal')).toHaveText('1.99 ETH')
-  await expect(page.getByTestId('summary-discount')).toHaveText('-0.199 ETH')
+  await expect(page.getByTestId('summary-discount')).toHaveText('(-) 0.199')
   await expect(page.getByTestId('summary-fee')).toHaveText('0.0045 ETH')
   await expect(page.getByTestId('summary-total')).toHaveText('1.7955 ETH')
 
   // 5. Dados do colecionador, carteira conectada e revisão.
-  await main(page).getByLabel('Telefone').fill('(11) 91234-5678')
-  await page.getByRole('button', { name: 'Conectar carteira' }).click()
-  await expect(page.getByTestId('wallet-status-wallet-ana-1')).toHaveText('Conectada')
-  await page.getByRole('button', { name: 'Revisar pedido' }).click()
-  await expect(page.getByRole('heading', { name: 'Revise seu pedido' })).toBeVisible()
-  await page.getByLabel('Li e aceito os termos de compra de NFTs.').check()
+  await readyToPay(page)
 
   // 6. Confirma: o pedido nasce pendente e só vira confirmado pela resposta da simulação.
   await page.getByRole('button', { name: 'Confirmar compra' }).click()

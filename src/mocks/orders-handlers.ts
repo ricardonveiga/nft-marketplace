@@ -1,5 +1,5 @@
 import { HttpResponse, http } from 'msw'
-import { normalizePhone, validateCollector } from '@/lib/validation'
+import { validateCollector, type CollectorFields } from '@/lib/validation'
 import type { CollectorData, Order, CreateOrderRequest, OrderErrorBody } from '@/types/order'
 import { authenticate } from './auth-handlers'
 import { buildCart } from './cart-handlers'
@@ -18,20 +18,22 @@ import { scheduleOrderSettlement } from './realtime'
 import { getScenario } from './scenario'
 import { readConnectedWalletId, walletsOf } from './wallets-handlers'
 
-const OPTIONAL_COLLECTOR_FIELDS = ['username', 'ensName', 'referralCode', 'notes'] as const
+/** Campos de texto do colecionador, aparados e com "" no lugar de ausentes (a API não confia no cliente). */
+function toCollectorFields(collector: Partial<CollectorData>): CollectorFields {
+  const text = (value: unknown) => (typeof value === 'string' ? value.trim() : '')
 
-function optionalCollectorFields(collector: CollectorData): Partial<CollectorData> {
-  const kept: Partial<CollectorData> = {}
-
-  for (const field of OPTIONAL_COLLECTOR_FIELDS) {
-    const value = collector[field]?.trim()
-
-    if (value) {
-      kept[field] = value
-    }
+  return {
+    name: text(collector.name),
+    username: text(collector.username),
+    profileName: text(collector.profileName),
+    email: text(collector.email),
+    walletType: text(collector.walletType),
+    walletAddress: text(collector.walletAddress),
+    secondary: text(collector.secondary),
+    referralCode: text(collector.referralCode),
+    ensName: text(collector.ensName),
+    notes: typeof collector.notes === 'string' ? collector.notes : '',
   }
-
-  return kept
 }
 
 function error(status: number, body: OrderErrorBody) {
@@ -95,7 +97,8 @@ export const ordersHandlers = [
       })
     }
 
-    const collectorErrors = validateCollector(body.collector)
+    const collector = toCollectorFields(body.collector)
+    const collectorErrors = validateCollector(collector)
     const wallet = walletsOf(user.id).find((candidate) => candidate.id === body.walletId)
 
     if (!wallet) {
@@ -152,6 +155,7 @@ export const ordersHandlers = [
         name: nft.name,
         collection: nft.collection,
         edition: nft.edition,
+        tokenId: nft.tokenId,
         imageUrl: nft.imageUrl,
         quantity,
         unitPriceEth,
@@ -163,11 +167,17 @@ export const ordersHandlers = [
       networkFeeEth: cart.networkFeeEth,
       totalEth: cart.totalEth,
       collector: {
-        name: body.collector.name.trim(),
-        email: body.collector.email.trim(),
-        phone: normalizePhone(body.collector.phone),
+        name: collector.name,
+        username: collector.username,
+        profileName: collector.profileName,
+        email: collector.email,
+        walletType: collector.walletType as CollectorData['walletType'],
+        walletAddress: collector.walletAddress,
+        referralCode: collector.referralCode,
+        ensName: collector.ensName,
         // Opcionais: só entram no retrato quando informados.
-        ...optionalCollectorFields(body.collector),
+        ...(collector.secondary ? { secondary: collector.secondary } : {}),
+        ...(collector.notes.trim() ? { notes: collector.notes.trim() } : {}),
       },
       wallet: { id: wallet.id, label: wallet.label, address: wallet.address },
       network: body.network,

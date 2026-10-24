@@ -2,7 +2,6 @@ import { Link } from '@tanstack/react-router'
 import { Copy } from 'lucide-react'
 import { useId, useState, type ReactNode } from 'react'
 import { shortAddress } from '@/lib/address'
-import { formatPhone } from '@/lib/phone'
 import type { Order } from '@/types/order'
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
@@ -109,24 +108,27 @@ export function OrderPaymentSection({ order }: { order: Order }) {
 }
 
 export function OrderCollectorSection({ order }: { order: Order }) {
+  const { collector } = order
+
   return (
     <Section title="Colecionador">
       <dl className="flex flex-col gap-2">
-        <Row label="Nome" value={order.collector.name} testId="order-collector-name" />
-        <Row label="E-mail" value={order.collector.email} testId="order-collector-email" />
-        <Row label="Telefone" value={formatPhone(order.collector.phone)} testId="order-collector-phone" />
-        {order.collector.username && (
-          <Row label="Nome de usuário" value={order.collector.username} testId="order-collector-username" />
+        <Row label="Nome de exibição" value={collector.name} testId="order-collector-name" />
+        <Row label="Nome de usuário" value={collector.username} testId="order-collector-username" />
+        <Row label="Nome do perfil" value={collector.profileName} testId="order-collector-profile" />
+        <Row label="E-mail" value={collector.email} testId="order-collector-email" />
+        <Row label="Tipo de carteira" value={collector.walletType} testId="order-collector-wallet-type" />
+        <Row
+          label="Carteira que recebe"
+          value={<span title={collector.walletAddress}>{shortAddress(collector.walletAddress)}</span>}
+          testId="order-collector-address"
+        />
+        <Row label="Nome ENS" value={collector.ensName} testId="order-collector-ens" />
+        <Row label="Código de indicação" value={collector.referralCode} testId="order-collector-referral" />
+        {collector.secondary && (
+          <Row label="ENS ou carteira secundária" value={collector.secondary} testId="order-collector-secondary" />
         )}
-        {order.collector.ensName && (
-          <Row label="Nome ENS" value={order.collector.ensName} testId="order-collector-ens" />
-        )}
-        {order.collector.referralCode && (
-          <Row label="Código de indicação" value={order.collector.referralCode} testId="order-collector-referral" />
-        )}
-        {order.collector.notes && (
-          <Row label="Observação" value={order.collector.notes} testId="order-collector-notes" />
-        )}
+        {collector.notes && <Row label="Observação" value={collector.notes} testId="order-collector-notes" />}
       </dl>
     </Section>
   )

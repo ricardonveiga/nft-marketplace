@@ -1,5 +1,6 @@
 import { expect, test, type Locator, type Page } from '@playwright/test'
 import { mockUsers } from '../src/mocks/fixtures/users'
+import { fillCollector } from './support/checkout'
 
 const [ana, bruno] = mockUsers
 
@@ -291,11 +292,9 @@ test('conta nova cadastra a carteira pelo pagamento e conclui a compra', async (
   await expect(page).toHaveURL('/pagamento')
   await expect(page.getByRole('radio', { name: /Minha carteira/ })).toBeChecked()
 
-  await main(page).getByLabel('Telefone').fill('(11) 91234-5678')
+  await fillCollector(page)
   await page.getByRole('button', { name: 'Conectar carteira' }).click()
   await expect(page.getByTestId(/wallet-status-wallet-/)).toHaveText('Conectada')
-  await page.getByRole('button', { name: 'Revisar pedido' }).click()
-  await page.getByLabel('Li e aceito os termos de compra de NFTs.').check()
   await page.getByRole('button', { name: 'Confirmar compra' }).click()
 
   await expect(page.getByTestId('order-confirmed')).toBeVisible({ timeout: 10_000 })

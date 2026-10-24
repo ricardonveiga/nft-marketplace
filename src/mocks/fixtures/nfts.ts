@@ -91,6 +91,7 @@ export const nfts: readonly Nft[] = seeds.map(
   ) => ({
     id: `nft-${String(index + 1).padStart(2, '0')}`,
     name,
+    tokenId: `#${(name.match(/#(\d+)/)?.[1] ?? '0').padStart(4, '0')}`,
     collection: collectionByArtwork[artwork],
     category: categoryOrder[(index * 4 + Math.floor(index / 5)) % categoryOrder.length],
     network: networkOrder[(index + Math.floor(index / 3)) % networkOrder.length],

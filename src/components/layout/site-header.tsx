@@ -90,6 +90,15 @@ export function SiteHeader() {
   const { search, update } = useCatalogSearch()
   const { openFilters } = useFiltersDrawer()
   const onHome = useRouterState({ select: (state) => state.location.pathname === '/' })
+  const pathname = useRouterState({ select: (state) => state.location.pathname })
+  const hash = useRouterState({ select: (state) => state.location.hash })
+  // Figma: o menu destaca "Mercado" nas telas de compra e "Início" em todas as outras.
+  const marketSection =
+    (onHome && hash === 'mercado') ||
+    pathname === '/carrinho' ||
+    pathname === '/pagamento' ||
+    pathname.startsWith('/nft/') ||
+    pathname.startsWith('/pedido/')
   const currentHref = useRouterState({ select: (state) => state.location.href })
   const session = useSession()
   const cartItemCount = useCart().data?.itemCount ?? 0
@@ -113,20 +122,18 @@ export function SiteHeader() {
           <nav aria-label="Principal" className="flex h-[35px] gap-6 lg:gap-[41px]">
             <Link
               to="/"
-              activeOptions={{ exact: true, includeHash: true, includeSearch: false }}
-              activeProps={{ className: 'font-bold text-text-accent' }}
-              className={navItemClass}
+              aria-current={onHome && !hash ? 'page' : undefined}
+              className={`${navItemClass} ${!marketSection ? 'font-bold text-text-accent' : ''}`}
             >
-              {({ isActive }) => <NavLabel isActive={isActive}>Início</NavLabel>}
+              <NavLabel isActive={!marketSection}>Início</NavLabel>
             </Link>
             <Link
               to="/"
               hash="mercado"
-              activeOptions={{ exact: true, includeHash: true, includeSearch: false }}
-              activeProps={{ className: 'font-bold text-text-accent' }}
-              className={navItemClass}
+              aria-current={onHome && hash === 'mercado' ? 'page' : undefined}
+              className={`${navItemClass} ${marketSection ? 'font-bold text-text-accent' : ''}`}
             >
-              {({ isActive }) => <NavLabel isActive={isActive}>Mercado</NavLabel>}
+              <NavLabel isActive={marketSection}>Mercado</NavLabel>
             </Link>
             <span aria-disabled="true" title="Em breve" className={soonClass}>
               Criadores

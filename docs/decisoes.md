@@ -214,11 +214,13 @@ NFTs, 3 páginas), e a arte do hero (o Figma usa o Emerald Ape; aqui vale o crit
 
 ## Pagamento e pedido
 
-- **Duas etapas**: (1) dados do colecionador + carteira e rede, (2) revisão. O envio só acontece
-  na revisão, depois de aceitar os termos. `/pagamento` exige login: o visitante vai ao login e
-  volta ao pagamento (o destino é fixado na primeira renderização da guarda de rota).
-- **Dados do colecionador**: nome, e-mail e telefone brasileiro com DDD (10 ou 11 dígitos,
-  aceita máscara). Vêm preenchidos com a conta. Os campos são inferidos (sem o Figma).
+- **Página única** (Figma): "Perfil do colecionador" à esquerda e "Seus NFTs" à direita. O resumo
+  é a revisão; "Confirmar compra" valida e envia, sem etapa extra nem termos (o frame não tem).
+  `/pagamento` exige login: o visitante vai ao login e volta ao pagamento.
+- **Dados do colecionador** (campos do Figma, obrigatórios com asterisco): nome de exibição,
+  nome de usuário, rede, nome do perfil, endereço da carteira, tipo de carteira, código de
+  indicação, e-mail e nome ENS (+ ".eth"); opcionais: ENS/carteira secundária e observação. Vêm
+  preenchidos com o que a conta já sabe. **Telefone saiu** (não existe no frame).
 - **Carteiras**: do mock (Ana tem 2, Bruno 1; contas novas não têm nenhuma e cadastram em `/carteiras`).
   A conexão é simulada no servidor: demora ~0,5 s, persiste após refresh, e a "Carteira
   secundária" da Ana sempre **recusa** a conexão (cenário determinístico). Desconectar é possível.
@@ -230,9 +232,10 @@ NFTs, 3 páginas), e a arte do hero (o Figma usa o Emerald Ape; aqui vale o crit
   renovada depois de um desfecho (para a tentativa seguinte ser um pedido novo).
 - **Cliques repetidos**: uma trava síncrona (ref) + botão desabilitado; um segundo clique no
   mesmo instante nem chega à API. Além disso a API recusa um novo pedido enquanto há um pendente.
-- **Revalidação**: o envio leva a cotação revisada (`version` + total). Se o carrinho mudou
-  (valores, cupom, taxa) a API responde 409 `quote_changed` com a cotação atual; a tela mostra
-  o novo resumo, desmarca os termos e exige nova confirmação. Itens indisponíveis, carteira
+- **Revalidação**: o envio leva a cotação vista (`version` + total). Se o total mudou (valores,
+  cupom, taxa) a tela avisa sozinha, desabilita o botão e exige "Aceitar novos valores"; a API
+  também responde 409 `quote_changed`. Só o total conta como mudança visível: a versão do
+  carrinho pode mudar (união do carrinho de visitante) sem alterar nada que a pessoa viu. Itens indisponíveis, carteira
   desconectada e carrinho vazio também têm tratamento próprio.
 - **Estados do pedido**: `pending` → `confirmed` | `declined`. O "processador" simulado decide
   ~1,2 s depois da criação; a página do pedido relê a cada segundo enquanto pendente (hoje por
@@ -399,39 +402,25 @@ socket (`order.updated`), ~1,2 s depois da criação.
   dessas telas, então essa adaptação é nossa.
 - Hero da Início e Pagamento mobile foram conferidos com prints e batem com o Figma (sem mudanças).
 
-## Pagamento desktop: perfil do colecionador (conferido com prints)
+## Pagamento (desktop): conferido com o frame `Pagamento.png`
 
-A descrição do Figma (sem o MCP) lista um formulário extenso "Perfil do colecionador" ao lado do
-resumo. Como cada campo foi tratado:
+Medido no pixel contra o frame (1440): colunas de 764 e 405 px, campos de 370 × 40 (vão de 24),
+botão 405 × 45, linhas de item de 70 px, rótulos de 15 px com asterisco laranja.
 
-- **Já existiam**: nome (o "nome de exibição"/"nome do perfil" do Figma é o mesmo dado; o rótulo
-  continua "Nome completo"), e-mail, telefone, carteira, rede e o resumo (itens, subtotal, cupom,
-  desconto, taxa e total).
-- **Novos, opcionais** (vazio = não informado; só entram no pedido quando preenchidos):
-  **Nome de usuário** (3–30: letras, números, `.` ou `_`), **Nome ENS** (`nome.eth`),
-  **Código de indicação** (4–12 letras ou números) e **Observação** (até 280 caracteres). O Figma
-  repete "ENS" e "nome ENS"; ficou um campo só. A validação é a mesma no formulário e na API
-  simulada (`src/lib/validation.ts`), os valores vão no retrato do pedido e aparecem no recibo.
-  O código de indicação é só registrado: não altera valores (não há regra de negócio para ele).
-- **Derivados da carteira** (somente leitura, não são campos): "Tipo de carteira" (Principal ou
-  Secundária) e "Endereço da carteira" completo. Não existe campo para digitar um endereço avulso:
-  o desafio manda pagar com as carteiras cadastradas.
-- **"Usar outra carteira?"**: só aparece com mais de uma carteira. Desmarcado, mostra só a
-  principal; marcado, lista as demais para escolher. Desmarcar volta para a principal.
-- **Botão** "Confirmar pagamento" passou a "Confirmar compra" (texto do Figma). O fluxo continua em
-  duas etapas (dados, depois revisão com aceite dos termos): a revisão antes do envio é exigida
-  pelo desafio, e o Figma descreve só a tela de dados.
-- **Só a partir de 768 px**: o frame mobile (414 px) do Figma não tem nada disto. Abaixo de 768 px
-  (`useMediaQuery`, ponto em que o app já troca de layout) os quatro campos opcionais, o
-  "Usar outra carteira?" e o bloco Tipo/Endereço não aparecem, e todas as carteiras ficam listadas
-  como antes. Escondido não vale: os campos não são validados nem enviados (o valor digitado fica
-  guardado e volta se a tela for alargada), então um valor inválido nunca trava o envio de forma
-  invisível.
-- **Regressão visual**: a baseline mobile do Pagamento é a original (a que já tinha sido conferida
-  com o Figma) e continua batendo; o layout mobile ficou idêntico ao de antes dos campos novos. A
-  baseline desktop foi regenerada (a tela mudou de propósito), então só vale como regressão.
-- **Pendente de conferir**: a descrição do Figma desktop é em texto; espaçamentos e ordem exata
-  dos campos não foram comparados com o frame.
+- **Validação**: nome, nome de usuário (3–30), nome do perfil, e-mail, tipo de carteira, código de
+  indicação (4–12 letras/números, ex.: `KURIO10`) e nome ENS são obrigatórios, como o asterisco do
+  Figma indica; o mesmo código valida o formulário e a API simulada (`src/lib/validation.ts`).
+  O código de indicação é só registrado: não altera valores.
+- **"Usar outra carteira?"**: torna o endereço editável (com validação de 0x + 40 hex); desmarcar volta
+  ao endereço da carteira escolhida.
+- **Carteira e rede**: o frame mostra MetaMask/Coinbase; aqui as opções são as carteiras
+  cadastradas da conta (a conexão simulada continua por "Conectar"/"Desconectar" na linha escolhida).
+  **Não replicado**: a pílula "carteiras compatíveis" (METAMASK · WALLETCONNECT · COINBASE) como
+  opção de rádio; ela aparece só no rodapé.
+- **ID do token** (`#0042`): derivado do número do nome do NFT, já que o desafio não traz esse dado.
+- **Menu**: "Mercado" fica ativo em carrinho, pagamento, detalhe e pedido; "Início" nas demais.
+- **Mobile**: a coluna única segue o mesmo formulário (sem os cortes antigos abaixo de 768 px).
+  O frame mobile ainda não foi recebido; a baseline mobile é só de regressão.
 
 ## Flakes conhecidos sob carga
 

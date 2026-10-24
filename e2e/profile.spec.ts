@@ -275,20 +275,6 @@ test('foto: arquivo de tipo inválido e arquivo grande demais são recusados com
   await expect(page.getByTestId('profile-avatar-fallback')).toBeVisible()
 })
 
-test('o telefone do perfil já vem preenchido no pagamento', async ({ page }) => {
-  await signIn(page, ana)
-  await field(page, 'Telefone (opcional)').fill('(11) 91234-5678')
-  await saveProfile(page).click()
-  await expect(page.getByRole('status').filter({ hasText: 'Dados atualizados.' })).toBeVisible()
-
-  await page.goto('/nft/nft-03')
-  await page.getByRole('button', { name: 'Adicionar ao carrinho' }).click()
-  await expect(page.getByRole('status').filter({ hasText: 'Adicionado ao carrinho.' })).toBeVisible()
-  await page.goto('/pagamento')
-
-  await expect(main(page).getByLabel('Telefone', { exact: true })).toHaveValue('(11) 91234-5678')
-})
-
 test('as alterações de uma conta não aparecem em outra', async ({ page }) => {
   await signIn(page, ana)
   await field(page, 'Nome completo').fill('Ana Alterada')

@@ -1,5 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 import { mockUsers } from '../src/mocks/fixtures/users'
+import { readyToPay } from './support/checkout'
 
 const [ana] = mockUsers
 
@@ -31,11 +32,7 @@ async function addToCart(page: Page, nftId: string, times = 1) {
 /** Do formulário de pagamento até o clique em "Confirmar compra". */
 async function payOrder(page: Page) {
   await page.goto('/pagamento')
-  await main(page).getByLabel('Telefone').fill('(11) 91234-5678')
-  await page.getByRole('button', { name: 'Conectar carteira' }).click()
-  await expect(page.getByTestId('wallet-status-wallet-ana-1')).toHaveText('Conectada')
-  await page.getByRole('button', { name: 'Revisar pedido' }).click()
-  await page.getByLabel('Li e aceito os termos de compra de NFTs.').check()
+  await readyToPay(page)
   await page.getByRole('button', { name: 'Confirmar compra' }).click()
 }
 
@@ -69,7 +66,7 @@ test('recibo confirmado mostra número, datas, itens, valores, pagamento e colec
   await expect(page.getByTestId('order-network')).toHaveText('Ethereum')
   await expect(page.getByTestId('order-collector-name')).toHaveText(ana.name)
   await expect(page.getByTestId('order-collector-email')).toHaveText(ana.email)
-  await expect(page.getByTestId('order-collector-phone')).toHaveText('(11) 91234-5678')
+  await expect(page.getByTestId('order-collector-wallet-type')).toHaveText('MetaMask')
 
   expect(hash).toMatch(/^0x[0-9a-f]{64}$/)
   await expect(page).toHaveTitle('Pedido KUR-000001 | Kurio')
@@ -198,11 +195,7 @@ test('pagamento recusado: sem referência de transação, com itens do retrato e
   await signIn(page)
   await addToCart(page, 'nft-03')
   await page.goto('/pagamento')
-  await main(page).getByLabel('Telefone').fill('(11) 91234-5678')
-  await page.getByRole('button', { name: 'Conectar carteira' }).click()
-  await expect(page.getByTestId('wallet-status-wallet-ana-1')).toHaveText('Conectada')
-  await page.getByRole('button', { name: 'Revisar pedido' }).click()
-  await page.getByLabel('Li e aceito os termos de compra de NFTs.').check()
+  await readyToPay(page)
   await page.evaluate(() => localStorage.setItem('mock-scenario', 'payment-declined'))
   await page.getByRole('button', { name: 'Confirmar compra' }).click()
 

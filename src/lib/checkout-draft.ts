@@ -1,5 +1,4 @@
 import type { NftNetwork } from '@/types/nft'
-import type { CollectorData } from '@/types/order'
 
 // Rascunho do pagamento na sessão da aba: sobrevive ao refresh sem sair do dispositivo.
 const DRAFT_KEY = 'kurio.checkout-draft'
@@ -7,11 +6,28 @@ const IDEMPOTENCY_KEY = 'kurio.checkout-key'
 
 // O rascunho e a chave pertencem a um usuário (`userId`): outro usuário na mesma aba nunca os vê,
 // mesmo que a limpeza do logout não tenha rodado (aba fechada no meio, token que venceu etc.).
+/** Valores digitados no formulário do pagamento (o nome ENS fica sem o sufixo). */
+export type CheckoutFormValues = {
+  name: string
+  username: string
+  profileName: string
+  email: string
+  walletType: string
+  walletAddress: string
+  secondary: string
+  referralCode: string
+  ensName: string
+  ensSuffix: string
+  notes: string
+}
+
 export type CheckoutDraft = {
   userId?: string
-  collector?: CollectorData
+  values?: Partial<CheckoutFormValues>
   walletId?: string | null
   network?: NftNetwork | ''
+  /** "Usar outra carteira?": o endereço que recebe os NFTs é digitado, em vez do da carteira escolhida. */
+  otherWallet?: boolean
 }
 
 /** Rascunho do usuário; o de outra conta é descartado (e apagado), nunca devolvido. */

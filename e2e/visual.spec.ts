@@ -82,22 +82,13 @@ test('Carrinho', async ({ page }) => {
   await expect(page).toHaveScreenshot('carrinho.png', { fullPage: true })
 })
 
-test('Pagamento: dados e revisão', async ({ page }) => {
+test('Pagamento', async ({ page }) => {
   await page.addInitScript((cart) => {
     localStorage.setItem('mock-cart:user:user-ana', JSON.stringify(cart))
   }, seededCart)
   await signIn(page, '/pagamento')
   await expect(page.getByRole('heading', { name: 'Perfil do colecionador' })).toBeVisible()
-  await page.getByRole('main').getByLabel('Telefone').fill('(11) 91234-5678')
-  await page.getByRole('button', { name: 'Conectar carteira' }).click()
-  await expect(page.getByTestId('wallet-status-wallet-ana-1')).toHaveText('Conectada')
   await settle(page)
 
-  await expect(page).toHaveScreenshot('pagamento-dados.png', { fullPage: true })
-
-  await page.getByRole('button', { name: 'Revisar pedido' }).click()
-  await expect(page.getByRole('heading', { name: 'Revise seu pedido' })).toBeVisible()
-  await settle(page)
-
-  await expect(page).toHaveScreenshot('pagamento-revisao.png', { fullPage: true })
+  await expect(page).toHaveScreenshot('pagamento.png', { fullPage: true })
 })

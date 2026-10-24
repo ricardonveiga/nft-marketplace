@@ -7,9 +7,8 @@ const [ana, bruno] = mockUsers
 
 const SECRETS = {
   name: 'Ana Segredo Pessoal',
-  phone: '(11) 91234-5678',
   username: 'ana_segredo',
-  ensName: 'anasegredo.eth',
+  ensName: 'anasegredo',
   referralCode: 'SEGREDO99',
   notes: 'Observação privada da Ana.',
 }
@@ -48,12 +47,11 @@ function browserStorage(page: Page) {
 async function fillAnaDraft(page: Page) {
   await addNeonToCart(page)
   await page.goto('/pagamento')
-  await main(page).getByLabel('Nome completo').fill(SECRETS.name)
-  await main(page).getByLabel('Telefone').fill(SECRETS.phone)
-  await main(page).getByLabel('Nome de usuário (opcional)').fill(SECRETS.username)
-  await main(page).getByLabel('Nome ENS (opcional)').fill(SECRETS.ensName)
-  await main(page).getByLabel('Código de indicação (opcional)').fill(SECRETS.referralCode)
-  await main(page).getByLabel('Observação (opcional)').fill(SECRETS.notes)
+  await main(page).getByLabel('Nome de exibição').fill(SECRETS.name)
+  await main(page).getByLabel('Nome de usuário').fill(SECRETS.username)
+  await main(page).getByLabel(/^Nome ENS/).fill(SECRETS.ensName)
+  await main(page).getByLabel('Código de indicação').fill(SECRETS.referralCode)
+  await main(page).getByLabel('Observação do colecionador (opcional)').fill(SECRETS.notes)
   // O rascunho é gravado a cada mudança; a conexão da carteira não é preciso aqui.
   await expect.poll(() => page.evaluate(() => sessionStorage.getItem('kurio.checkout-draft'))).toContain(
     SECRETS.notes,
@@ -77,14 +75,13 @@ test('logout e troca de usuário: o rascunho do pagamento da Ana não aparece pa
   await addNeonToCart(page)
   await page.goto('/pagamento')
 
-  // O formulário do Bruno vem com os dados do Bruno, e os opcionais, vazios.
-  await expect(main(page).getByLabel('Nome completo')).toHaveValue(bruno.name)
-  await expect(main(page).getByLabel('E-mail', { exact: true })).toHaveValue(bruno.email)
-  await expect(main(page).getByLabel('Telefone')).toHaveValue('')
-  await expect(main(page).getByLabel('Nome de usuário (opcional)')).toHaveValue('')
-  await expect(main(page).getByLabel('Nome ENS (opcional)')).toHaveValue('')
-  await expect(main(page).getByLabel('Código de indicação (opcional)')).toHaveValue('')
-  await expect(main(page).getByLabel('Observação (opcional)')).toHaveValue('')
+  // O formulário do Bruno vem com os dados do Bruno; o que a conta não sabe, vazio.
+  await expect(main(page).getByLabel('Nome de exibição')).toHaveValue(bruno.name)
+  await expect(main(page).getByLabel(/^E-mail/)).toHaveValue(bruno.email)
+  await expect(main(page).getByLabel('Nome de usuário')).toHaveValue(bruno.email.split('@')[0])
+  await expect(main(page).getByLabel(/^Nome ENS/)).toHaveValue('')
+  await expect(main(page).getByLabel('Código de indicação')).toHaveValue('')
+  await expect(main(page).getByLabel('Observação do colecionador (opcional)')).toHaveValue('')
 
   // Nada da Ana na tela (inclui o e-mail e as carteiras dela) nem no armazenamento.
   await expect(main(page)).not.toContainText(SECRETS.name)
@@ -115,7 +112,7 @@ test('troca de usuário sem logout (rascunho esquecido na aba): o Bruno não o v
       'kurio.checkout-draft',
       JSON.stringify({
         userId: 'user-ana',
-        collector: { name: secrets.name, email: 'ana@kurio.test', phone: secrets.phone },
+        values: { name: secrets.name, email: 'ana@kurio.test', referralCode: secrets.referralCode },
         walletId: 'wallet-ana-1',
         network: 'Ethereum',
       }),
@@ -130,14 +127,14 @@ test('troca de usuário sem logout (rascunho esquecido na aba): o Bruno não o v
   await addNeonToCart(page)
   await page.goto('/pagamento')
 
-  await expect(main(page).getByLabel('Nome completo')).toHaveValue(bruno.name)
-  await expect(main(page).getByLabel('E-mail', { exact: true })).toHaveValue(bruno.email)
-  await expect(main(page).getByLabel('Telefone')).toHaveValue('')
+  await expect(main(page).getByLabel('Nome de exibição')).toHaveValue(bruno.name)
+  await expect(main(page).getByLabel(/^E-mail/)).toHaveValue(bruno.email)
+  await expect(main(page).getByLabel('Código de indicação')).toHaveValue('')
 
   const storage = await browserStorage(page)
 
   expect(storage).not.toContain(SECRETS.name)
-  expect(storage).not.toContain(SECRETS.phone)
+  expect(storage).not.toContain(SECRETS.referralCode)
   expect(storage).not.toContain('chave-da-ana')
 })
 
@@ -147,7 +144,7 @@ test('o mesmo usuário com a sessão expirada no pagamento continua com o própr
   await signIn(page, ana)
   await addNeonToCart(page)
   await page.goto('/pagamento')
-  await main(page).getByLabel('Nome completo').fill(SECRETS.name)
+  await main(page).getByLabel('Nome de exibição').fill(SECRETS.name)
   await expect.poll(() => page.evaluate(() => sessionStorage.getItem('kurio.checkout-draft'))).toContain(
     SECRETS.name,
   )
@@ -165,5 +162,5 @@ test('o mesmo usuário com a sessão expirada no pagamento continua com o própr
 
   // O rascunho é do mesmo usuário, então continua lá.
   await page.goto('/pagamento')
-  await expect(main(page).getByLabel('Nome completo')).toHaveValue(SECRETS.name)
+  await expect(main(page).getByLabel('Nome de exibição')).toHaveValue(SECRETS.name)
 })

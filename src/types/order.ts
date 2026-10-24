@@ -1,16 +1,24 @@
 import type { Cart } from './cart'
 import type { NftNetwork } from './nft'
+import type { WalletType } from './wallet'
 
 export type OrderStatus = 'pending' | 'confirmed' | 'declined'
 
+/** Dados do colecionador no pagamento (Figma: "Perfil do colecionador"). */
 export type CollectorData = {
+  /** Nome de exibição. */
   name: string
+  username: string
+  profileName: string
   email: string
-  phone: string
-  /** Campos opcionais do perfil do colecionador (vazio = não informado). */
-  username?: string
-  ensName?: string
-  referralCode?: string
+  walletType: WalletType
+  /** Endereço da carteira que recebe os NFTs (0x + 40 hexadecimais). */
+  walletAddress: string
+  /** "ENS ou carteira secundária" (opcional). */
+  secondary?: string
+  referralCode: string
+  /** Nome ENS completo, com o sufixo (ex.: "ana.eth"). */
+  ensName: string
   notes?: string
 }
 
@@ -19,6 +27,8 @@ export type OrderItem = {
   name: string
   collection: string
   edition: string
+  /** ID do token (ex.: "#0042"). */
+  tokenId: string
   imageUrl: string
   quantity: number
   unitPriceEth: string
@@ -59,9 +69,7 @@ export type CreateOrderRequest = {
 export type OrderErrorBody = {
   code: string
   message?: string
-  errors?: Partial<
-    Record<'name' | 'email' | 'phone' | 'username' | 'ensName' | 'referralCode' | 'notes' | 'network', string>
-  >
+  errors?: Partial<Record<keyof CollectorData | 'network', string>>
   /** Cotação atual, quando o pedido foi recusado por mudança de valores/disponibilidade. */
   cart?: Cart
   orderId?: string

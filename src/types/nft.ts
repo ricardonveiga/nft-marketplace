@@ -9,6 +9,8 @@ export type NftNetwork = 'Ethereum' | 'Polygon' | 'Solana'
 export type Nft = {
   id: string
   name: string
+  /** ID do token (ex.: "#0042"), derivado do número do nome. */
+  tokenId: string
   collection: string
   /** Categoria usada no filtro "Coleções" da Início (ex.: "Arte digital"). */
   category: string

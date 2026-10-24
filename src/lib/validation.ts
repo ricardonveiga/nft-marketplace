@@ -1,3 +1,5 @@
+import { WALLET_TYPES } from '@/types/wallet'
+
 export type LoginFields = {
   email: string
   password: string
@@ -92,13 +94,18 @@ export function validateRegister(values: RegisterFields): FieldErrors<RegisterFi
   return errors
 }
 
+/** Campos do "Perfil do colecionador" do pagamento (Figma). Os de asterisco são obrigatórios. */
 export type CollectorFields = {
   name: string
-  email: string
-  phone: string
   username: string
-  ensName: string
+  profileName: string
+  email: string
+  walletType: string
+  walletAddress: string
+  secondary: string
   referralCode: string
+  /** Nome ENS completo, com o sufixo (ex.: "ana.eth"); vazio = não informado. */
+  ensName: string
   notes: string
 }
 
@@ -108,7 +115,7 @@ export function validateUsername(value: string): string | undefined {
   const trimmed = value.trim()
 
   if (!trimmed) {
-    return undefined
+    return 'Informe o nome de usuário.'
   }
 
   return /^[A-Za-z0-9_.]{3,30}$/.test(trimmed)
@@ -116,21 +123,44 @@ export function validateUsername(value: string): string | undefined {
     : 'Use de 3 a 30 letras, números, ponto ou sublinhado.'
 }
 
+export function validateProfileName(value: string): string | undefined {
+  const trimmed = value.trim()
+
+  if (!trimmed) {
+    return 'Informe o nome do perfil.'
+  }
+
+  return trimmed.length < 2 || trimmed.length > 40 ? 'O nome do perfil deve ter de 2 a 40 caracteres.' : undefined
+}
+
 export function validateEnsName(value: string): string | undefined {
+  const trimmed = value.trim()
+
+  if (!trimmed) {
+    return 'Informe o nome ENS.'
+  }
+
+  return /^([a-z0-9-]+\.)+eth$/i.test(trimmed) ? undefined : 'Use letras, números e hífens no nome ENS.'
+}
+
+/** "ENS ou carteira secundária": opcional; se vier, é um nome .eth ou um endereço 0x. */
+export function validateSecondary(value: string): string | undefined {
   const trimmed = value.trim()
 
   if (!trimmed) {
     return undefined
   }
 
-  return /^([a-z0-9-]+\.)+eth$/i.test(trimmed) ? undefined : 'Informe um nome ENS válido, como nome.eth.'
+  return /^0x[0-9a-fA-F]{40}$/.test(trimmed) || /^([a-z0-9-]+\.)+eth$/i.test(trimmed)
+    ? undefined
+    : 'Informe um nome ENS (.eth) ou um endereço 0x válido.'
 }
 
 export function validateReferralCode(value: string): string | undefined {
   const trimmed = value.trim()
 
   if (!trimmed) {
-    return undefined
+    return 'Informe o código de indicação.'
   }
 
   return /^[A-Za-z0-9]{4,12}$/.test(trimmed) ? undefined : 'O código tem de 4 a 12 letras ou números.'
@@ -138,6 +168,10 @@ export function validateReferralCode(value: string): string | undefined {
 
 export function validateNotes(value: string): string | undefined {
   return value.length > NOTES_MAX_LENGTH ? `Use no máximo ${NOTES_MAX_LENGTH} caracteres.` : undefined
+}
+
+export function validateWalletType(value: string): string | undefined {
+  return (WALLET_TYPES as readonly string[]).includes(value) ? undefined : 'Selecione o tipo de carteira.'
 }
 
 /** Telefone brasileiro com DDD: 10 ou 11 dígitos (aceita máscara, espaços e +55). */
@@ -159,14 +193,14 @@ export function validatePhone(value: string): string | undefined {
     : 'Informe um telefone válido com DDD.'
 }
 
-/** Os campos opcionais podem faltar (pedidos de clientes antigos); nome, e-mail e telefone valem sempre. */
-export function validateCollector(
-  values: Pick<CollectorFields, 'name' | 'email' | 'phone'> & Partial<CollectorFields>,
-): FieldErrors<CollectorFields> {
+/** Validação do colecionador no pagamento: a mesma no formulário e na API simulada. */
+export function validateCollector(values: CollectorFields): FieldErrors<CollectorFields> {
   const errors: FieldErrors<CollectorFields> = {}
   const email = values.email.trim()
 
   errors.name = validateName(values.name)
+  errors.username = validateUsername(values.username)
+  errors.profileName = validateProfileName(values.profileName)
 
   if (!email) {
     errors.email = 'Informe seu e-mail.'
@@ -174,11 +208,12 @@ export function validateCollector(
     errors.email = 'Informe um e-mail válido.'
   }
 
-  errors.phone = validatePhone(values.phone)
-  errors.username = validateUsername(values.username ?? '')
-  errors.ensName = validateEnsName(values.ensName ?? '')
-  errors.referralCode = validateReferralCode(values.referralCode ?? '')
-  errors.notes = validateNotes(values.notes ?? '')
+  errors.walletType = validateWalletType(values.walletType)
+  errors.walletAddress = validateWalletAddress(values.walletAddress)
+  errors.secondary = validateSecondary(values.secondary)
+  errors.referralCode = validateReferralCode(values.referralCode)
+  errors.ensName = validateEnsName(values.ensName)
+  errors.notes = validateNotes(values.notes)
 
   for (const key of Object.keys(errors) as Array<keyof CollectorFields>) {
     if (!errors[key]) {

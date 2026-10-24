@@ -3,6 +3,7 @@ import { useRef } from 'react'
 import { dismissNotice, useNotices } from '@/lib/realtime/notices'
 
 type RealtimeNoticesProps = {
+  className?: string
   /** Mostra avisos de mudança de preço/disponibilidade destes NFTs. */
   nftIds?: readonly string[]
   /** Mostra avisos sobre este pedido. */
@@ -14,7 +15,7 @@ type RealtimeNoticesProps = {
  * `role="status"` (anunciada por leitores de tela) e também aparece na tela.
  * Só mostra o que chegou depois de a tela abrir, para não exibir avisos antigos.
  */
-export function RealtimeNotices({ nftIds, orderId }: RealtimeNoticesProps) {
+export function RealtimeNotices({ nftIds, orderId, className }: RealtimeNoticesProps) {
   const openedAt = useRef(Date.now())
   const notices = useNotices().filter(
     (notice) =>
@@ -24,7 +25,7 @@ export function RealtimeNotices({ nftIds, orderId }: RealtimeNoticesProps) {
   )
 
   return (
-    <div role="status" data-testid="realtime-notices" className="flex flex-col gap-2 empty:hidden">
+    <div role="status" data-testid="realtime-notices" className={`flex flex-col gap-2 empty:hidden ${className ?? ''}`}>
       {notices.map((notice) => (
         <p
           key={notice.id}
