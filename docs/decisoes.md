@@ -253,8 +253,6 @@ NFTs, 3 páginas), e a arte do hero (o Figma usa o Emerald Ape; aqui vale o crit
   avisa isso.
 - **Recusado**: mostra o motivo, os itens do retrato e "Tentar novamente"; não tem referência de
   transação nem botão de imprimir. Pendente: aviso de processamento e os mesmos blocos.
-- **Imprimir recibo**: chama `window.print()`; os estilos de impressão (`print:hidden`, `@media
-  print`) escondem header, footer, barra inferior e botões e usam papel claro.
 - **Cenários**: `payment-declined` (o próximo pagamento é recusado), `order-timeout` (cria o
   pedido mas a resposta não chega, uma vez).
 
