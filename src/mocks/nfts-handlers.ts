@@ -9,12 +9,21 @@ import {
 import { compareEth } from '@/lib/eth'
 import type { Nft, NftDetail, NftFacets, NftListResponse } from '@/types/nft'
 import {
+  COPYRIGHT_NOTE,
+  CONTRACT_NOTE,
   REFERENCE_DATE,
+  aboutOf,
+  attributesOf,
   categoryOrder,
   creatorOf,
   descriptionOf,
+  editionOptionsOf,
   galleryOf,
+  networkNoteOf,
   networkOrder,
+  ratingOf,
+  reviewsOf,
+  storyOf,
 } from './fixtures/nfts'
 import { currentNft, currentNfts, maxQuantityFor } from './catalog-state'
 import { getScenario } from './scenario'
@@ -225,6 +234,16 @@ export const nftsHandlers = [
     const detail: NftDetail = {
       ...nft,
       description: descriptionOf(nft),
+      about: aboutOf(nft),
+      ratingAverage: ratingOf(nft).average,
+      reviewCount: ratingOf(nft).count,
+      reviews: reviewsOf(nft),
+      editionOptions: editionOptionsOf(nft),
+      attributes: attributesOf(nft),
+      story: storyOf(nft),
+      networkNote: networkNoteOf(nft),
+      contractNote: CONTRACT_NOTE,
+      copyrightNote: COPYRIGHT_NOTE,
       creator: creatorOf(nft),
       gallery: galleryOf(nft),
       maxQuantity: maxQuantityFor(nft),

@@ -18,10 +18,10 @@ async function expectNoHorizontalScroll(page: Page, width: number) {
 
 test('carrinho: sem rolagem horizontal em 390, 768 e 1440 px (com itens e cupom)', async ({ page }) => {
   await page.goto('/nft/nft-03')
-  await page.getByRole('button', { name: 'Adicionar ao carrinho' }).click()
+  await page.getByRole('button', { name: 'Comprar' }).click()
   await expect(page.getByRole('status').filter({ hasText: 'Adicionado ao carrinho.' })).toBeVisible()
   await page.goto('/nft/nft-01')
-  await page.getByRole('button', { name: 'Adicionar ao carrinho' }).click()
+  await page.getByRole('button', { name: 'Comprar' }).click()
   await expect(page.getByRole('status').filter({ hasText: 'Adicionado ao carrinho.' })).toBeVisible()
 
   for (const width of WIDTHS) {

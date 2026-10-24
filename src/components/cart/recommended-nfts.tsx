@@ -6,8 +6,25 @@ import { useRecommendedNfts } from '@/hooks/use-nfts'
 const PAGE_SIZE = 5
 
 /** "Colecionadores também viram": 5 cards por vez no desktop, com pontos para trocar de página. */
-export function RecommendedNfts() {
-  const { data: nfts, isPending, isError } = useRecommendedNfts()
+export function RecommendedNfts({
+  title = 'Colecionadores também viram',
+  excludeId,
+  testId = 'recommended',
+  className = 'mt-[95px]',
+  compact = false,
+  tight = false,
+}: {
+  title?: string
+  /** NFT da própria página: não é sugerido a si mesmo. */
+  excludeId?: string
+  testId?: string
+  className?: string
+  /** Espaçamento do nome e do preço do carrinho (o detalhe usa o do catálogo). */
+  compact?: boolean
+  tight?: boolean
+}) {
+  const { data: recommended, isPending, isError } = useRecommendedNfts()
+  const nfts = recommended?.filter((nft) => nft.id !== excludeId)
   const wide = useMediaQuery('(min-width: 1024px)')
   const [page, setPage] = useState(0)
 
@@ -20,12 +37,12 @@ export function RecommendedNfts() {
   const visible = wide ? (nfts ?? []).slice(current * PAGE_SIZE, (current + 1) * PAGE_SIZE) : (nfts ?? [])
 
   return (
-    <section aria-labelledby="recomendados" className="mt-[95px]" data-testid="recommended">
+    <section aria-labelledby={`${testId}-titulo`} className={className} data-testid={testId}>
       <h2
-        id="recomendados"
+        id={`${testId}-titulo`}
         className="border-b border-header-line pb-2 text-[17px] leading-5 font-bold text-text-accent"
       >
-        Colecionadores também viram
+        {title}
       </h2>
 
       {isPending ? (
@@ -46,7 +63,7 @@ export function RecommendedNfts() {
           >
             {visible.map((nft) => (
               <li key={nft.id} className="w-[200px] shrink-0 snap-start lg:w-auto">
-                <NftCard nft={nft} compact priority={!wide} />
+                <NftCard nft={nft} compact={compact || tight} tight={tight} priority={!wide} />
               </li>
             ))}
           </ul>

@@ -44,7 +44,7 @@ test('resetAll restaura catálogo, contas, carrinho, favoritos, perfil, cenário
   await page.goto('/nft/nft-03')
   await page.getByRole('button', { name: `Favoritar ${NEON}` }).click()
   await expect(page.getByRole('button', { name: `Favoritar ${NEON}` })).toHaveAttribute('aria-pressed', 'true')
-  await page.getByRole('button', { name: 'Adicionar ao carrinho' }).click()
+  await page.getByRole('button', { name: 'Comprar' }).click()
   await expect(page.getByRole('status').filter({ hasText: 'Adicionado ao carrinho.' })).toBeVisible()
   await page.goto('/carrinho')
   await page.getByLabel('Cupom de desconto').fill('KURIO10')

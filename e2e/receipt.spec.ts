@@ -24,7 +24,7 @@ async function addToCart(page: Page, nftId: string, times = 1) {
   await page.goto(`/nft/${nftId}`)
 
   for (let attempt = 0; attempt < times; attempt++) {
-    await page.getByRole('button', { name: 'Adicionar ao carrinho' }).click()
+    await page.getByRole('button', { name: 'Comprar' }).click()
     await expect(page.getByRole('status').filter({ hasText: 'Adicionado ao carrinho.' })).toBeVisible()
   }
 }

@@ -10,7 +10,7 @@ const SAGE = 'Sage Nomad #009'
 
 async function addToCart(page: Page, nftId: string) {
   await page.goto(`/nft/${nftId}`)
-  await page.getByRole('button', { name: 'Adicionar ao carrinho' }).click()
+  await page.getByRole('button', { name: 'Comprar' }).click()
   await expect(page.getByRole('status').filter({ hasText: 'Adicionado ao carrinho.' })).toBeVisible()
 }
 
@@ -112,7 +112,7 @@ test('mudança de quantidade é anunciada para leitores de tela', async ({ page 
 
 test('limite por pedido: a tela de detalhe trava ao chegar no máximo', async ({ page }) => {
   await page.goto('/nft/nft-01')
-  const add = page.getByRole('button', { name: 'Adicionar ao carrinho' })
+  const add = page.getByRole('button', { name: 'Comprar' })
 
   for (let attempt = 0; attempt < 5; attempt++) {
     await add.click()
@@ -158,7 +158,7 @@ test('NFT esgotado não tem como entrar no carrinho pela tela', async ({ page })
   await page.goto('/nft/nft-08')
 
   await expect(page.getByText('Esta edição está esgotada.')).toBeVisible()
-  await expect(page.getByRole('button', { name: 'Adicionar ao carrinho' })).toHaveCount(0)
+  await expect(page.getByRole('button', { name: 'Comprar' })).toHaveCount(0)
   await expect(cartLink(page, 'Carrinho')).toBeVisible()
 })
 

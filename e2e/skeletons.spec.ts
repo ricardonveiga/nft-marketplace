@@ -47,7 +47,7 @@ test('detalhe: o esqueleto aparece durante a lentidão, depois some, sem desloca
 test('carrinho: o esqueleto aparece durante a lentidão, depois some, sem deslocar o layout', async ({ page }) => {
   // O item entra no carrinho com a API em velocidade normal.
   await page.goto('/nft/nft-03')
-  await page.getByRole('button', { name: 'Adicionar ao carrinho' }).click()
+  await page.getByRole('button', { name: 'Comprar' }).click()
   await expect(page.getByRole('status').filter({ hasText: 'Adicionado ao carrinho.' })).toBeVisible()
 
   await trackLayoutShift(page)

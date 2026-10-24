@@ -86,7 +86,7 @@ function CartPage() {
         )}
       </div>
 
-      {(isPending || (cart && cart.items.length > 0)) && <RecommendedNfts />}
+      {(isPending || (cart && cart.items.length > 0)) && <RecommendedNfts compact />}
     </div>
   )
 }

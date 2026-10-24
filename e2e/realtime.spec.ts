@@ -66,7 +66,7 @@ async function signIn(page: Page, user: { email: string; password: string }, red
 
 async function addToCart(page: Page, nftId: string) {
   await page.goto(`/nft/${nftId}`)
-  await page.getByRole('button', { name: 'Adicionar ao carrinho' }).click()
+  await page.getByRole('button', { name: 'Comprar' }).click()
   await expect(page.getByRole('status').filter({ hasText: 'Adicionado ao carrinho.' })).toBeVisible()
 }
 
@@ -139,7 +139,7 @@ test('detalhe: preço e disponibilidade ao vivo, com aviso acessível', async ({
   await control(page).updateNft('nft-03', { availableQuantity: 0 })
 
   await expect(page.getByText('Esta edição está esgotada.')).toBeVisible()
-  await expect(page.getByRole('button', { name: 'Adicionar ao carrinho' })).toHaveCount(0)
+  await expect(page.getByRole('button', { name: 'Comprar' })).toHaveCount(0)
   await expect(page.getByTestId('realtime-notices').getByText('Neon Vessel #552 esgotou.')).toBeVisible()
 })
 

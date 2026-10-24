@@ -26,7 +26,7 @@ async function signIn(page: Page, user: { email: string; password: string }, red
 
 async function addToCart(page: Page, nftId: string) {
   await page.goto(`/nft/${nftId}`)
-  await page.getByRole('button', { name: 'Adicionar ao carrinho' }).click()
+  await page.getByRole('button', { name: 'Comprar' }).click()
   await expect(page.getByRole('status').filter({ hasText: 'Adicionado ao carrinho.' })).toBeVisible()
 }
 

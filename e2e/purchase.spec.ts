@@ -19,7 +19,7 @@ test('compra completa: do catálogo ao recibo confirmado, com cupom', async ({ p
   // 2. Detalhe: confere o NFT e adiciona ao carrinho.
   await expect(page).toHaveURL(/\/nft\/nft-03$/)
   await expect(page.getByTestId('detail-price')).toContainText('1.99')
-  await page.getByRole('button', { name: 'Adicionar ao carrinho' }).click()
+  await page.getByRole('button', { name: 'Comprar' }).click()
   await expect(page.getByRole('status').filter({ hasText: 'Adicionado ao carrinho.' })).toBeVisible()
 
   // 3. Carrinho: o item está lá e um cupom válido gera o desconto calculado pela API.

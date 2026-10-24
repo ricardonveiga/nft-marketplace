@@ -5,11 +5,12 @@ import { useFavorites, useToggleFavorite } from '@/hooks/use-favorites'
 import { useSession } from '@/hooks/use-session'
 import { getSafeRedirect } from '@/lib/redirect'
 
+// Figma: botão vazado de 129 × 40 com o coração e o texto "Favoritar".
 const buttonClass =
-  'grid size-11 place-items-center rounded-full border border-border-soft bg-background/80 text-foreground backdrop-blur transition-colors hover:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring'
+  'inline-flex h-10 w-[129px] items-center justify-center gap-2 rounded-[3px] border border-primary text-sm text-foreground transition-colors hover:bg-surface-featured focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring'
 
 /**
- * Coração de favoritos. Visitantes são levados ao login e voltam para o mesmo NFT;
+ * Favoritar. Visitantes são levados ao login e voltam para o mesmo NFT;
  * usuários autenticados alternam o favorito (com reversão se a API falhar).
  */
 export function FavoriteButton({ nftId, name }: { nftId: string; name: string }) {
@@ -28,7 +29,8 @@ export function FavoriteButton({ nftId, name }: { nftId: string; name: string })
         aria-label={`Entrar para favoritar ${name}`}
         className={buttonClass}
       >
-        <Heart className="size-5" aria-hidden="true" />
+        <Heart className="size-5 text-text-accent" strokeWidth={1.5} aria-hidden="true" />
+        Favoritar
       </Link>
     )
   }
@@ -52,9 +54,14 @@ export function FavoriteButton({ nftId, name }: { nftId: string; name: string })
             },
           )
         }}
-        className={`${buttonClass} disabled:opacity-60 ${favorited ? 'border-primary text-primary' : ''}`}
+        className={`${buttonClass} disabled:opacity-60`}
       >
-        <Heart className={`size-5 ${favorited ? 'fill-current' : ''}`} aria-hidden="true" />
+        <Heart
+          className={`size-5 text-text-accent ${favorited ? 'fill-current' : ''}`}
+          strokeWidth={1.5}
+          aria-hidden="true"
+        />
+        Favoritar
       </button>
       {error && (
         <p role="alert" className="max-w-56 text-right text-xs text-destructive">

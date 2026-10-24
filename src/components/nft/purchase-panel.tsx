@@ -1,7 +1,6 @@
-import { Link, useNavigate } from '@tanstack/react-router'
+import { Link } from '@tanstack/react-router'
 import { Minus, Plus } from 'lucide-react'
-import { useState } from 'react'
-import { Button } from '@/components/ui/button'
+import { useState, type ReactNode } from 'react'
 import { useAddToCart, useCart } from '@/hooks/use-cart'
 import { getApiErrorMessage } from '@/lib/api-error'
 import type { NftDetail } from '@/types/nft'
@@ -9,18 +8,18 @@ import type { NftDetail } from '@/types/nft'
 type Feedback = { kind: 'success' | 'error'; text: string }
 
 const stepperButtonClass =
-  'grid size-10 place-items-center focus-visible:outline-2 focus-visible:outline-ring disabled:cursor-not-allowed disabled:opacity-40'
+  'grid h-12 w-[33px] place-items-center rounded-full bg-primary text-primary-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:cursor-not-allowed disabled:opacity-40'
 
 function units(count: number) {
   return `${count} ${count === 1 ? 'unidade' : 'unidades'}`
 }
 
 /**
- * Quantidade + compra. O limite considera o estoque da edição, o máximo por pedido e o
+ * Quantidade + COMPRAR + Favoritar. O limite considera o estoque da edição, o máximo por pedido e o
  * que o usuário já tem no carrinho; a API continua sendo quem decide (erros são exibidos).
+ * COMPRAR coloca o NFT no carrinho e oferece o caminho para ele.
  */
-export function PurchasePanel({ nft }: { nft: NftDetail }) {
-  const navigate = useNavigate()
+export function PurchasePanel({ nft, favorite }: { nft: NftDetail; favorite: ReactNode }) {
   const add = useAddToCart()
   const cart = useCart()
   const [quantity, setQuantity] = useState(1)
@@ -33,30 +32,27 @@ export function PurchasePanel({ nft }: { nft: NftDetail }) {
 
   if (soldOut) {
     return (
-      <div role="status" className="rounded-lg bg-card p-4">
-        <p className="font-bold">Esta edição está esgotada.</p>
-        <p className="mt-1 text-sm text-text-secondary">
-          Não há unidades disponíveis para compra.{' '}
-          <Link to="/" className="underline underline-offset-4">
-            Ver outros NFTs
-          </Link>
-        </p>
+      <div className="flex flex-col gap-4">
+        <div role="status" className="rounded-lg bg-card p-4">
+          <p className="font-bold">Esta edição está esgotada.</p>
+          <p className="mt-1 text-sm text-text-secondary">
+            Não há unidades disponíveis para compra.{' '}
+            <Link to="/" className="underline underline-offset-4">
+              Ver outros NFTs
+            </Link>
+          </p>
+        </div>
+        <div className="flex justify-end">{favorite}</div>
       </div>
     )
   }
 
-  function addToCart(options: { buyNow: boolean }) {
+  function buy() {
     setFeedback(null)
     add.mutate(
       { nftId: nft.id, quantity: selected },
       {
         onSuccess: () => {
-          if (options.buyNow) {
-            void navigate({ to: '/carrinho' })
-
-            return
-          }
-
           setQuantity(1)
           setFeedback({ kind: 'success', text: 'Adicionado ao carrinho.' })
         },
@@ -70,19 +66,13 @@ export function PurchasePanel({ nft }: { nft: NftDetail }) {
   }
 
   const atLimit = remaining === 0
+  const showHint = atLimit || selected >= remaining
 
   return (
-    <div className="flex flex-col gap-4">
-      {!atLimit && (
-        <div className="flex flex-wrap items-center gap-4">
-          <span id="quantity-label" className="text-sm text-text-secondary">
-            Quantidade
-          </span>
-          <div
-            role="group"
-            aria-labelledby="quantity-label"
-            className="inline-flex items-center rounded-md border border-border-soft"
-          >
+    <div className="flex flex-col gap-2">
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        {!atLimit ? (
+          <div role="group" aria-label="Quantidade" className="flex items-center gap-[14px]">
             <button
               type="button"
               aria-label="Diminuir quantidade"
@@ -90,9 +80,9 @@ export function PurchasePanel({ nft }: { nft: NftDetail }) {
               onClick={() => setQuantity(selected - 1)}
               className={stepperButtonClass}
             >
-              <Minus className="size-4" aria-hidden="true" />
+              <Minus className="size-[18px]" strokeWidth={2.5} aria-hidden="true" />
             </button>
-            <output aria-label={`Quantidade: ${selected}`} className="min-w-10 text-center text-base">
+            <output aria-label={`Quantidade: ${selected}`} className="min-w-3 text-center text-base">
               {selected}
             </output>
             <button
@@ -102,13 +92,31 @@ export function PurchasePanel({ nft }: { nft: NftDetail }) {
               onClick={() => setQuantity(selected + 1)}
               className={stepperButtonClass}
             >
-              <Plus className="size-4" aria-hidden="true" />
+              <Plus className="size-[18px]" strokeWidth={2.5} aria-hidden="true" />
             </button>
           </div>
-        </div>
-      )}
+        ) : (
+          <span />
+        )}
 
-      <p className="text-sm text-text-secondary" data-testid="quantity-hint">
+        <div className="flex items-start gap-2">
+          <button
+            type="button"
+            onClick={buy}
+            disabled={add.isPending || atLimit}
+            aria-busy={add.isPending}
+            className="h-10 w-[129px] rounded-[3px] bg-primary text-sm font-bold text-primary-foreground uppercase focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {add.isPending ? 'Adicionando…' : 'Comprar'}
+          </button>
+          {favorite}
+        </div>
+      </div>
+
+      <p
+        data-testid="quantity-hint"
+        className={showHint ? 'text-sm text-text-secondary' : 'sr-only'}
+      >
         {atLimit
           ? `Você já tem o máximo permitido (${units(nft.maxQuantity)}) deste NFT no carrinho.`
           : selected >= remaining
@@ -116,31 +124,7 @@ export function PurchasePanel({ nft }: { nft: NftDetail }) {
             : `Até ${units(nft.maxQuantity)} por pedido.`}
       </p>
 
-      <div className="flex flex-wrap gap-3">
-        <Button
-          type="button"
-          onClick={() => addToCart({ buyNow: false })}
-          disabled={add.isPending || atLimit}
-          aria-busy={add.isPending}
-          className="h-[45px] rounded-md px-6 text-base font-bold"
-        >
-          {add.isPending ? 'Adicionando…' : 'Adicionar ao carrinho'}
-        </Button>
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => addToCart({ buyNow: true })}
-          disabled={add.isPending || atLimit}
-          className="h-[45px] rounded-md border-primary px-6 text-base font-bold text-text-accent"
-        >
-          Comprar agora
-        </Button>
-      </div>
-
-      <p
-        role="status"
-        className={`min-h-5 text-sm ${feedback?.kind === 'error' ? 'text-destructive' : 'text-text-accent'}`}
-      >
+      <p role="status" className={`text-sm empty:hidden ${feedback?.kind === 'error' ? 'text-destructive' : 'text-text-accent'}`}>
         {feedback?.text}
         {feedback?.kind === 'success' && (
           <>

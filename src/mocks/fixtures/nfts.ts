@@ -3,6 +3,7 @@ import type {
   NftAvailability,
   NftNetwork,
   NftRarity,
+  NftReview,
 } from '@/types/nft'
 
 type Artwork = 'emerald' | 'sage' | 'neon' | 'golden'
@@ -131,4 +132,71 @@ export function galleryOf(nft: Nft) {
   const own = nft.imageUrl
 
   return [own, ...artworks.map((name) => `/nfts/${name}.webp`).filter((url) => url !== own)]
+}
+
+const attributesByCollection: Record<string, string[]> = {
+  'Emerald Apes': ['Óculos', 'Esmeralda'],
+  'Sage Nomads': ['Chapéu', 'Sálvia'],
+  'Neon Vessels': ['Terno', 'Neon'],
+  'Golden Signals': ['Fones', 'Dourado'],
+}
+
+const rarityNames: Record<NftRarity, string> = {
+  comum: 'Comum',
+  raro: 'Raro',
+  epico: 'Épico',
+  lendario: 'Lendário',
+}
+
+/** Resumo curto ("Sobre este NFT"). */
+export function aboutOf(nft: Nft) {
+  return `Um colecionável digital finalizado à mão da coleção Kurio Editions, verificado na ${nft.network}, com arte desbloqueável e acesso para colecionadores.`
+}
+
+export function attributesOf(nft: Nft) {
+  return [...(attributesByCollection[nft.collection] ?? []), rarityNames[nft.rarity]]
+}
+
+/** Opções de edição: as tiragens menores, a do NFT e a aberta. */
+export function editionOptionsOf(nft: Nft) {
+  return [...new Set(['1/1', '1/10', nft.edition, 'ABERTA'])]
+}
+
+/** Nota média e total de avaliações, derivados da popularidade (determinístico). */
+export function ratingOf(nft: Nft) {
+  return { average: 3.5 + (nft.popularity % 3) * 0.5, count: nft.popularity + 2 }
+}
+
+export function storyOf(nft: Nft) {
+  return [
+    `${nft.name} é uma obra digital ${nft.edition} finalizada à mão da coleção Kurio Editions. Cada atributo fica armazenado nos metadados do token e verificado na ${nft.network}. A obra explora identidade, movimento e luz em um mundo digital sem fronteiras.`,
+    `A propriedade inclui a arte em alta resolução, lançamentos exclusivos para colecionadores e um registro permanente de procedência registrada na rede. ${creatorOf(nft)} recebe 5% de direitos autorais nas vendas secundárias, apoiando novos trabalhos e lançamentos da comunidade.`,
+  ]
+}
+
+export function networkNoteOf(nft: Nft) {
+  return `Cunhado na ${nft.network} com procedência imutável e metadados armazenados no IPFS.`
+}
+
+export const CONTRACT_NOTE = 'Direitos autorais do criador: 5% nas vendas secundárias, pagos automaticamente pelos mercados compatíveis.'
+export const COPYRIGHT_NOTE = '0x7A42...19E8 · Contrato inteligente ERC-721 verificado.'
+
+const reviewAuthors = ['Marina Duarte', 'Rafael Nunes', 'Camila Torres', 'Diego Lopes', 'Helena Faria', 'Bruno Costa']
+const reviewTexts = [
+  'Arte linda e entrega rápida na carteira. Superou o que eu esperava.',
+  'Os detalhes ficam ainda melhores em alta resolução. Boa compra.',
+  'Procedência clara e metadados conferidos. Recomendo a coleção.',
+  'Gostei do acesso exclusivo para colecionadores. Vale o preço.',
+  'Transação simples e sem surpresas. Já estou de olho nos próximos lançamentos.',
+]
+
+/** Avaliações do NFT: sempre a quantidade de `ratingOf`, com textos e datas determinísticos. */
+export function reviewsOf(nft: Nft): NftReview[] {
+  return Array.from({ length: ratingOf(nft).count }, (_, index) => ({
+    id: `${nft.id}-review-${index + 1}`,
+    author: reviewAuthors[(index + nft.popularity) % reviewAuthors.length],
+    rating: index % 4 === 3 ? 4 : 5,
+    text: reviewTexts[(index * 2 + nft.popularity) % reviewTexts.length],
+    createdAt: new Date(REFERENCE_DATE - (index + 1) * 3 * DAY).toISOString(),
+  }))
 }

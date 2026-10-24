@@ -145,20 +145,24 @@ NFTs, 3 páginas), e a arte do hero (o Figma usa o Emerald Ape; aqui vale o crit
   para leitores de tela); o contador continua no ícone do carrinho.
 - **Mobile**: ainda não há frame; abaixo de 1024 px a tabela vira cartões empilhados.
 
-## Detalhe do NFT
+## Detalhe do NFT (`/nft/:id`): conferido com o frame `Detalhes do NFT.png`
 
-- **Galeria**: o Figma só tem 4 artes. A galeria mostra a arte do NFT e as outras 3 do catálogo
-  como miniaturas (dado de mock, só para exercitar a interface). A API devolve `gallery`.
-- **Quantidade**: o máximo é o menor entre o limite por pedido (5), o estoque da edição e o que
-  ainda cabe somando o que já está no carrinho. A API continua sendo quem decide (409 com mensagem).
-- **Edição esgotada**: a tela não oferece compra e explica o motivo.
-- **NFT inexistente**: `GET /api/nfts/:id` devolve 404 e a tela mostra "NFT não encontrado"
-  (o título da aba também muda).
-- **Comprar agora**: adiciona ao carrinho e abre o carrinho (o pagamento ainda não existe).
-- **Favoritos** exigem login (visitante vai ao login e volta ao mesmo NFT). Atualização
-  otimista; se a API falhar o coração volta ao estado anterior, o erro é avisado e o estado
-  real é relido. Cenário de teste: `localStorage['mock-scenario'] = 'favorites-error'`.
-- **Dados extras de mock**: descrição e criador por coleção, gerados nas fixtures.
+- **Layout** (medido no pixel, 1440): breadcrumb "Início / Mercado", miniaturas de 100 px em coluna,
+  imagem de 444 px com a arte de 402 px dentro do cartão, e a coluna de informações a 725 px.
+- **Informações**: nome, preço, estrelas e "N avaliações de colecionadores", "Sobre este NFT:",
+  "Edição:" (opções `1/1`, `1/10`, a do NFT selecionada e `ABERTA`), quantidade, **COMPRAR** e
+  **Favoritar**, ID do token, coleção, atributos e "Compartilhar este NFT:" (ícones inertes, "Em breve").
+  Os dados novos (resumo, nota e avaliações, atributos, textos da aba e edições) vêm da API simulada.
+- **COMPRAR** põe o NFT no carrinho (respeitando estoque e limite por pedido) e mostra
+  "Adicionado ao carrinho. Ver carrinho"; saiu o "Comprar agora" (o frame só tem um botão de compra).
+- **Abas**: "Detalhes do NFT" (parágrafos + Rede, Contrato e Direitos autorais, com os mesmos rótulos
+  do frame) e "Avaliações de colecionadores (N)" com a lista de avaliações.
+- **Mais desta coleção**: reaproveita as sugestões do carrinho (`GET /api/nfts/recommended`, sem o
+  próprio NFT), 5 por página, com pontos; o nome e o preço dos cards ficam mais juntos que no carrinho.
+- **Mantido além do frame**: "Edição esgotada" (sem compra), aviso de limite por pedido (visível só ao
+  atingir o limite, antes é só para leitores de tela), disponibilidade para leitores de tela.
+- **Não replicado**: as miniaturas do frame repetem a mesma imagem; aqui são as artes do catálogo. O zoom
+  da imagem é só o ícone (inerte). O nome da coleção vem do dado ("Emerald Apes", não "Kurio Apes").
 
 ## Perfil do colecionador (`/perfil`): conferido com o frame `Perfil do Colecionador.png`
 

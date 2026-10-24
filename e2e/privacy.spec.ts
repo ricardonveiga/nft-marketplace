@@ -33,7 +33,7 @@ async function signOut(page: Page, name: string) {
 
 async function addNeonToCart(page: Page) {
   await page.goto('/nft/nft-03')
-  await page.getByRole('button', { name: 'Adicionar ao carrinho' }).click()
+  await page.getByRole('button', { name: 'Comprar' }).click()
   await expect(page.getByRole('status').filter({ hasText: 'Adicionado ao carrinho.' })).toBeVisible()
 }
 

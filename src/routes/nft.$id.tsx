@@ -1,11 +1,9 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { isAxiosError } from 'axios'
 import { useEffect } from 'react'
-import {
-  BackToMarket,
-  NftDetailSkeleton,
-  NftDetailView,
-} from '@/components/nft/nft-detail-view'
+import { RecommendedNfts } from '@/components/cart/recommended-nfts'
+import { Breadcrumb } from '@/components/layout/breadcrumb'
+import { NftDetailSkeleton, NftDetailView } from '@/components/nft/nft-detail-view'
 import { RealtimeNotices } from '@/components/realtime/realtime-notices'
 import { Button } from '@/components/ui/button'
 import { useNft } from '@/hooks/use-nfts'
@@ -30,9 +28,9 @@ function NftDetailPage() {
   }, [nft, notFound])
 
   return (
-    <div className="mx-auto w-full max-w-[1264px] px-6 py-8 md:px-8 md:py-12">
-      <BackToMarket />
-      <div className="mb-6 empty:hidden">
+    <div className="mx-auto w-full max-w-[1264px] px-6 pt-[32px] pb-24 md:px-8">
+      <Breadcrumb items={[{ label: 'Início', to: '/' }, { label: 'Mercado', to: '/', hash: 'mercado' }]} />
+      <div className="mt-3 empty:hidden">
         <RealtimeNotices nftIds={[id]} />
       </div>
 
@@ -58,6 +56,10 @@ function NftDetailPage() {
       )}
 
       {nft && <NftDetailView nft={nft} />}
+
+      {(isPending || nft) && (
+        <RecommendedNfts title="Mais desta coleção" excludeId={id} testId="related" tight className="mt-[95px]" />
+      )}
     </div>
   )
 }

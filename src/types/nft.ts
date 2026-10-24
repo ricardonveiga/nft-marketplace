@@ -34,9 +34,33 @@ export type Nft = {
   popularity: number
 }
 
+export type NftReview = {
+  id: string
+  author: string
+  /** Nota de 1 a 5. */
+  rating: number
+  text: string
+  /** Data da avaliação (ISO 8601). */
+  createdAt: string
+}
+
 /** Dados extras da tela de detalhe. */
 export type NftDetail = Nft & {
   description: string
+  /** "Sobre este NFT": resumo curto ao lado da imagem. */
+  about: string
+  /** Nota média (de 0 a 5, em meios pontos) e quantidade de avaliações. */
+  ratingAverage: number
+  reviewCount: number
+  reviews: NftReview[]
+  /** Edições exibidas como opções (a do NFT é a selecionada). */
+  editionOptions: string[]
+  attributes: string[]
+  /** Aba "Detalhes do NFT": parágrafos e as notas de rede, contrato e direitos autorais. */
+  story: string[]
+  networkNote: string
+  contractNote: string
+  copyrightNote: string
   creator: string
   /** Imagens da galeria; a primeira é a arte principal. */
   gallery: string[]
