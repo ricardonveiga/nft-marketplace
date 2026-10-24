@@ -43,6 +43,17 @@ export async function fetchHighlights() {
   return response.data.nfts
 }
 
+/** "Colecionadores também viram": sugestões do carrinho (até 15 NFTs, em páginas de 5). */
+export async function fetchRecommendedNfts() {
+  const response = await api.get<{ nfts: Nft[] }>('/nfts/recommended')
+
+  if (!Array.isArray(response.data?.nfts)) {
+    throw new Error('Resposta de /nfts/recommended fora do formato esperado')
+  }
+
+  return response.data.nfts
+}
+
 export async function fetchNft(id: string) {
   const response = await api.get<{ nft: NftDetail }>(`/nfts/${encodeURIComponent(id)}`)
 

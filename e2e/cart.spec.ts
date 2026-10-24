@@ -191,14 +191,14 @@ test('cupom válido calcula o desconto na API (aceita minúsculas) e pode ser re
   await page.getByLabel('Cupom de desconto').fill('kurio10')
   await page.getByRole('button', { name: 'Aplicar' }).click()
 
-  await expect(page.getByTestId('summary-discount')).toHaveText('-0.238 ETH')
+  await expect(page.getByTestId('summary-discount')).toHaveText('(-) 0.238')
   await expect(page.getByTestId('summary-subtotal')).toHaveText('2.38 ETH')
   await expect(page.getByTestId('summary-total')).toHaveText('2.1465 ETH')
   await expect(page.getByText('10% de desconto no pedido')).toBeVisible()
 
   await page.getByRole('button', { name: 'Remover cupom KURIO10' }).click()
 
-  await expect(page.getByTestId('summary-discount')).toHaveCount(0)
+  await expect(page.getByTestId('summary-discount')).toHaveText('(-) 00.00')
   await expect(page.getByTestId('summary-total')).toHaveText('2.3845 ETH')
 })
 
@@ -224,7 +224,7 @@ test('cupom inválido, expirado e vazio mostram erro associado ao campo', async 
   await expect(page.getByText('Este cupom expirou.')).toBeVisible()
 
   // Nada foi aplicado: o total segue sem desconto.
-  await expect(page.getByTestId('summary-discount')).toHaveCount(0)
+  await expect(page.getByTestId('summary-discount')).toHaveText('(-) 00.00')
   await expect(page.getByTestId('summary-total')).toHaveText('1.1945 ETH')
 })
 
@@ -281,7 +281,7 @@ test('itens que ficaram indisponíveis são sinalizados e bloqueiam a finalizaç
   // Só o item comprável entra nos valores.
   await expect(page.getByTestId('summary-subtotal')).toHaveText('1.69 ETH')
   await expect(page.getByRole('alert').filter({ hasText: 'Resolva os itens indisponíveis' })).toBeVisible()
-  await expect(page.getByRole('button', { name: 'Finalizar compra' })).toBeDisabled()
+  await expect(page.getByRole('button', { name: 'Conectar e finalizar' })).toBeDisabled()
 
   await row(page, 'Golden Echo #333').getByRole('button', { name: /Remover/ }).click()
   await row(page, EMERALD).getByRole('button', { name: /Remover/ }).click()
@@ -319,4 +319,36 @@ test('falha ao carregar o carrinho mostra erro e permite tentar de novo', async 
   await page.getByRole('button', { name: 'Tentar novamente' }).click()
 
   await expect(page.getByTestId('cart-empty')).toBeVisible()
+})
+
+test('sugestões: 5 cards por página, com pontos para trocar de página', async ({ page }) => {
+  test.skip((page.viewportSize()?.width ?? 0) < 1024, 'páginas de 5 só no desktop')
+  await addToCart(page, 'nft-01')
+  await openCart(page)
+
+  const suggestions = page.getByTestId('recommended')
+  await expect(suggestions.getByRole('heading', { name: 'Colecionadores também viram' })).toBeVisible()
+  await expect(suggestions.getByTestId('nft-card')).toHaveCount(5)
+  await expect(suggestions.getByTestId('nft-card').first()).toContainText('Cosmic Bloom #118')
+
+  await suggestions.getByRole('button', { name: 'Página 2 de 3' }).click()
+  await expect(suggestions.getByTestId('nft-card')).toHaveCount(5)
+  await expect(suggestions.getByTestId('nft-card').first()).not.toContainText('Cosmic Bloom #118')
+  await expect(suggestions.getByRole('button', { name: 'Página 2 de 3' })).toHaveAttribute('aria-current', 'true')
+})
+
+test('carrinho (Figma): tabela de 782 px, resumo de 332 px e botão de 332 × 40 no desktop', async ({ page }) => {
+  test.skip((page.viewportSize()?.width ?? 0) < 1264, 'duas colunas só a partir de 1264 px')
+  await addToCart(page, 'nft-01')
+  await openCart(page)
+
+  await expect(page.getByRole('navigation', { name: 'Trilha de navegação' })).toContainText('Início/Mercado/Carrinho')
+  const rowBox = (await row(page, EMERALD).boundingBox())!
+  const button = (await page.getByRole('link', { name: 'Conectar e finalizar' }).boundingBox())!
+
+  expect(rowBox.width).toBe(782)
+  expect(rowBox.height).toBe(70)
+  expect(button.width).toBe(332)
+  expect(button.height).toBe(40)
+  await expect(row(page, EMERALD)).toContainText('ID do token: #0042')
 })

@@ -10,7 +10,16 @@ const rarityLabel: Record<NftRarity, string> = {
 }
 
 /** `priority` marca os cards já visíveis ao abrir a página: a imagem carrega logo, sem lazy. */
-export function NftCard({ nft, priority = false }: { nft: Nft; priority?: boolean }) {
+export function NftCard({
+  nft,
+  priority = false,
+  compact = false,
+}: {
+  nft: Nft
+  priority?: boolean
+  /** Sugestões do carrinho (Figma): nome de 15 px, preço de 16 px e espaços um pouco diferentes. */
+  compact?: boolean
+}) {
   const soldOut = nft.availability === 'esgotado'
 
   return (
@@ -18,7 +27,7 @@ export function NftCard({ nft, priority = false }: { nft: Nft; priority?: boolea
       to="/nft/$id"
       params={{ id: nft.id }}
       data-testid="nft-card"
-      className="group flex w-full flex-col gap-[7px] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring md:gap-3"
+      className={`group flex w-full flex-col gap-[7px] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring ${compact ? 'md:gap-2.5' : 'md:gap-3'}`}
     >
       <div className="relative flex h-[200px] items-center justify-center overflow-hidden rounded-[20px] bg-[linear-gradient(139.5deg,var(--card)_12%,var(--surface-raised)_106.6%)] md:aspect-[258/300] md:h-auto md:rounded-none md:bg-none md:bg-card">
         <img
@@ -45,12 +54,14 @@ export function NftCard({ nft, priority = false }: { nft: Nft; priority?: boolea
       </div>
 
       <div
-        className={`flex flex-1 flex-col justify-between gap-0 pl-2 md:gap-[7px] md:pl-0 ${nft.previousPriceEth ? 'md:min-h-[45px]' : ''}`}
+        className={`flex flex-1 flex-col justify-between gap-0 pl-2 ${compact ? 'md:gap-[11px]' : 'md:gap-[7px]'} md:pl-0 ${nft.previousPriceEth ? 'md:min-h-[45px]' : ''}`}
       >
-        <h3 className="text-[15px] font-normal md:text-base md:leading-4">
+        <h3 className={`text-[15px] font-normal md:leading-4 ${compact ? '' : 'md:text-base'}`}>
           {nft.name}
         </h3>
-        <p className="flex items-center gap-3 text-base leading-4 font-bold text-text-accent max-md:-mt-0.5 md:-translate-y-px md:text-lg">
+        <p
+          className={`flex items-center gap-3 text-base leading-4 font-bold text-text-accent max-md:-mt-0.5 md:-translate-y-px ${compact ? 'md:text-base' : 'md:text-lg'}`}
+        >
           {nft.priceEth} ETH
           {nft.previousPriceEth && (
             <span className="font-normal text-brand-secondary">

@@ -159,7 +159,7 @@ test('carrinho: valores recalculados pela API e item que esgota é sinalizado', 
   await control(page).updateNft('nft-01', { availableQuantity: 0 })
 
   await expect(page.getByTestId('cart-item')).toContainText('Este NFT esgotou. Remova-o para continuar.')
-  await expect(page.getByRole('button', { name: 'Finalizar compra' })).toBeDisabled()
+  await expect(page.getByRole('button', { name: 'Conectar e finalizar' })).toBeDisabled()
 })
 
 test('pagamento: mudança de preço durante a revisão exige nova confirmação', async ({ page }) => {

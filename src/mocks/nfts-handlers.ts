@@ -22,6 +22,11 @@ import { getScenario } from './scenario'
 const DEFAULT_PAGE_SIZE = 12
 const MAX_PAGE_SIZE = 50
 const NEW_RELEASE_DAYS = 30
+const RECOMMENDED_IDS = [
+  'nft-04', 'nft-05', 'nft-06', 'nft-07', 'nft-09',
+  'nft-10', 'nft-11', 'nft-13', 'nft-14', 'nft-15',
+  'nft-16', 'nft-17', 'nft-18', 'nft-19', 'nft-20',
+]
 const TRENDING_MIN_POPULARITY = 70
 
 function parsePositiveInt(value: string | null, fallback: number) {
@@ -179,6 +184,24 @@ export const nftsHandlers = [
     }
 
     const nfts = pickHighlights(scenario === 'empty' ? [] : currentNfts(), HIGHLIGHTS_COUNT)
+
+    return HttpResponse.json({ nfts })
+  }),
+
+  // Sugestões do carrinho: lista fixa e disponível (a primeira página segue o frame do Figma).
+  http.get('/api/nfts/recommended', () => {
+    const scenario = getScenario()
+
+    if (scenario === 'error') {
+      return HttpResponse.json({ message: 'Serviço indisponível' }, { status: 503 })
+    }
+
+    const nfts =
+      scenario === 'empty'
+        ? []
+        : RECOMMENDED_IDS.map((id) => currentNft(id)).filter(
+            (nft): nft is Nft => Boolean(nft) && nft?.availability !== 'esgotado',
+          )
 
     return HttpResponse.json({ nfts })
   }),

@@ -41,7 +41,7 @@ async function startCheckout(page: Page) {
 test('visitante vai do carrinho ao login e volta ao pagamento', async ({ page }) => {
   await addToCart(page, 'nft-03')
   await page.goto('/carrinho')
-  await page.getByRole('link', { name: 'Finalizar compra' }).click()
+  await page.getByRole('link', { name: 'Conectar e finalizar' }).click()
 
   await expect(page).toHaveURL(/\/login\?redirect=%2Fpagamento/)
   await main(page).getByLabel('E-mail', { exact: true }).fill(ana.email)

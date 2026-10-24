@@ -1,5 +1,5 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
-import { fetchFeaturedNft, fetchHighlights, fetchNft, fetchNfts } from '@/api/nfts'
+import { fetchFeaturedNft, fetchHighlights, fetchNft, fetchNfts, fetchRecommendedNfts } from '@/api/nfts'
 import type { NftListParams } from '@/types/nft'
 
 export function useNfts(params: NftListParams = {}) {
@@ -31,5 +31,12 @@ export function useHighlights() {
   return useQuery({
     queryKey: ['nfts', 'highlights'],
     queryFn: fetchHighlights,
+  })
+}
+
+export function useRecommendedNfts() {
+  return useQuery({
+    queryKey: ['nfts', 'recommended'],
+    queryFn: fetchRecommendedNfts,
   })
 }

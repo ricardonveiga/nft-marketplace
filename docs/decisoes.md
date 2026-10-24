@@ -125,25 +125,25 @@ terceira linha sem nome/preço do desktop, o coração só no primeiro card do m
 implementados), os 4 números de página e as contagens dos filtros (dados do Figma; o mock tem 27
 NFTs, 3 páginas), e a arte do hero (o Figma usa o Emerald Ape; aqui vale o critério do mais caro).
 
-## Carrinho
+## Carrinho (`/carrinho`): conferido com o frame `Carrinho de NFTs.png`
 
-- **A API calcula tudo**: subtotal, desconto, taxa de rede e total chegam prontos (strings
-  decimais, BigInt no mock); a interface só exibe. Nada é recalculado no cliente.
-- **Taxa de rede**: fixa, 0.0045 ETH por pedido com ao menos um item comprável.
-- **Estoque por edição**: `availableQuantity` = unidades restantes da edição (esgotado = 0).
-  Limite por pedido: 5 unidades; `maxQuantity` do item = menor entre o limite e o estoque.
-- **Itens indisponíveis** (esgotaram ou o estoque ficou abaixo da quantidade) continuam na
-  lista, sinalizados, **ficam fora dos valores** e bloqueiam a finalização até serem resolvidos.
-- **Cupons do mock**: `KURIO10` (10%), `GENESIS15` (15%), `EXPIRADO20` (expirado); códigos
-  inexistentes são inválidos. Desconto = subtotal × % (divisão inteira em wei).
-- **Carrinho do visitante** é identificado por `X-Guest-Cart` (UUID em
-  `localStorage['kurio.guest-cart']`). Ao entrar ou cadastrar, `POST /api/cart/merge` passa os
-  itens para a conta, somando quantidades (respeitando o limite). O carrinho de cada conta persiste.
-- **Troca de usuário/logout** zera o cache privado com `resetQueries` e a consulta do carrinho
-  é refeita com a nova identidade.
-- **Ordem das respostas**: cada cotação tem `version`; uma resposta mais antiga nunca
-  sobrescreve a mais nova (base para os eventos de tempo real).
-- **Botão "Finalizar compra"** fica desabilitado até a etapa de pagamento existir.
+- **Layout** (medido no pixel, 1440): tabela de 782 px (NFTs, Preço, Edições, Total e a lixeira, com
+  linhas de 70 px e vão de 12) ao lado do "Resumo da carteira" de 332 px (vão de 86), breadcrumb
+  "Início / Mercado / Carrinho" e, abaixo, "Colecionadores também viram".
+- **Resumo**: código promocional com "Aplicar" colado ao campo, Subtotal, "Desconto do lançamento"
+  (sempre visível: `(-) 00.00` sem cupom), Taxa de rede, "Taxa estimada" e Total, calculados pela API.
+  O botão passou a "Conectar e finalizar" (texto do Figma) e leva ao pagamento; visitante passa pelo
+  login e volta. "Continuar explorando" volta ao catálogo.
+- **"Colecionadores também viram"**: 15 sugestões da API simulada (`GET /api/nfts/recommended`, lista
+  fixa de NFTs disponíveis; a primeira página repete a do frame), 5 cards por página no desktop e
+  pontos para trocar de página. Abaixo de 1024 px vira uma faixa rolável.
+- **Quantidade**: botões redondos laranja de 19 × 24 px, limite por pedido de 5 (o frame mostra 6 e 9,
+  que a regra do desafio não permite; o aviso "Máximo de 5 unidades por pedido." aparece sob o item).
+- **ID do token**: derivado do número do nome do NFT (o frame mostra valores que não casam com os nomes).
+- **Não replicado**: as imagens dos cards de sugestão variam de tamanho no frame; aqui todas usam o
+  mesmo card do catálogo. O "12 itens" e o título "Carrinho de NFTs" visível saíram (o título ficou só
+  para leitores de tela); o contador continua no ícone do carrinho.
+- **Mobile**: ainda não há frame; abaixo de 1024 px a tabela vira cartões empilhados.
 
 ## Detalhe do NFT
 

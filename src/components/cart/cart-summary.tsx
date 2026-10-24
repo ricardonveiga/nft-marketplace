@@ -40,10 +40,10 @@ function CouponBox({ cart, busy, onFeedback }: CartSummaryProps) {
 
   if (cart.coupon) {
     return (
-      <div className="flex items-center justify-between gap-3 rounded-md bg-surface-dark px-4 py-3">
-        <p className="min-w-0 text-sm">
+      <div className="flex h-10 items-center justify-between gap-3 border border-primary px-3">
+        <p className="min-w-0 truncate text-xs">
           <span className="font-bold text-text-accent">{cart.coupon.code}</span>
-          <span className="block text-text-secondary">{cart.coupon.description}</span>
+          <span className="ml-2 text-text-secondary">{cart.coupon.description}</span>
         </p>
         <button
           type="button"
@@ -59,7 +59,7 @@ function CouponBox({ cart, busy, onFeedback }: CartSummaryProps) {
             })
           }
           aria-label={`Remover cupom ${cart.coupon.code}`}
-          className="shrink-0 text-sm underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-ring disabled:opacity-50"
+          className="shrink-0 text-xs underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-ring disabled:opacity-50"
         >
           Remover
         </button>
@@ -69,28 +69,26 @@ function CouponBox({ cart, busy, onFeedback }: CartSummaryProps) {
 
   return (
     <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-1">
-      <div className="flex h-10 rounded-md bg-surface-dark">
-        <label htmlFor={inputId} className="sr-only">
-          Cupom de desconto
-        </label>
+      <div className="flex h-10 rounded-[2px] border border-primary">
         <input
           id={inputId}
           name="coupon"
+          aria-label="Cupom de desconto"
           value={code}
           onChange={(event) => {
             setCode(event.target.value)
             setError('')
           }}
-          placeholder="Código do cupom"
+          placeholder="Digite o código promocional..."
           autoComplete="off"
           aria-invalid={error ? true : undefined}
           aria-describedby={error ? errorId : undefined}
-          className="min-w-0 flex-1 rounded-l-md bg-transparent px-4 text-sm uppercase outline-none placeholder:text-brand-secondary placeholder:normal-case focus-visible:ring-2 focus-visible:ring-ring aria-[invalid=true]:ring-2 aria-[invalid=true]:ring-destructive"
+          className="min-w-0 flex-1 bg-transparent px-[6px] text-xs uppercase outline-none placeholder:text-brand-secondary placeholder:normal-case focus-visible:bg-surface-featured aria-[invalid=true]:text-destructive"
         />
         <button
           type="submit"
           disabled={busy || cart.items.length === 0}
-          className="rounded-r-md bg-primary px-4 text-sm font-bold text-primary-foreground focus-visible:outline-2 focus-visible:outline-ring disabled:opacity-50"
+          className="-my-px -mr-px w-[102px] shrink-0 bg-primary text-[15px] font-bold text-primary-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:opacity-50"
         >
           {apply.isPending ? 'Aplicando…' : 'Aplicar'}
         </button>
@@ -104,17 +102,28 @@ function CouponBox({ cart, busy, onFeedback }: CartSummaryProps) {
   )
 }
 
-function Row({ label, value, testId, strong }: { label: string; value: string; testId: string; strong?: boolean }) {
+function Row({
+  label,
+  value,
+  testId,
+  small,
+}: {
+  label: string
+  value: string
+  testId: string
+  small?: boolean
+}) {
   return (
-    <div className={`flex items-baseline justify-between gap-4 ${strong ? 'text-lg font-bold' : 'text-sm'}`}>
-      <dt className={strong ? undefined : 'text-text-secondary'}>{label}</dt>
-      <dd data-testid={testId} className={strong ? 'text-text-accent' : undefined}>
+    <div className="flex items-baseline justify-between gap-4 text-[15px] leading-5">
+      <dt>{label}</dt>
+      <dd data-testid={testId} className={small ? 'text-[15px]' : 'text-lg leading-5'}>
         {value}
       </dd>
     </div>
   )
 }
 
+/** "Resumo da carteira" (Figma): cupom, valores calculados pela API e a saída para o pagamento. */
 export function CartSummary(props: CartSummaryProps) {
   const { cart } = props
   const headingId = useId()
@@ -122,57 +131,59 @@ export function CartSummary(props: CartSummaryProps) {
   const hasPayable = cart.items.some((item) => item.status === 'ok')
 
   return (
-    <section
-      aria-labelledby={headingId}
-      className="flex flex-col gap-5 rounded-lg bg-card p-6 lg:sticky lg:top-24"
-    >
-      <h2 id={headingId} className="text-lg leading-4">
-        Resumo do pedido
+    <section aria-labelledby={headingId} className="flex flex-col">
+      <h2 id={headingId} className="border-b border-header-line pt-px pb-[9px] text-lg leading-5 font-bold">
+        Resumo da carteira
       </h2>
 
-      <CouponBox {...props} />
+      <p className="mt-[22px] text-sm leading-5 font-bold">Código promocional</p>
+      <div className="mt-[6px]">
+        <CouponBox {...props} />
+      </div>
 
-      <dl className="flex flex-col gap-3">
+      <dl className="mt-[22px] flex flex-col gap-[13px]">
         <Row label="Subtotal" value={`${cart.subtotalEth} ETH`} testId="summary-subtotal" />
-        {cart.coupon && (
-          <Row
-            label={`Desconto (${cart.coupon.discountPercent}%)`}
-            value={`-${cart.discountEth} ETH`}
-            testId="summary-discount"
-          />
-        )}
+        <Row
+          label="Desconto do lançamento"
+          value={`(-) ${cart.coupon ? cart.discountEth : '00.00'}`}
+          testId="summary-discount"
+          small
+        />
         <Row label="Taxa de rede" value={`${cart.networkFeeEth} ETH`} testId="summary-fee" />
-        <div className="border-t border-border pt-3">
-          <Row label="Total" value={`${cart.totalEth} ETH`} testId="summary-total" strong />
+        <p className="text-right text-[11px] leading-[14px] text-text-accent">Taxa estimada</p>
+        <div className="mt-[4px] flex items-baseline justify-between text-[15px] leading-5 font-bold">
+          <dt>Total</dt>
+          <dd data-testid="summary-total" className="text-lg text-text-accent">
+            {cart.totalEth} ETH
+          </dd>
         </div>
       </dl>
 
       {blocked && (
-        <p role="alert" className="text-sm text-destructive">
+        <p role="alert" className="mt-4 text-sm text-destructive">
           Resolva os itens indisponíveis para continuar.
         </p>
       )}
 
       {blocked || !hasPayable ? (
-        <>
-          <Button
-            type="button"
-            disabled
-            className="h-[45px] w-full rounded-md text-base font-bold"
-          >
-            Finalizar compra
-          </Button>
-          {!hasPayable && (
-            <p className="-mt-2 text-xs text-text-secondary">
-              Adicione itens disponíveis para finalizar.
-            </p>
-          )}
-        </>
+        <Button type="button" disabled className="mt-[18px] h-10 w-full rounded-[3px] text-[15px] font-bold">
+          Conectar e finalizar
+        </Button>
       ) : (
-        <Button asChild className="h-[45px] w-full rounded-md text-base font-bold">
-          <Link to="/pagamento">Finalizar compra</Link>
+        <Button asChild className="mt-[18px] h-10 w-full rounded-[3px] text-[15px] font-bold">
+          <Link to="/pagamento">Conectar e finalizar</Link>
         </Button>
       )}
+      {!hasPayable && (
+        <p className="mt-2 text-xs text-text-secondary">Adicione itens disponíveis para finalizar.</p>
+      )}
+
+      <Link
+        to="/"
+        className="mt-[12px] self-center text-[15px] leading-5 text-text-accent focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
+      >
+        Continuar explorando
+      </Link>
     </section>
   )
 }

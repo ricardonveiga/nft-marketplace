@@ -31,7 +31,7 @@ test('compra completa: do catálogo ao recibo confirmado, com cupom', async ({ p
   await expect(page.getByRole('button', { name: 'Remover cupom KURIO10' })).toBeVisible()
 
   // 4. Pagamento: visitante vai ao login e volta ao pagamento com o carrinho (e o cupom) da conta.
-  await page.getByRole('link', { name: 'Finalizar compra' }).click()
+  await page.getByRole('link', { name: 'Conectar e finalizar' }).click()
   await expect(page).toHaveURL(/\/login\?redirect=%2Fpagamento/)
   await main(page).getByLabel('E-mail', { exact: true }).fill(ana.email)
   await main(page).getByLabel('Senha', { exact: true }).fill(ana.password!)
