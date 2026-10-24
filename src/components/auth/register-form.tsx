@@ -100,7 +100,7 @@ export function RegisterForm({ redirect }: RegisterFormProps) {
       <form
         onSubmit={handleSubmit}
         noValidate
-        className="mx-auto flex w-full max-w-[340px] flex-col gap-3 px-6 pt-6 sm:px-0"
+        className="mx-auto flex w-full max-w-[340px] flex-col gap-3 px-6 pt-6 sm:px-0 max-md:max-w-none max-md:px-7 max-md:pt-[37px]"
       >
         <AuthField
           tone="outline"
@@ -160,9 +160,16 @@ export function RegisterForm({ redirect }: RegisterFormProps) {
           type="submit"
           disabled={register.isPending}
           aria-busy={register.isPending}
-          className="mt-3 h-[45px] w-full rounded-[7px] text-base font-bold"
+          className="mt-3 h-[45px] w-full rounded-[7px] text-base font-bold max-md:mt-[28px] max-md:h-[60px] max-md:rounded-xl"
         >
-          {register.isPending ? 'Criando conta…' : 'Criar conta'}
+          {register.isPending ? (
+            'Criando conta…'
+          ) : (
+            <>
+              <span className="max-md:hidden">Criar conta</span>
+              <span className="md:hidden">Criar perfil</span>
+            </>
+          )}
         </Button>
       </form>
 

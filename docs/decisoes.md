@@ -458,3 +458,14 @@ a conferência vem de prints enviados pelo usuário.
   Detalhe do NFT, Recibo/confirmação, Login mobile, Cadastro, e as telas Carteiras e Perfil além
   do menu lateral.
 - **Fora do Figma:** Performance mobile do Lighthouse abaixo da meta (ver `ARCHITECTURE.md`).
+
+## Mobile (frames de 414 × 896)
+
+Mesma lógica do desktop; só o que o frame mobile mostra diferente.
+
+- **Cadastro e Login (mobile)**: viram tela cheia (sem o modal, sem a Início atrás, sem abas nem X):
+  "KURIO", título ("Criar perfil de colecionador" / "Entrar"), campos de 50 px com cantos de 12 px,
+  botão de 60 px ("Criar perfil" no mobile, "Criar conta" no desktop), "Ou continue com", botões
+  sociais inertes e o link de baixo ("Já tem uma conta? Entre" / "Novo na Kurio? Crie uma conta").
+  Medido no pixel contra os frames. O frame do cadastro centraliza o placeholder do primeiro campo;
+  não replicado (o texto digitado também ficaria centralizado, um defeito de uso).

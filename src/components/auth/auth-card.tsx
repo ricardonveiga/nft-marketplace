@@ -37,18 +37,27 @@ export function AuthCard({ mode, redirect, expired, subtitle, minHeight = 600, c
   return (
     <div
       style={{ minHeight }}
-      className={`relative w-full border-b-[10px] border-primary bg-card max-md:!min-h-0 ${mode === 'register' ? 'overflow-hidden rounded-[10px]' : ''}`}
+      className={`relative w-full border-b-[10px] border-primary bg-card max-md:!min-h-dvh max-md:border-b-0 max-md:bg-transparent ${mode === 'register' ? 'overflow-hidden rounded-[10px] max-md:rounded-none' : ''}`}
     >
       <button
         type="button"
         aria-label="Fechar e voltar"
         onClick={() => router.history.replace(redirect)}
-        className="absolute top-2 right-[9px] grid size-6 place-items-center text-primary focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-ring"
+        className="absolute top-2 right-[9px] grid size-6 max-md:hidden place-items-center text-primary focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-ring"
       >
         <X className="size-6" strokeWidth={1.5} aria-hidden="true" />
       </button>
 
-      <div className="flex flex-col items-center gap-10 px-6 pt-12">
+      <div className="hidden flex-col items-center px-6 max-md:flex max-md:pt-[128px]">
+        <p aria-hidden="true" className="text-[32px] leading-10 font-bold tracking-[0.09em]">
+          KURIO
+        </p>
+        <h1 className="mt-[88px] text-lg leading-5 font-bold">
+          {mode === 'login' ? 'Entrar' : 'Criar perfil de colecionador'}
+        </h1>
+      </div>
+
+      <div className="flex flex-col items-center gap-10 px-6 pt-12 max-md:hidden">
         <div className="flex items-center gap-2">
           {mode === 'login' ? (
             <h1 className={activeClass}>Entrar</h1>
@@ -79,6 +88,24 @@ export function AuthCard({ mode, redirect, expired, subtitle, minHeight = 600, c
       )}
 
       {children}
+
+      <p className="hidden pb-[28px] text-center text-[15px] leading-5 text-text-secondary max-md:block">
+        {mode === 'login' ? (
+          <>
+            Novo na Kurio?{' '}
+            <Link to="/cadastro" search={search} className="focus-visible:outline-2 focus-visible:outline-ring">
+              Crie uma conta
+            </Link>
+          </>
+        ) : (
+          <>
+            Já tem uma conta?{' '}
+            <Link to="/login" search={search} className="focus-visible:outline-2 focus-visible:outline-ring">
+              Entre
+            </Link>
+          </>
+        )}
+      </p>
     </div>
   )
 }

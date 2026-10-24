@@ -270,7 +270,7 @@ test.describe('erro geral (500)', () => {
     await main(page).getByLabel('E-mail', { exact: true }).fill('maria.teste@kurio.test')
     await main(page).getByLabel('Senha', { exact: true }).fill('Senha-segura-1')
     await main(page).getByLabel('Confirmar senha', { exact: true }).fill('Senha-segura-1')
-    await main(page).getByRole('button', { name: 'Criar conta', exact: true }).click()
+    await main(page).getByRole('button', { name: /^Criar (conta|perfil)$/ }).click()
     await expect(main(page).getByText('Não foi possível criar a conta agora. Tente novamente.')).toBeVisible()
     await expect(page).toHaveURL(/\/cadastro/)
   })

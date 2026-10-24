@@ -20,7 +20,7 @@ async function fillRegister(
 }
 
 async function submit(page: Page) {
-  await page.getByRole('button', { name: 'Criar conta', exact: true }).click()
+  await page.getByRole('button', { name: /^Criar (conta|perfil)$/ }).click()
 }
 
 function accountMenu(page: Page, name: string) {
@@ -137,7 +137,7 @@ test('retorno ao fluxo anterior: cadastra e volta para o NFT de origem', async (
   await expect(page).toHaveURL(/\/login\?redirect=%2Fnft%2Fnft-03/)
 
   // O destino é preservado ao alternar entre as abas do modal.
-  await page.getByRole('main').getByRole('link', { name: 'Criar conta' }).click()
+  await page.getByRole('main').getByRole('link', { name: /^(Criar conta|Crie uma conta)$/ }).click()
   await expect(page).toHaveURL(/\/cadastro\?redirect=%2Fnft%2Fnft-03/)
 
   await fillRegister(page, newUser)
@@ -149,11 +149,11 @@ test('retorno ao fluxo anterior: cadastra e volta para o NFT de origem', async (
 
 test('abas do modal: Criar conta ↔ Entrar', async ({ page }) => {
   await page.goto('/login')
-  await page.getByRole('main').getByRole('link', { name: 'Criar conta' }).click()
+  await page.getByRole('main').getByRole('link', { name: /^(Criar conta|Crie uma conta)$/ }).click()
   await expect(page).toHaveURL(/\/cadastro/)
-  await expect(page.getByRole('heading', { name: 'Criar conta' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: /^Criar (conta|perfil)/ })).toBeVisible()
 
-  await page.getByRole('main').getByRole('link', { name: 'Entrar' }).click()
+  await page.getByRole('main').getByRole('link', { name: /^(Entrar|Entre)$/ }).click()
   await expect(page).toHaveURL(/\/login/)
   await expect(page.getByRole('heading', { name: 'Entrar' })).toBeVisible()
 })
@@ -194,11 +194,14 @@ test('só a senha tem o olho de mostrar e ocultar; a confirmação não (como no
 test('cadastro (Figma): textos, campos e login social inerte', async ({ page }) => {
   await page.goto('/cadastro')
 
-  await expect(page.getByRole('heading', { level: 1, name: 'Criar conta' })).toBeVisible()
-  await expect(page.getByRole('main').getByRole('link', { name: 'Entrar', exact: true })).toBeVisible()
-  await expect(
-    page.getByText('Crie seu perfil de colecionador e conecte uma carteira quando quiser.'),
-  ).toBeVisible()
+  await expect(page.getByRole('heading', { level: 1, name: /^Criar (conta|perfil)/ })).toBeVisible()
+  await expect(page.getByRole('main').getByRole('link', { name: /^(Entrar|Entre)$/ })).toBeVisible()
+
+  if ((page.viewportSize()?.width ?? 0) >= 768) {
+    await expect(
+      page.getByText('Crie seu perfil de colecionador e conecte uma carteira quando quiser.'),
+    ).toBeVisible()
+  }
 
   for (const [label, placeholder] of [
     ['Nome de usuário', 'Nome de usuário'],
@@ -227,4 +230,22 @@ test('cadastro (Figma): textos, campos e login social inerte', async ({ page }) 
     expect(box.height).toBe(656)
     expect(box.y).toBe(158)
   }
+})
+
+test('cadastro e login (Figma mobile): campos de 50 px, botão de 60 px e sem o modal', async ({ page }) => {
+  test.skip((page.viewportSize()?.width ?? 0) >= 768, 'só no mobile')
+
+  for (const path of ['/cadastro', '/login']) {
+    await page.goto(path)
+    const field = (await page.getByRole('main').getByLabel('E-mail', { exact: true }).boundingBox())!
+    const submit = (await page.getByRole('main').getByRole('button', { name: /^(Entrar|Criar perfil)$/ }).boundingBox())!
+
+    expect(field.width).toBe(358)
+    expect(field.height).toBe(50)
+    expect(submit.height).toBe(60)
+  }
+
+  await expect(page.getByRole('main').getByRole('link', { name: 'Entre', exact: true })).toHaveCount(0)
+  await page.goto('/cadastro')
+  await expect(page.getByRole('button', { name: 'Criar perfil' })).toBeVisible()
 })

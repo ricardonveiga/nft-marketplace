@@ -124,6 +124,7 @@ test('redirect externo ou malicioso é ignorado', async ({ page }) => {
 })
 
 test('fechar o login volta para a página de origem', async ({ page }) => {
+  test.skip((page.viewportSize()?.width ?? 0) < 768, 'no mobile (Figma) a tela de login não tem o X')
   await page.goto('/login?redirect=/nft/nft-02')
   await page.getByRole('button', { name: 'Fechar e voltar' }).click()
 
@@ -233,7 +234,9 @@ test('modal de login (Figma): 500 × 600 a 160 px do topo, com a Início inerte 
     await expect(page).toHaveURL(/\/login/)
   }
 
-  // O X (orange) fecha o modal e volta ao destino.
-  await page.getByRole('button', { name: 'Fechar e voltar' }).click()
-  await expect(page).toHaveURL('/')
+  // O X (orange) fecha o modal e volta ao destino (só no desktop: o frame mobile não tem o X).
+  if ((page.viewportSize()?.width ?? 0) >= 768) {
+    await page.getByRole('button', { name: 'Fechar e voltar' }).click()
+    await expect(page).toHaveURL('/')
+  }
 })

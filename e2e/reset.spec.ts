@@ -34,7 +34,7 @@ test('resetAll restaura catálogo, contas, carrinho, favoritos, perfil, cenário
   await main(page).getByLabel('E-mail', { exact: true }).fill(carla.email)
   await main(page).getByLabel('Senha', { exact: true }).fill(carla.password)
   await main(page).getByLabel('Confirmar senha', { exact: true }).fill(carla.password)
-  await main(page).getByRole('button', { name: 'Criar conta', exact: true }).click()
+  await main(page).getByRole('button', { name: /^Criar (conta|perfil)$/ }).click()
   await expect(page.getByRole('button', { name: `Conta de ${carla.name}` })).toBeVisible()
   await signOut(page, carla.name)
 

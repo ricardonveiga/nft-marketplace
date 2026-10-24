@@ -34,7 +34,7 @@ test('cadastro guarda só o hash da senha e o login continua funcionando', async
   await field(page, 'E-mail').fill(carla.email)
   await field(page, 'Senha').fill(carla.password)
   await field(page, 'Confirmar senha').fill(carla.password)
-  await page.getByRole('button', { name: 'Criar conta', exact: true }).click()
+  await page.getByRole('button', { name: /^Criar (conta|perfil)$/ }).click()
   await expect(page.getByRole('button', { name: `Conta de ${carla.name}` })).toBeVisible()
 
   const secrets = await storedSecrets(page)
@@ -63,7 +63,7 @@ test('trocar a senha no perfil guarda só o hash e a nova senha passa a valer', 
   await field(page, 'Senha atual').fill(ana.password!)
   await field(page, 'Nova senha').fill(novaSenha)
   await field(page, 'Confirmar nova senha').fill(novaSenha)
-  await page.getByRole('button', { name: 'Alterar senha', exact: true }).click()
+  await page.getByRole('button', { name: 'Salvar', exact: true }).click()
   await expect(page.getByRole('status').filter({ hasText: /senha/i }).first()).toBeVisible()
 
   const secrets = await storedSecrets(page)

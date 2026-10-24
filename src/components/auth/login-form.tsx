@@ -86,7 +86,7 @@ export function LoginForm({ redirect, expired }: LoginFormProps) {
       <form
         onSubmit={handleSubmit}
         noValidate
-        className="mx-auto flex w-full max-w-[340px] flex-col gap-3 px-6 pt-6 sm:px-0"
+        className="mx-auto flex w-full max-w-[340px] flex-col gap-3 px-6 pt-6 sm:px-0 max-md:max-w-none max-md:px-7 max-md:pt-[37px]"
       >
         <AuthField
           tone="outline"
@@ -130,7 +130,7 @@ export function LoginForm({ redirect, expired }: LoginFormProps) {
           type="submit"
           disabled={login.isPending}
           aria-busy={login.isPending}
-          className="mt-3 h-[45px] w-full rounded-[7px] text-base font-bold"
+          className="mt-3 h-[45px] w-full rounded-[7px] text-base font-bold max-md:mt-[28px] max-md:h-[60px] max-md:rounded-xl"
         >
           {login.isPending ? 'Entrando…' : 'Entrar'}
         </Button>

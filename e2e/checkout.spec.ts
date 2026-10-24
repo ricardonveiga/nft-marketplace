@@ -130,7 +130,7 @@ test('usuário sem carteiras cadastradas é avisado', async ({ page }) => {
   await main(page).getByLabel('E-mail', { exact: true }).fill('carla@exemplo.com')
   await main(page).getByLabel('Senha', { exact: true }).fill('senha1234')
   await main(page).getByLabel('Confirmar senha', { exact: true }).fill('senha1234')
-  await main(page).getByRole('button', { name: 'Criar conta', exact: true }).click()
+  await main(page).getByRole('button', { name: /^Criar (conta|perfil)$/ }).click()
   await expect(page).toHaveURL('/')
 
   await addToCart(page, 'nft-03')

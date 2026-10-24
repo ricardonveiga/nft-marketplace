@@ -74,7 +74,7 @@ test('cadastro: sem rolagem horizontal em 390, 768 e 1440 px (também com os err
     await expect(main(page).getByLabel('Nome de usuário', { exact: true })).toBeVisible()
     await expectNoHorizontalScroll(page, width)
 
-    await main(page).getByRole('button', { name: 'Criar conta', exact: true }).click()
+    await main(page).getByRole('button', { name: /^Criar (conta|perfil)$/ }).click()
     await expect(main(page).getByText('Informe seu nome.')).toBeVisible()
     await expectNoHorizontalScroll(page, width)
   }

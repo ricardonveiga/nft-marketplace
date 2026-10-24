@@ -6,7 +6,7 @@ const inputClass =
 
 // Modal de login e cadastro (Figma): campo vazado, com contorno de 1 px que fica laranja no foco.
 const outlineInputClass =
-  'h-10 w-full rounded-[2px] border border-border bg-transparent px-4 text-sm text-foreground outline-none placeholder:text-brand-secondary focus-visible:border-primary aria-[invalid=true]:border-destructive'
+  'h-10 w-full rounded-[2px] border border-border bg-transparent px-4 text-sm max-md:h-[50px] max-md:rounded-xl text-foreground outline-none placeholder:text-brand-secondary focus-visible:border-primary aria-[invalid=true]:border-destructive'
 
 export type AuthFieldProps = {
   label: string

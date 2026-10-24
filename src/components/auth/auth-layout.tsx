@@ -9,12 +9,12 @@ import { HomeContent } from '@/components/home/home-content'
 export function AuthLayout({ children, top = 160 }: { children: ReactNode; top?: number }) {
   return (
     <>
-      <div aria-hidden="true" inert>
+      <div aria-hidden="true" inert className="max-md:hidden">
         <HomeContent />
       </div>
       <div
         style={{ '--auth-top': `${top}px` } as CSSProperties}
-        className="fixed top-6 left-1/2 z-[60] max-h-[calc(100dvh-3rem)] w-[calc(100%-2rem)] max-w-[500px] -translate-x-1/2 overflow-y-auto md:top-[var(--auth-top)]"
+        className="fixed top-6 left-1/2 z-[60] max-h-[calc(100dvh-3rem)] w-[calc(100%-2rem)] max-w-[500px] -translate-x-1/2 overflow-y-auto max-md:inset-0 max-md:max-h-none max-md:w-full max-md:max-w-none max-md:translate-x-0 max-md:bg-background md:top-[var(--auth-top)]"
       >
         {children}
       </div>
